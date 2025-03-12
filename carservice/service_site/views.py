@@ -1,14 +1,18 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from . import models
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+@login_required()
 def index(request):
     return render(request, 'base.html', {
         'title': 'Home',
     })
 
-
+@login_required
+@permission_required('service_site.view_customer', raise_exception=True)
 def customer_list(request):
     search_query = request.GET.get("search", "")
     page_number = request.GET.get("page", 1)
