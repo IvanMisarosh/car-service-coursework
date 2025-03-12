@@ -9,6 +9,7 @@ from django.db import models
 
 
 class DriveType(models.Model):
+    drive_type_id = models.AutoField(primary_key=True, db_column='DriveTypeID')
     drive_type_name = models.CharField(max_length=50, unique=True, db_column='DriveTypeName')
 
     class Meta:
@@ -19,6 +20,7 @@ class DriveType(models.Model):
         return self.drive_type_name
 
 class CarBrand(models.Model):
+    car_brand_id = models.AutoField(primary_key=True, db_column='CarBrandID')
     brand_name = models.CharField(max_length=100, unique=True, db_column='BrandName')
     
     class Meta:
@@ -29,6 +31,7 @@ class CarBrand(models.Model):
         return self.brand_name
 
 class SuspensionType(models.Model):
+    suspension_type_id = models.AutoField(primary_key=True, db_column='SuspensionTypeID')
     suspension_type_name = models.CharField(max_length=50, unique=True, db_column='SuspensionTypeName')
     
     class Meta:
@@ -39,6 +42,7 @@ class SuspensionType(models.Model):
         return self.suspension_type_name
 
 class TransmissionType(models.Model):
+    transmission_type_id = models.AutoField(primary_key=True, db_column='TransmissionTypeID')
     transmission_type_name = models.CharField(max_length=50, unique=True, db_column='TransmissionTypeName')
     
     class Meta:
@@ -49,6 +53,7 @@ class TransmissionType(models.Model):
         return self.transmission_type_name
 
 class EngineType(models.Model):
+    engine_type_id = models.AutoField(primary_key=True, db_column='EngineTypeID')
     engine_type_name = models.CharField(max_length=50, unique=True, db_column='EngineTypeName')
     
     class Meta:
@@ -59,6 +64,7 @@ class EngineType(models.Model):
         return self.engine_type_name
 
 class BodyType(models.Model):
+    body_type_id = models.AutoField(primary_key=True, db_column='BodyTypeID')
     body_type_name = models.CharField(max_length=50, unique=True, db_column='BodyTypeName')
     
     class Meta:
@@ -69,6 +75,7 @@ class BodyType(models.Model):
         return self.body_type_name
 
 class CarModel(models.Model):
+    car_model_id = models.AutoField(primary_key=True, db_column='CarModelID')
     model_name = models.CharField(max_length=100, unique=True, db_column='ModelName')
     dimensions = models.CharField(max_length=35, null=True, blank=True, db_column='Dimensions')
     drive_type = models.ForeignKey(DriveType, null=True, blank=True, on_delete=models.CASCADE, db_column='DriveTypeID')
@@ -86,6 +93,7 @@ class CarModel(models.Model):
         return self.model_name
 
 class Customer(models.Model):
+    customer_id = models.AutoField(primary_key=True, db_column='CustomerID')
     email = models.CharField(max_length=100, null=True, blank=True, db_column='Email')
     first_name = models.CharField(max_length=50, db_column='FirstName')
     last_name = models.CharField(max_length=50, db_column='LastName')
@@ -99,6 +107,7 @@ class Customer(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 class Color(models.Model):
+    color_id = models.AutoField(primary_key=True, db_column='ColorID')
     color_name = models.CharField(max_length=70, unique=True, db_column='ColorName')
     
     class Meta:
@@ -109,6 +118,7 @@ class Color(models.Model):
         return self.color_name
 
 class Car(models.Model):
+    car_id = models.AutoField(primary_key=True, db_column='CarID')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, db_column='CustomerID')
     car_model = models.ForeignKey(CarModel, on_delete=models.CASCADE, db_column='CarModelID')
     color = models.ForeignKey(Color, on_delete=models.CASCADE, db_column='ColorID')
@@ -125,6 +135,7 @@ class Car(models.Model):
         return f"{self.car_model} ({self.vin})"
 
 class PartType(models.Model):
+    part_type_id = models.AutoField(primary_key=True, db_column='PartTypeID')
     part_type_name = models.CharField(max_length=100, unique=True, db_column='PartTypeName')
     
     class Meta:
@@ -135,6 +146,7 @@ class PartType(models.Model):
         return self.parttype_name
 
 class PartBrand(models.Model):
+    part_brand_id = models.AutoField(primary_key=True, db_column='PartBrandID')
     brand_name = models.CharField(max_length=100, unique=True, db_column='BrandName')
     
     class Meta:
@@ -145,6 +157,7 @@ class PartBrand(models.Model):
         return self.brand_name
 
 class Part(models.Model):
+    part_id = models.AutoField(primary_key=True, db_column='PartID')
     part_brand = models.ForeignKey(PartBrand, null=True, blank=True, on_delete=models.SET_NULL, db_column='PartBrandID')
     part_type = models.ForeignKey(PartType, null=True, blank=True, on_delete=models.SET_NULL, db_column='PartTypeID')
     part_name = models.CharField(max_length=100, db_column='PartName')
@@ -162,6 +175,7 @@ class Part(models.Model):
         return self.part_name
 
 class Station(models.Model):
+    station_id = models.AutoField(primary_key=True, db_column='StationID')
     address = models.CharField(max_length=100, db_column='Address')
     phone_number = models.CharField(max_length=25, db_column='PhoneNumber')
     
@@ -174,6 +188,7 @@ class Station(models.Model):
         return self.address
 
 class PartInStation(models.Model):
+    part_in_station_id = models.AutoField(primary_key=True, db_column='PartInStationID')
     station = models.ForeignKey(Station, on_delete=models.CASCADE, db_column='StationID')
     part = models.ForeignKey(Part, on_delete=models.CASCADE, db_column='PartID')
     quantity = models.IntegerField(db_column='Quantity')
@@ -187,6 +202,7 @@ class PartInStation(models.Model):
         return f"{self.part} at {self.station}"
 
 class EmployeePosition(models.Model):
+    employee_position_id = models.AutoField(primary_key=True, db_column='EmployeePositionID')
     position_name = models.CharField(max_length=100, unique=True, db_column='PositionName')
     
     class Meta:
@@ -197,6 +213,7 @@ class EmployeePosition(models.Model):
         return self.position_name
 
 class Employee(models.Model):
+    employee_id = models.AutoField(primary_key=True, db_column='EmployeeID')
     employee_position = models.ForeignKey(EmployeePosition, null=True, blank=True, on_delete=models.SET_NULL, db_column='EmployeePositionID')
     station = models.ForeignKey(Station, on_delete=models.CASCADE, db_column='StationID')
     first_name = models.CharField(max_length=50, db_column='FirstName')
@@ -213,6 +230,7 @@ class Employee(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 class ServiceType(models.Model):
+    service_type_id = models.AutoField(primary_key=True, db_column='ServiceTypeID')
     service_type_name = models.CharField(max_length=100, unique=True, db_column='ServiceTypeName')
     
     class Meta:
@@ -223,6 +241,7 @@ class ServiceType(models.Model):
         return self.service_type_name
 
 class Service(models.Model):
+    service_id = models.AutoField(primary_key=True, db_column='ServiceID')
     service_type = models.ForeignKey(ServiceType, null=True, blank=True, on_delete=models.SET_NULL, db_column='ServiceTypeID')
     service_name = models.CharField(max_length=100, unique=True, db_column='ServiceName')
     description = models.CharField(max_length=255, null=True, blank=True, db_column='Description')
@@ -236,6 +255,7 @@ class Service(models.Model):
         return self.service_name
 
 class VisitStatus(models.Model):
+    visit_status_id = models.AutoField(primary_key=True, db_column='VisitStatusID')
     status_name = models.CharField(max_length=70, unique=True, db_column='StatusName')
     
     class Meta:
@@ -246,6 +266,7 @@ class VisitStatus(models.Model):
         return self.status_name
 
 class PaymentStatus(models.Model):
+    payment_status_id = models.AutoField(primary_key=True, db_column='PaymentStatusID')
     payment_name = models.CharField(max_length=70, unique=True, db_column='PaymentName')
     
     class Meta:
@@ -256,6 +277,7 @@ class PaymentStatus(models.Model):
         return self.payment_name
 
 class Visit(models.Model):
+    visit_id = models.AutoField(primary_key=True, db_column='VisitID')
     visit_status = models.ForeignKey(VisitStatus, on_delete=models.CASCADE, db_column='VisitStatusID')
     car = models.ForeignKey(Car, on_delete=models.CASCADE, db_column='CarID')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, db_column='EmployeeID')
@@ -276,6 +298,7 @@ class Visit(models.Model):
         return f"Visit {self.visit_number} - {self.car}"
 
 class VisitService(models.Model):
+    visit_service_id = models.AutoField(primary_key=True, db_column='VisitServiceID')
     visit = models.ForeignKey(Visit, on_delete=models.CASCADE, db_column='VisitID')
     service = models.ForeignKey(Service, on_delete=models.CASCADE, db_column='ServiceID')
     quantity = models.IntegerField(db_column='Quantity')
@@ -288,6 +311,7 @@ class VisitService(models.Model):
         return f"{self.service} for {self.visit}"
 
 class ProvidedService(models.Model):
+    provided_service_id = models.AutoField(primary_key=True, db_column='ProvidedServiceID')
     employee = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.SET_NULL, db_column='EmployeeID')
     visit_service = models.OneToOneField(VisitService, on_delete=models.CASCADE, db_column='VisitServiceID')
     provided_date = models.DateTimeField(null=True, blank=True, db_column='ProvidedDate')
@@ -300,6 +324,7 @@ class ProvidedService(models.Model):
         return f"Service provided: {self.visitservice}"
 
 class RequiredPart(models.Model):
+    required_part_id = models.AutoField(primary_key=True, db_column='RequiredPartID')
     part_in_station = models.ForeignKey(PartInStation, on_delete=models.CASCADE, db_column='PartInStationID')
     provided_service = models.ForeignKey(ProvidedService, on_delete=models.CASCADE, db_column='ProvidedServiceID')
     quantity = models.IntegerField(db_column='Quantity')
@@ -312,6 +337,7 @@ class RequiredPart(models.Model):
         return f"{self.quantity} of {self.partinstation.part} for {self.providedservice}"
 
 class Supplier(models.Model):
+    supplier_id = models.AutoField(primary_key=True, db_column='SupplierID')
     email = models.CharField(max_length=100, null=True, blank=True, db_column='Email')
     phone_number = models.CharField(max_length=15, null=True, blank=True, db_column='PhoneNumber')
     supplier_name = models.CharField(max_length=100, null=True, blank=True, db_column='SupplierName')
@@ -324,6 +350,7 @@ class Supplier(models.Model):
         return self.supplier_name
 
 class ProcurementStatus(models.Model):
+    procurement_status_id = models.AutoField(primary_key=True, db_column='ProcurementStatusID')
     status_name = models.CharField(max_length=50, null=True, blank=True, db_column='StatusName')
     
     class Meta:
@@ -334,6 +361,7 @@ class ProcurementStatus(models.Model):
         return self.status_name
 
 class ProcurementOrder(models.Model):
+    procurement_order_id = models.AutoField(primary_key=True, db_column='ProcurementOrderID')
     employee = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.SET_NULL, db_column='EmployeeID')
     supplier = models.ForeignKey(Supplier, null=True, blank=True, on_delete=models.SET_NULL, db_column='SupplierID')
     procurement_status = models.ForeignKey(ProcurementStatus, null=True, blank=True, on_delete=models.SET_NULL, db_column='ProcurementStatusID')
@@ -349,6 +377,7 @@ class ProcurementOrder(models.Model):
         return f"Order {self.order_number}"
 
 class ProcurementUnit(models.Model):
+    procurement_unit_id = models.AutoField(primary_key=True, db_column='ProcurementUnitID')
     part = models.ForeignKey(Part, on_delete=models.CASCADE, db_column='PartID')
     quantity = models.IntegerField(db_column='Quantity')
     price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, db_column='PricePerUnit')
@@ -362,6 +391,7 @@ class ProcurementUnit(models.Model):
         return f"{self.quantity} of {self.part}"
 
 class StoragePlacement(models.Model):
+    storage_placement_id = models.AutoField(primary_key=True, db_column='StoragePlacementID')
     procurement_unit = models.ForeignKey(ProcurementUnit, on_delete=models.CASCADE, db_column='ProcurementUnitID')
     part_in_station = models.ForeignKey(PartInStation, on_delete=models.CASCADE, db_column='PartInStationID')
     quantity = models.IntegerField(null=True, blank=True, db_column='Quantity')

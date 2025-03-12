@@ -1,0 +1,38 @@
+<table class="table table-striped mt-3">
+    <thead class="table-dark">
+        <tr>
+            <th>Email</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Phone Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for customer in customers %}
+        <tr>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.first_name }}</td>
+            <td>{{ customer.last_name }}</td>
+            <td>{{ customer.phone_number }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center">No customers found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="mt-3">
+    {% if customers.has_previous %}
+        <button hx-get="{% url 'customers' %}?page={{ customers.previous_page_number }}" hx-target="#customer-list"
+                class="btn btn-primary">Previous</button>
+    {% endif %}
+
+    <span class="mx-3">Page {{ customers.number }} of {{ customers.paginator.num_pages }}</span>
+
+    {% if customers.has_next %}
+        <button hx-get="{% url 'customers' %}?page={{ customers.next_page_number }}" hx-target="#customer-list"
+                class="btn btn-primary">Next</button>
+    {% endif %}
+</div>

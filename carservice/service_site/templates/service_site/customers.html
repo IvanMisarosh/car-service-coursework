@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Customers{% endblock %}
+
+{% block content %}
+    <div class="mt-4">
+        <h2>Customers</h2>
+        <input type="text" id="search" class="form-control" placeholder="Search by name..." 
+               hx-get="{% url 'customers' %}" 
+               hx-trigger="keyup changed delay:500ms" 
+               hx-target="#customer-list">
+        
+        <div id="customer-list" hx-get="{% url 'customers' %}" hx-trigger="load">
+            {% include 'service_site/customers_list.html' %}
+        </div>
+    </div>
+{% endblock %}
