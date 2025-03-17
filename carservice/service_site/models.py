@@ -105,6 +105,18 @@ class Customer(models.Model):
     
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+    
+    def get_car_num(self):
+        cars = Car.objects.filter(customer=self.customer_id)
+        return len(cars)
+    
+    def last_visit(self):
+        """Returns the most recent visit for this customer."""
+        return Visit.objects.filter(car__customer=self).order_by('-visit_date').first()
+    
+    def last_visit_date(self):
+        return self.last_visit().visit_date
+
 
 class Color(models.Model):
     color_id = models.AutoField(primary_key=True, db_column='ColorID')

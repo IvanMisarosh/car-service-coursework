@@ -3,15 +3,32 @@
 
 {% block content %}
     {% include 'service_site/includes/nav_bar.html'%}
-    <div class="mt-4">
+    <div class="container p-5">
         <h2>Customers</h2>
-        <input type="text" id="search" class="form-control" placeholder="Search by name..." 
-               hx-get="{% url 'customers' %}" 
-               hx-trigger="keyup changed delay:500ms" 
-               hx-target="#customer-list">
-        
-        <div id="customer-list" hx-get="{% url 'customers' %}" hx-trigger="load">
-            {% include 'service_site/customers_list.html' %}
+        <div class="row">
+            <div class="col-2 bg-info" id="customer-list-filters">
+                <form id="filter-form">
+                    {{ form.as_p }}
+                    <button hx-get="{% url 'customers' %}"
+                            hx-target="#customer-list"
+                            hx-include="#filter-form"
+                            hx-push-url="true"
+                            class="btn btn-primary">Filter</button>
+                </form>
+            </div>
+
+            <div class="col-7" id="customer-list">
+                {% include 'service_site/customers_list.html' %}
+            </div>
+
+            <div class="col-3 d-flex flex-column h-200" id="selected-customer-details">
+                <div class="bg-info p-2 mb-2 flex-fill" id="selected-customer-visits">
+                    
+                </div>
+                <div class="bg-warning p-2 flex-fill" id="selected-customer-cars">
+                    
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

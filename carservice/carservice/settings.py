@@ -43,8 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'service_site',
-    "django_htmx",
+    'django_htmx',
     'bootstrap5',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
