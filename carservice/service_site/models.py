@@ -106,9 +106,16 @@ class Customer(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     
-    def get_car_num(self):
+    def get_cars(self):
         cars = Car.objects.filter(customer=self.customer_id)
+        return cars
+    
+    def get_car_num(self):
+        cars = self.get_cars()
         return len(cars)
+    
+    def get_visits(self):
+        return Visit.objects.filter(car__customer=self).order_by('-visit_date')
     
     def last_visit(self):
         """Returns the most recent visit for this customer."""
@@ -308,6 +315,10 @@ class Visit(models.Model):
     
     def __str__(self):
         return f"Visit {self.visit_number} - {self.car}"
+    
+    def visit_service_count(self):
+        services = VisitService.objects.filter(visit=self.visit_id)
+        return len(services)
 
 class VisitService(models.Model):
     visit_service_id = models.AutoField(primary_key=True, db_column='VisitServiceID')

@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Customers{% endblock %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'service_site/selected_customer_details.css' %}"> 
+{% endblock %}
 
 {% block content %}
     {% include 'service_site/includes/nav_bar.html'%}
@@ -22,12 +28,7 @@
             </div>
 
             <div class="col-3 d-flex flex-column h-200" id="selected-customer-details">
-                <div class="bg-info p-2 mb-2 flex-fill" id="selected-customer-visits">
-                    
-                </div>
-                <div class="bg-warning p-2 flex-fill" id="selected-customer-cars">
-                    
-                </div>
+                {% include 'service_site/selected_customer_details.html' %}
             </div>
         </div>
     </div>

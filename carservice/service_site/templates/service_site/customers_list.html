@@ -11,13 +11,17 @@
     </thead>
     <tbody>
         {% for customer in customers %}
-        <tr>
+        <tr hx-get="{% url 'customer-details' %}"
+            hx-vals='{"customer_id": "{{customer.customer_id}}"}'
+            hx-trigger="click"
+            hx-target="#selected-customer-details"
+            style="cursor: pointer">
             <td>{{ customer.email }}</td>
             <td>{{ customer.first_name }}</td>
             <td>{{ customer.last_name }}</td>
             <td>{{ customer.phone_number }}</td>
-            <td>{{ customer.last_visit_date|date:"F j, Y" }}
-            <td>{{ customer.get_car_num}}
+            <td>{{ customer.last_visit_date|date:"F j, Y" }}</td>
+            <td>{{ customer.get_car_num }}</td>
         </tr>
         {% empty %}
         <tr>

@@ -14,16 +14,27 @@ def index(request):
 
 @login_required
 @permission_required('service_site.view_customer', raise_exception=True)
+def customer_details(request):
+    customer_id = request.GET.get("customer_id", None)
+    customer = models.Customer.objects.get(pk=customer_id)
+
+    context = {
+        'customer_cars': customer.get_cars(),
+        'customer_visits': customer.get_visits()
+    }
+
+    return render(request, "service_site/selected_customer_details.html", context)
+
+
+@login_required
+@permission_required('service_site.view_customer', raise_exception=True)
 def customer_list(request):
-    # search_query = request.GET.get("search", "")
     page_number = request.GET.get("page", 1)
 
     customers = models.Customer.objects.all().order_by("last_name", "first_name")
     customer_filter = filters.CustomerFilter(request.GET, customers)
-    # if search_query:
-    #     customers = customers.filter(first_name__icontains=search_query) | customers.filter(last_name__icontains=search_query)
 
-    paginator = Paginator(customer_filter.qs, 10)  # Show 10 customers per page
+    paginator = Paginator(customer_filter.qs, 10)
     page_obj = paginator.get_page(page_number)
 
     context = {
