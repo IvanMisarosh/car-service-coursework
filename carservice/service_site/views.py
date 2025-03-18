@@ -3,6 +3,7 @@ from django.core.paginator import Paginator
 from . import models
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
+from django.db.models import OuterRef, Subquery, Max, F
 from . import filters
 
 # Create your views here.
@@ -32,8 +33,10 @@ def customer_details(request):
 def customer_list(request):
     page_number = request.GET.get("page", 1)
     items_per_page = int(request.GET.get("items_per_page", 10))
+    sorting_method = request.GET.get("sorting_method", "first_name")
 
-    customers = models.Customer.objects.all().order_by("last_name", "first_name")
+    customers = models.Customer.objects.all().order_by(sorting_method)
+
     customer_filter = filters.CustomerFilter(request.GET, customers)
 
     paginator = Paginator(customer_filter.qs, items_per_page)
