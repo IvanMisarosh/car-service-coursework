@@ -19,6 +19,7 @@ def customer_details(request):
     customer = models.Customer.objects.get(pk=customer_id)
 
     context = {
+        'customer': customer,
         'customer_cars': customer.get_cars(),
         'customer_visits': customer.get_visits()
     }
@@ -30,11 +31,12 @@ def customer_details(request):
 @permission_required('service_site.view_customer', raise_exception=True)
 def customer_list(request):
     page_number = request.GET.get("page", 1)
+    items_per_page = int(request.GET.get("items_per_page", 10))
 
     customers = models.Customer.objects.all().order_by("last_name", "first_name")
     customer_filter = filters.CustomerFilter(request.GET, customers)
 
-    paginator = Paginator(customer_filter.qs, 10)
+    paginator = Paginator(customer_filter.qs, items_per_page)
     page_obj = paginator.get_page(page_number)
 
     context = {

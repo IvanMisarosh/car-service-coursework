@@ -6,7 +6,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <script src="{% static 'htmx.min.js' %}" defer></script>
+        <script src="{% static 'js/htmx.min.js' %}" defer></script>
 
         {% load bootstrap5 %}
         {% bootstrap_css %}
@@ -15,9 +15,10 @@
         <title>{% block title %}{% endblock %}</title>
         {% comment %} <link rel="stylesheet" href="{% static 'app.css' %}"> {% endcomment %}
         {% block css_files %}{% endblock %}
+        {% block js_files %}{% endblock %}
 
     </head>
-    
+
     <body>
         {% block content %}
         {% endblock %}

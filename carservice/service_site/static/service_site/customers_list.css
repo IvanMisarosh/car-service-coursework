@@ -1,0 +1,23 @@
+#customers-table td {
+    padding: 10px;
+    border: 1px solid #220d0d;
+    text-wrap: nowrap;
+
+}
+
+#table-container{
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+#items-lable{
+    text-wrap: nowrap;
+}
+
+#customers-table tbody tr.active {
+    background-color: #d1e7dd; 
+}
+
+#customers-table tbody tr:hover {
+    background-color: #cfcfcf; 
+}

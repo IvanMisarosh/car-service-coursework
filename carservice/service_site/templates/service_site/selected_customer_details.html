@@ -1,4 +1,5 @@
-<div class="bg-info p-2 mb-2 flex-fill" id="selected-customer-cars">
+<div class="bg-info p-2 mt-2 mb-2 rounded border shadow" id="selected-customer-cars">
+    <h3>{% if customer %} {{ customer.first_name }}'s {% endif%} Cars</h3>
     {% if customer_cars %}
         <div class="list-group" id="customer-cars">
             {% for car in customer_cars%}
@@ -18,12 +19,13 @@
             {% endfor %}
         </div>
     {% else %}
-        no customer selected
+        Customer is not selected
     {% endif %}
 
 </div>
 
-<div class="bg-warning p-2 flex-fill" id="selected-customer-visits">
+<div class="bg-warning p-2 mb-2 rounded border shadow" id="selected-customer-visits">
+    <h3>{% if customer %} {{ customer.first_name }}'s {% endif%} Visits</h3>
     {% if customer_visits %}
         <div class="list-group" id="customer-visits">
             {% for visit in customer_visits%}
@@ -42,6 +44,6 @@
             {% endfor %}
         </div>
     {% else %}
-        no customer selected
+        Customer is not selected
     {% endif %}
 </div>

@@ -1,33 +1,45 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}Customers{% endblock %}
 
 {% block css_files %}
     <link rel="stylesheet" href="{% static 'service_site/selected_customer_details.css' %}"> 
+    <link rel="stylesheet" href="{% static 'service_site/customers_list.css' %}">
+    <link rel="stylesheet" href="{% static 'service_site/customers.css' %}">  
+{% endblock %}
+
+{% block js_files %}
+    <script src="{% static 'service_site/js/customers.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
     {% include 'service_site/includes/nav_bar.html'%}
-    <div class="container p-5">
-        <h2>Customers</h2>
-        <div class="row">
-            <div class="col-2 bg-info" id="customer-list-filters">
-                <form id="filter-form">
-                    {{ form.as_p }}
+    <div class="container-fluid px-5 pt-2">
+        <div class="row flex-nowrap mt-2">
+            <h2 class="col-2">Customers</h2>
+            <a class="col-3" href="/"><button class="btn btn-primary mt-2 mb-2">Add customer</button></a>
+        </div>
+        
+        <div class="row flex-nowrap mt-2">
+            <div class="col-2 bg-info rounded shadow align-self-start" id="customer-list-filters">
+                <form class='mt-2' id="filter-form">
+                    {% crispy form %}
                     <button hx-get="{% url 'customers' %}"
                             hx-target="#customer-list"
                             hx-include="#filter-form"
                             hx-push-url="true"
-                            class="btn btn-primary">Filter</button>
+                            hx-vals='js:{"items_per_page": document.getElementById("items-per-page").value}'
+                            class="btn btn-primary mt-2 mb-2 w-100">Filter</button>
                 </form>
             </div>
 
-            <div class="col-7" id="customer-list">
+            <div class="col-7 shadow rounded me-2 ms-2 align-self-start" id="customer-list">
                 {% include 'service_site/customers_list.html' %}
             </div>
 
-            <div class="col-3 d-flex flex-column h-200" id="selected-customer-details">
+            <div class="col-3 shadow align-self-start" id="selected-customer-details">
                 {% include 'service_site/selected_customer_details.html' %}
             </div>
         </div>
