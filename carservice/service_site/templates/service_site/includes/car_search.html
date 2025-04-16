@@ -1,0 +1,13 @@
+<input class="border border-gray-300 rounded px-4 py-2 w-full" id="car-search-bar"
+        type="search"
+        name="search"
+        placeholder="Begin Typing To Search Cars..."
+        hx-get="{% url 'car-search' %}"
+        hx-trigger="input delay:0.2s"
+        hx-target="#car-search-results"
+    />
+    <section> 
+        <div class="list-group" id="car-search-results">
+            {% include "service_site/includes/car_search_result.html" %}
+        </div>
+    </section>

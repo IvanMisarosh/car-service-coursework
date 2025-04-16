@@ -1,0 +1,32 @@
+#customer-visits{
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#car-search-bar{
+    border-radius: 3px;
+}
+
+#car-search-results{
+    max-height: 300px;
+    margin-bottom: 10px;
+    overflow-y:scroll;
+}
+
+#service-search-results{
+    max-height: 300px;
+    margin-bottom: 10px;
+    overflow-y:scroll;
+}
+
+#visit-services{
+    max-height: 450px;
+    margin-bottom: 10px;
+    overflow-y:scroll;
+}
+
+#staged-visit-services{
+    max-height: 370px;
+    margin-bottom: 10px;
+    overflow-y:scroll;
+}

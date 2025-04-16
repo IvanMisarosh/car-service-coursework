@@ -1,0 +1,18 @@
+{% csrf_token %}
+{% for car in car_selection%}
+    <div class="list-group-item list-group-item-action flex-column align-items-start"
+         hx-post="{% url 'select-car-in-car-search-modal'%}" 
+         hx-target="#selected-car-details"
+         hx-vals='{"car_id": "{{ car.car_id }}"}'
+         hx-trigger="click"
+         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+         >
+        <div class="d-flex justify-content-between">
+            <h5 class="mb-1">{{car.car_model.car_brand.brand_name}} {{car.car_model.model_name}}</h5>
+            {% if car.manufacture_year%}
+                <small>{{car.manufacture_year}} year</small>
+            {% endif %}
+        </div>
+        <h8>{{car.customer.first_name}} {{car.customer.last_name}}, {{car.customer.phone_number}}</h8>
+    </div> 
+{% endfor %}

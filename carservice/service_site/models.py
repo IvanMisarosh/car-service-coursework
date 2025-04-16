@@ -6,6 +6,8 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.utils import timezone
+import random
 
 
 class DriveType(models.Model):
@@ -138,7 +140,7 @@ class Color(models.Model):
 
 class Car(models.Model):
     car_id = models.AutoField(primary_key=True, db_column='CarID')
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, db_column='CustomerID')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, db_column='CustomerID', related_name='cars')
     car_model = models.ForeignKey(CarModel, on_delete=models.CASCADE, db_column='CarModelID')
     color = models.ForeignKey(Color, on_delete=models.CASCADE, db_column='ColorID')
     manufacture_year = models.IntegerField(null=True, blank=True, db_column='ManufactureYear')
@@ -298,10 +300,10 @@ class PaymentStatus(models.Model):
 class Visit(models.Model):
     visit_id = models.AutoField(primary_key=True, db_column='VisitID')
     visit_status = models.ForeignKey(VisitStatus, on_delete=models.CASCADE, db_column='VisitStatusID')
-    car = models.ForeignKey(Car, on_delete=models.CASCADE, db_column='CarID')
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, db_column='CarID', related_name='visits')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, db_column='EmployeeID')
     payment_status = models.ForeignKey(PaymentStatus, null=True, blank=True, on_delete=models.SET_NULL, db_column='PaymentStatusID')
-    visit_date = models.DateTimeField(auto_now_add=True, db_column='VisitDate')
+    visit_date = models.DateTimeField(default=timezone.now, db_column='VisitDate')
     planned_end_date = models.DateTimeField(null=True, blank=True, db_column='PlannedEndDate')
     actual_end_date = models.DateTimeField(null=True, blank=True, db_column='ActualEndDate')
     details = models.CharField(max_length=500, null=True, blank=True, db_column='Details')
@@ -319,10 +321,20 @@ class Visit(models.Model):
     def visit_service_count(self):
         services = VisitService.objects.filter(visit=self.visit_id)
         return len(services)
+    
+    @staticmethod
+    def generate_visit_number():
+        """Generates a unique visit number."""
+        while True:
+            visit_number = random.randint(1000, 9999)
+            if not Visit.objects.filter(visit_number=visit_number).exists():
+                break
+        return visit_number
+        
 
 class VisitService(models.Model):
     visit_service_id = models.AutoField(primary_key=True, db_column='VisitServiceID')
-    visit = models.ForeignKey(Visit, on_delete=models.CASCADE, db_column='VisitID')
+    visit = models.ForeignKey(Visit, on_delete=models.CASCADE, db_column='VisitID', related_name='visit_services')
     service = models.ForeignKey(Service, on_delete=models.CASCADE, db_column='ServiceID')
     quantity = models.IntegerField(db_column='Quantity')
     
@@ -336,7 +348,7 @@ class VisitService(models.Model):
 class ProvidedService(models.Model):
     provided_service_id = models.AutoField(primary_key=True, db_column='ProvidedServiceID')
     employee = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.SET_NULL, db_column='EmployeeID')
-    visit_service = models.OneToOneField(VisitService, on_delete=models.CASCADE, db_column='VisitServiceID')
+    visit_service = models.OneToOneField(VisitService, on_delete=models.CASCADE, db_column='VisitServiceID', related_name='provided_service')
     provided_date = models.DateTimeField(null=True, blank=True, db_column='ProvidedDate')
     
     class Meta:

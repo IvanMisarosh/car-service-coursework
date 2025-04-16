@@ -1,0 +1,25 @@
+{% csrf_token %}
+{% for service in service_selection%}
+    <div class="list-group-item list-group-item-action flex-column align-items-start"
+         hx-post="{% url 'add-staged-service'%}" 
+         hx-target="#staged-visit-services"
+         hx-swap="beforeend"
+         hx-vals='{"service_id": "{{ service.service_id }}"}'
+         hx-include="#visit-id-hidden-input"
+         hx-trigger="click"
+         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+         >
+ 
+        <div class="d-flex w-60 justify-content-between">
+            <div class="fw-bold">{{service.service_name}}</div>
+            <small>₴{{service.price}}</small>
+        </div> 
+        <div>
+            {% if service.service_type.service_type_name %}
+                Category: {{service.service_type.service_type_name}}
+            {% else %}
+                Category: Not specified
+            {% endif %}
+        </div>
+    </div> 
+{% endfor %}

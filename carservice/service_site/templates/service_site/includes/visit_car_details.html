@@ -1,0 +1,49 @@
+<div class="bg-info p-2 mt-2 mb-2 rounded border shadow" id="customer-details">
+                    
+    {% if visit_customer %}
+        <p>
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCustomerDetails" aria-expanded="false" aria-controls="collapseCustomerDetails">
+                <h5>Click for owner details</h5>
+            </button>
+        </p>
+        <div class="collapse" id="collapseCustomerDetails">
+            <div class="card card-body">
+                <h5>{{visit_customer.first_name}} {{visit_customer.last_name}}</h5>
+                <p>{{visit_customer.phone_number}}</p>
+                <p>{{visit_customer.email}}</p>
+                <p>{{visit_customer.address}}</p>
+            </div>
+        </div>
+        
+    {% else %}
+        Select the car to see the customer details
+    {% endif %}     
+</div>
+
+<div class="bg-warning p-2 mb-2 rounded border shadow" id="car-search-container">
+    <div class="bg-info p-2 mt-2 mb-2 rounded border shadow" id="selected-car">
+        {% if visit_car %}
+            <div class="row">
+                {% include 'service_site/includes/car_details.html'%}
+            </div>  
+        {% else %}
+            Select the car to see the details
+        {% endif %}
+        
+    </div>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#carSearchModal">
+        Change car in visit
+    </button> 
+</div>
+
+<div id="visit-car-input" hx-swap-oob="true" >
+    <input type="hidden" name="car" id="car-id-input" value="{{ visit_car.pk }}">
+</div>
+
+<div id="selected-car-details-container" hx-swap-oob="true">
+                        
+</div>
+
+

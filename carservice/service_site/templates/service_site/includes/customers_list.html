@@ -15,14 +15,13 @@
             <tr hx-get="{% url 'customer-details' %}"
                 hx-vals='{"customer_id": "{{ customer.customer_id }}"}'
                 hx-trigger="click"
-                hx-target="#selected-customer-details"
-                style="cursor: pointer">
-                <td>{{ customer.email }}</td>
+                hx-target="#selected-customer-details">
+                <td>{%if customer.email %}{{ customer.email }} {% else %} Not specified {% endif %}</td>
                 <td>{{ customer.first_name }}</td>
                 <td>{{ customer.last_name }}</td>
                 <td>{{ customer.phone_number }}</td>
                 <td id="last-visit-column">
-                    <a href="{% url 'index' %}" id="last-visit-link">{{ customer.last_visit.visit_date|date:"F j, Y" }}</a>
+                    <a href="{% url 'visit-detail' customer.last_visit.visit_id %}" id="last-visit-link">{{ customer.last_visit.visit_date|date:"F j, Y" }}</a>
                 </td>
                 <td>
                     <div class="dropdown">

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Visit details{% endblock %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'service_site/visit_details.css' %}"> 
+{% endblock %}
+
+{% block js_files %}
+    <script src="{% static 'service_site/js/car_search_modal.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% include 'service_site/includes/nav_bar.html'%}
+    <div class="container-fluid px-5 pt-2">
+        <div class="row flex-nowrap mt-2">
+            <div class="bg-warning col-8 align-self-start me-2 ms-2 shadow rounded">
+                <div class="row flex-nowrap mt-2">
+                    <div class="bg-warning col-4 shadow me-2 ms-2 mb-2 mt-2 align-self-start rounded">
+                        <form method="post" action={% if visit.pk %}"{% url 'visit-detail'  visit.pk  %}" {%else%} "{% url 'create-visit' %}" {% endif %}
+                         id="visit-form" 
+                         hx-target="#visit-details"
+                         hx-push-url="true" 
+                         hx-swap="innerHTML">
+                            <h5>Visit details: {{visit.visit_number}}</h5>
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ visit_form.visit_date|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ visit_form.visit_status|as_crispy_field }}                     
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ visit_form.planned_end_date|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ visit_form.actual_end_date|as_crispy_field }}                     
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ visit_form.payment_date|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ visit_form.payment_status|as_crispy_field }}                     
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                {{ visit_form.employee|as_crispy_field }}
+                            </div>
+                            <div class="mt-2">
+                                {{ visit_form.details|as_crispy_field }}
+                            </div>
+
+                            <input class='form-control' type="hidden" name="visit_id" id="visit-id-hidden-input" value="{{ visit.pk }}">
+
+                            <div id="visit-car-input">
+                                <input class='form-control' type="hidden" name="car" id="car-id-input" value="{{ visit.car.pk }}">
+                            </div>                            
+                              
+                            <button type="submit" class="btn btn-primary mt-3">
+                                {% if visit %}
+                                    Save 
+                                {% else %}
+                                    Create 
+                                {% endif %}
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="bg-warning col-7 shadow me-2 ms-2 align-self-start rounded" id="visit-car-details">
+                        {% include 'service_site/includes/visit_car_details.html' %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-warning col-4 shadow rounded me-2 ms-2 align-self-start" id="visit-services-details">
+                <h2> Services </h2>
+                {% if visit %}
+                    {% include 'service_site/includes/visit_services.html' %}
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#serviceSearchModal">
+                        Add services to visit
+                    </button> 
+                {% else %}
+                    <p>Select/create a visit to see the services</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        
+    </div>
+    <!-- Visit Service Search Modal -->
+    <div class="modal fade" id="serviceSearchModal" tabindex="-1" aria-labelledby="serviceSearchModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="serviceSearchModalLabel">Search for a services</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% include 'service_site/includes/service_search.html' %}
+                            </div>
+                            <div class="col-md-6 ms-auto" id="staged-visit-services-container">
+                                <div class="list-group mb-2" id="staged-visit-services">
+                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="add-services-button" type="button" class="btn btn-primary add-services-button" data-bs-dismiss="modal"
+                            hx-post="{% url 'save-staged-services' %}" 
+                            hx-target="#visit-services" 
+                            hx-vals='{"visit_id": "{{ visit.pk }}"}' 
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                        Add services to visit
+                    </button>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Car Search Modal -->
+    <div class="modal fade" id="carSearchModal" tabindex="-1" aria-labelledby="carSearchModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="carSearchModalLabel">Search for a Car</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="selected-car-details-container">
+                        <div class="row bg-warning shadow me-2 ms-2 align-self-start rounded" id="selected-car-details">
+                        
+                        </div>
+                    </div>
+                    <div>
+                        <button id="confirm-car-button" type="button" class="btn btn-primary add-services-button" data-bs-dismiss="modal"
+                            hx-post="{% url 'update-visit-car'%}" 
+                            hx-target="#visit-car-details"
+                            hx-trigger="click"
+                            hx-swap="innerHTML"
+                            hx-include="#selected-car-id-hidden-input"
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                        >
+                            Confirm car in visit
+                        </button>
+                    </div>
+
+                    
+                    {% include 'service_site/includes/car_search.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('serviceSearchModal').addEventListener('hidden.bs.modal', function () {
+            // Clear the contents of the staged-visit-services div
+            document.getElementById('staged-visit-services').innerHTML = '';
+            
+            // Make the HTMX request to clear session data
+            htmx.ajax('POST', '{% url "clear-staged-services" %}', {
+                values: {
+                    'visit_id': '{{ visit.pk }}',
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                }
+            });
+        });
+        </script>
+{% endblock %}

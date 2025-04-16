@@ -37,7 +37,7 @@
                 <p class="mb-1">{{visit.visit_service_count}} services, totaling ₴{{visit.price}}</p>
                 {% if visit.actual_end_date %}
                     <small>Completed: {{visit.actual_end_date|date:"F j, Y" }}</small>
-                {% else %}
+                {% elif visit.planned_end_date %}
                     <small>Planned end date: {{visit.planned_end_date|date:"F j, Y" }}</small>
                 {% endif %} 
                 </a>

@@ -36,7 +36,7 @@
                     <option value="-phone_number">Phone number desc</option>
                 </select>
             </div>
-            <a class="col-1" href="/"><button class="btn btn-primary mt-2 mb-2">Add customer</button></a>
+            <a class="col-2" href="/"><button class="btn btn-primary mt-2 mb-2">Add customer</button></a>
         </div>
         
         <div class="row flex-nowrap mt-2">
@@ -54,11 +54,11 @@
             </div>
 
             <div class="col-7 shadow rounded me-2 ms-2 align-self-start" id="customer-list">
-                {% include 'service_site/customers_list.html' %}
+                {% include 'service_site/includes/customers_list.html' %}
             </div>
 
             <div class="col-3 shadow align-self-start" id="selected-customer-details">
-                {% include 'service_site/selected_customer_details.html' %}
+                {% include 'service_site/includes/selected_customer_details.html' %}
             </div>
         </div>
     </div>

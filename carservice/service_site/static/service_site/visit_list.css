@@ -1,4 +1,4 @@
-#customers-table td {
+#visits-table td {
     padding: 10px;
     border: 1px solid #220d0d;
     text-wrap: nowrap;
@@ -14,10 +14,10 @@
     text-wrap: nowrap;
 }
 
-#customers-table tbody tr.active {
+#visits-table tbody tr.active {
     background-color: #cae7f1; 
 }
 
-#customers-table tbody tr:hover {
-    background-color: #cfcfcf;
+#visits-table tbody tr:hover {
+    background-color: #cfcfcf; 
 }

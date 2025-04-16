@@ -1,0 +1,31 @@
+{% csrf_token %}
+
+<div class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="ms-2 me-auto">
+        <div class="fw-bold">{{staged_service.service_name}}</div>
+            <div>Category: {{staged_service.service_type_name}}</div>
+            <form hx-post="{% url 'update-staged-service' %}" 
+                hx-trigger="change delay:100ms"
+                hx-swap="none"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                >
+                <input type="hidden" name="temp_id" value="{{ staged_service.temp_id }}">
+                <input type="hidden" name="visit_id" value="{{ visit_id }}">
+                <input type="text" class="form-control" name="quantity" value="{{ staged_service.quantity }}">
+            </form>
+            Price: {{staged_service.price}} ₴
+    </div>
+        
+    {% if staged_service.description %}
+        <p class="mb-1">{{staged_service.description}}</p>
+    {% endif %}
+    
+    <button class="btn btn-sm btn-danger" 
+            hx-post="{% url 'remove-staged-service' %}"
+            hx-vals='{"temp_id": "{{staged_service.temp_id}}", "visit_id": "{{visit_id}}"}'
+            hx-target="closest .list-group-item"
+            hx-swap="outerHTML"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        Remove
+    </button>
+</div>

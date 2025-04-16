@@ -1,0 +1,55 @@
+<div class="col-md-4">
+
+    <input type="hidden" id="selected-car-id-hidden-input" name="selected_car_id" value="{{ visit_car.pk }}">
+
+    <h6>Selected car details</h6>
+    <h5>{{visit_car.car_model.car_brand.brand_name}} {{visit_car.car_model.model_name}}</h5>
+    {% if visit_car.manufacture_year%}
+        <p>Year: {{visit_car.manufacture_year}}</p>
+    {% endif %}
+    {% if visit_car.mileage%}
+        <p>Mileage: {{visit_car.mileage}} km</p>
+    {% else %}
+        <pl>Unknown mileage</p>
+    {% endif %}
+    <p>VIN: {{visit_car.vin}}</p>
+    <p>Color: {{visit_car.color}}</p>
+</div>
+<div class="col-md-8">
+    <h6>Model details</h6>
+    <p>Engine: 
+        {% if visit_car.car_model.engine_type %} 
+            {{visit_car.car_model.engine_type.engine_type_name}}
+        {% else %}
+            Unknown
+        {% endif %}
+    </p>
+    <p>Transmission:
+        {% if visit_car.car_model.transmission_type %} 
+            {{visit_car.car_model.transmission_type.transmission_type_name}}
+        {% else %}
+            Unknown
+        {% endif %}
+    </p>
+    <p>Suspension type:
+        {% if visit_car.car_model.suspenison_type %} 
+            {{visit_car.car_model.suspenison_type.suspenison_type_name}}
+        {% else %}
+            Unknown
+        {% endif %}
+    </p>
+    <p>Body type:
+        {% if visit_car.car_model.body_type %} 
+            {{visit_car.car_model.body_type.body_type_name}}
+        {% else %}
+            Unknown
+        {% endif %} 
+    </p>
+    <p>Drive type: 
+        {% if visit_car.car_model.drive_type %} 
+            {{visit_car.car_model.drive_type.drive_type_name}}
+        {% else %}
+            Unknown
+        {% endif %}    
+    </p>
+</div>
