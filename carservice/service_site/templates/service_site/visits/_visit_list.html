@@ -44,8 +44,6 @@
         {% if visits.has_previous %}
         <button hx-get="{% url 'visits' %}?page={{ visits.previous_page_number }}&items_per_page={{ visits.paginator.per_page }}" 
                 hx-target="#visit-list"
-                {% comment %} hx-include="#filter-form" {% endcomment %}
-                {% comment %} hx-vals='js:{"sorting_method": document.getElementById("sorting_method").value}' {% endcomment %}
                 class="btn btn-primary">Previous</button>
         {% endif %}
 
@@ -54,9 +52,7 @@
         {% if visits.has_next %}
         <button hx-get="{% url 'visits' %}?page={{ visits.next_page_number }}&items_per_page={{ visits.paginator.per_page }}" 
                 hx-target="#visit-list"
-                {% comment %} hx-include="#filter-form" {% endcomment %}
                 hx-push-url="true"
-                {% comment %} hx-vals='js:{"sorting_method": document.getElementById("sorting_method").value}' {% endcomment %}
                 class="btn btn-primary">Next</button>
         {% endif %}
     </div>
@@ -66,9 +62,7 @@
         <select id="items-per-page" name="items_per_page" 
                 hx-get="{% url 'visits' %}" 
                 hx-target="#visit-list" 
-                {% comment %} hx-include="#filter-form" {% endcomment %}
                 hx-push-url="true"
-                {% comment %} hx-vals='js:{"sorting_method": document.getElementById("sorting_method").value}' {% endcomment %}
                 class="form-select">
             <option value="10" {% if visits.paginator.per_page == 10 %}selected{% endif %}>10</option>
             <option value="25" {% if visits.paginator.per_page == 25 %}selected{% endif %}>25</option>

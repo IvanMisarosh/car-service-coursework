@@ -1,37 +1,15 @@
 from django.shortcuts import render, redirect
-from django.core.paginator import Paginator
 from django.db.models import Q
-from . import models
+from .. import models
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from django.views.generic import View 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponse
 import uuid
-from . import filters
-from . import forms
-
-class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['service_site.view_customer']
-    login_url = '/login/'
-
-    def get(self, request, *args, **kwargs):
-        page_number = request.GET.get("page", 1)
-        items_per_page = int(request.GET.get("items_per_page", 10))
-
-        visits = models.Visit.objects.all().select_related(
-            'visit_status', 'car', 'car__customer', 'car__car_model', 'employee', 'payment_status').order_by('-visit_date')
+from .. import forms
 
 
-        paginator = Paginator(visits, items_per_page)
-        page_obj = paginator.get_page(page_number)
-
-        context = {
-            "visits": page_obj,
-        }
-
-        return render_htmx(request, "service_site/visits.html", "service_site/includes/visit_list.html", context)
-    
 class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['service_site.view_customer']
     login_url = '/login/'
@@ -40,7 +18,7 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
         visit_id = kwargs.get('visit_id')
 
         if not visit_id:
-            return render(request, "service_site/visit_details.html", {
+            return render(request, "service_site/visits/visit_details.html", {
                 "visit_form": forms.VisitForm(),
             })
         
@@ -58,7 +36,7 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
         self.save_visit_data_in_session(request, visit)
 
-        return render(request, "service_site/visit_details.html", context)
+        return render(request, "service_site/visits/visit_details.html", context)
     
     def post(self, request, *args, **kwargs):
         visit_id = kwargs.get('visit_id')
@@ -82,7 +60,7 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
             print(form.instance)
             # If form is not valid, re-render the page with errors
             print(form.instance.visit_services.all())
-            return render(request, "service_site/visit_details.html", {
+            return render(request, "service_site/visits/visit_details.html", {
                 "visit_form": form,
                 "visit_car": form.instance.car,
                 "visit_customer": form.instance.car.customer, 
@@ -101,42 +79,6 @@ def index(request):
         'title': 'Home',
     })
 
-@login_required
-@permission_required('service_site.view_customer', raise_exception=True)
-def customer_details(request):
-    customer_id = request.GET.get("customer_id", None)
-    customer = models.Customer.objects.get(pk=customer_id)
-
-    context = {
-        'customer': customer,
-        'customer_cars': customer.get_cars(),
-        'customer_visits': customer.get_visits()
-    }
-
-    return render(request, "service_site/includes/selected_customer_details.html", context)
-
-
-@login_required
-@permission_required('service_site.view_customer', raise_exception=True)
-def customer_list(request):
-    page_number = request.GET.get("page", 1)
-    items_per_page = int(request.GET.get("items_per_page", 10))
-    sorting_method = request.GET.get("sorting_method", "first_name")
-
-    customers = models.Customer.objects.all().order_by(sorting_method)
-
-    customer_filter = filters.CustomerFilter(request.GET, customers)
-
-    paginator = Paginator(customer_filter.qs, items_per_page)
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        "customers": page_obj,
-        "form": customer_filter.form,
-    }
-
-    return render_htmx(request, "service_site/customers.html", "service_site/includes/customers_list.html", context)
-
 def car_search(request):
     search_query = request.GET.get("search", "")
     
@@ -154,7 +96,7 @@ def car_search(request):
         'car_model', 'car_model__car_brand', 'customer'
     ).filter(query).distinct()
     
-    return render(request, "service_site/includes/car_search_result.html", {
+    return render(request, "service_site/visits/_car_search_result.html", {
         "car_selection": cars,
     })
 
@@ -170,7 +112,7 @@ def service_search(request):
     
     services = models.Service.objects.select_related('service_type').filter(query).distinct().order_by('service_name')
     
-    return render(request, "service_site/includes/service_search_result.html", {
+    return render(request, "service_site/visits/_service_search_result.html", {
         "service_selection": services,
     })
 
@@ -186,7 +128,7 @@ def update_visit_car(request):
         "visit_customer": car.customer,
     }
 
-    return render(request, "service_site/includes/visit_car_details.html", context)
+    return render(request, "service_site/visits/_visit_car_details.html", context)
 
 def select_car_in_car_search_modal(request):
     car_id = request.POST.get('car_id')
@@ -200,7 +142,7 @@ def select_car_in_car_search_modal(request):
         "visit_customer": car.customer,
     }
 
-    return render(request, "service_site/includes/car_details.html", context)
+    return render(request, "service_site/visits/_car_details.html", context)
 
 def add_staged_service(request):
     service_id = request.POST.get('service_id')
@@ -236,7 +178,7 @@ def add_staged_service(request):
         "visit_id": visit_id
     }
 
-    return render(request, "service_site/includes/staged_visit_service.html", context)
+    return render(request, "service_site/visits/_staged_visit_service.html", context)
 
 def update_staged_service(request):
     temp_id = request.POST.get('temp_id')
@@ -297,7 +239,7 @@ def save_staged_services(request):
     visit_services = models.VisitService.objects.filter(visit=visit).select_related(
         'service', 'service__service_type', 'provided_service').order_by('-provided_service__provided_date')
     
-    return render(request, 'service_site/includes/visit_services.html', 
+    return render(request, 'service_site/visits/_visit_services.html', 
         {
             'visit_services': visit_services,
         }
@@ -320,12 +262,4 @@ def delete_visit_service(request, visit_service_id):
     visit_service = models.VisitService.objects.get(pk=visit_service_id)
     visit_service.delete()
     
-    return HttpResponse("") 
-
-
-
-def render_htmx(request, template_full, template_partial, context):
-    if request.htmx:
-        return render(request, template_partial, context)
-    else:
-        return render(request, template_full, context)
+    return HttpResponse("")

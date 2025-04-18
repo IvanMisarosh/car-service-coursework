@@ -74,7 +74,7 @@
                     </div>
                     
                     <div class="bg-warning col-7 shadow me-2 ms-2 align-self-start rounded" id="visit-car-details">
-                        {% include 'service_site/includes/visit_car_details.html' %}
+                        {% include 'service_site/visits/_visit_car_details.html' %}
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
             <div class="bg-warning col-4 shadow rounded me-2 ms-2 align-self-start" id="visit-services-details">
                 <h2> Services </h2>
                 {% if visit %}
-                    {% include 'service_site/includes/visit_services.html' %}
+                    {% include 'service_site/visits/_visit_services.html' %}
                     <!-- Button trigger modal -->
                     <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#serviceSearchModal">
                         Add services to visit
@@ -107,7 +107,7 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-md-6">
-                                {% include 'service_site/includes/service_search.html' %}
+                                {% include 'service_site/visits/_service_search.html' %}
                             </div>
                             <div class="col-md-6 ms-auto" id="staged-visit-services-container">
                                 <div class="list-group mb-2" id="staged-visit-services">
@@ -120,8 +120,7 @@
                     <button id="add-services-button" type="button" class="btn btn-primary add-services-button" data-bs-dismiss="modal"
                             hx-post="{% url 'save-staged-services' %}" 
                             hx-target="#visit-services" 
-                            hx-vals='{"visit_id": "{{ visit.pk }}"}' 
-                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                            hx-vals='{"visit_id": "{{ visit.pk }}"}'>
                         Add services to visit
                     </button>
                     
@@ -151,14 +150,13 @@
                             hx-trigger="click"
                             hx-swap="innerHTML"
                             hx-include="#selected-car-id-hidden-input"
-                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                         >
                             Confirm car in visit
                         </button>
                     </div>
 
                     
-                    {% include 'service_site/includes/car_search.html' %}
+                    {% include 'service_site/visits/_car_search.html' %}
                 </div>
             </div>
         </div>

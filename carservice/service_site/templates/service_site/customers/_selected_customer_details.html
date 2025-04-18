@@ -29,7 +29,7 @@
     {% if customer_visits %}
         <div class="list-group" id="customer-visits">
             {% for visit in customer_visits%}
-                <a href="" class="list-group-item list-group-item-action flex-column align-items-start">
+                <a href="{% url 'visit-detail' visit.pk %}" method="GET" class="list-group-item list-group-item-action flex-column align-items-start">
                 <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">{{visit.visit_number}}, {{visit.visit_date|date:"F j, Y" }}</h5>
                     <small>{{visit.visit_status.status_name}}</small>
