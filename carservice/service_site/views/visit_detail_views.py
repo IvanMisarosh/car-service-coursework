@@ -25,7 +25,9 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
         visit = models.Visit.objects.select_related(
             'visit_status', 'car', 'car__customer', 'car__car_model', 'employee',
               'employee__employee_position', 'payment_status').prefetch_related('visit_services',
-               'visit_services__provided_service', "visit_services__service", 'visit_services__service__service_type').get(pk=visit_id)
+               'visit_services__provided_service', 'visit_services__provided_service__employee',
+                'visit_services__provided_service__required_parts', "visit_services__service", 
+                 'visit_services__service__service_type').get(pk=visit_id)
         
         context = {
             "visit": visit,
@@ -70,7 +72,24 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def save_visit_data_in_session(self, request, visit):
         request.session['visit_id'] = visit.pk
+
+def visit_service(request, visit_service_id):
+    visit_service = models.VisitService.objects.select_related(
+        'service', 'service__service_type', 'provided_service', 'provided_service__employee').prefetch_related(
+            'provided_service__required_parts'
+        ).get(pk=visit_service_id)
     
+    if request.method == 'POST':
+        qty = int(request.POST.get('quantity', 1))
+        if qty > 0:
+            visit_service.quantity = qty
+            visit_service.save()
+
+    context = {
+        "v_service": visit_service,
+    }
+
+    return render(request, "service_site/visits/_visit_service.html", context)
 
 # Create your views here.
 @login_required()

@@ -4,13 +4,15 @@
     <div class="ms-2 me-auto">
         <div class="fw-bold">{{staged_service.service_name}}</div>
             <div>Category: {{staged_service.service_type_name}}</div>
-            <form hx-post="{% url 'update-staged-service' %}" 
-                hx-trigger="change delay:100ms"
-                hx-swap="none"
-                >
+            <form id="quantity-form-{{staged_service.temp_id}}">
                 <input type="hidden" name="temp_id" value="{{ staged_service.temp_id }}">
                 <input type="hidden" name="visit_id" value="{{ visit_id }}">
-                <input type="text" class="form-control" name="quantity" value="{{ staged_service.quantity }}">
+                <input type="number" min='1' step='1' class="form-control" name="quantity" value="{{ staged_service.quantity }}"
+                    hx-post="{% url 'update-staged-service' %}" 
+                    hx-trigger="input changed delay:300ms"
+                    hx-swap="none"
+                    hx-include="#quantity-form-{{staged_service.temp_id}}"
+                    >
             </form>
             Price: {{staged_service.price}} ₴
     </div>

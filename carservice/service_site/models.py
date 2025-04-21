@@ -344,6 +344,10 @@ class VisitService(models.Model):
     
     def __str__(self):
         return f"{self.service} for {self.visit}"
+    
+    def get_total_price(self):
+        """Calculates the total price for this service."""
+        return self.service.price * self.quantity
 
 class ProvidedService(models.Model):
     provided_service_id = models.AutoField(primary_key=True, db_column='ProvidedServiceID')
@@ -357,11 +361,19 @@ class ProvidedService(models.Model):
     
     def __str__(self):
         return f"Service provided: {self.visitservice}"
+    
+    def get_total_price(self):
+        """Calculates the total price for this provided service."""
+        required_parts_price = 0
+        for r_part in self.required_parts.all():
+            required_parts_price += r_part.get_total_price()
+            
+        return self.visit_service.get_total_price() + required_parts_price
 
 class RequiredPart(models.Model):
     required_part_id = models.AutoField(primary_key=True, db_column='RequiredPartID')
     part_in_station = models.ForeignKey(PartInStation, on_delete=models.CASCADE, db_column='PartInStationID')
-    provided_service = models.ForeignKey(ProvidedService, on_delete=models.CASCADE, db_column='ProvidedServiceID')
+    provided_service = models.ForeignKey(ProvidedService, on_delete=models.CASCADE, db_column='ProvidedServiceID', related_name='required_parts')
     quantity = models.IntegerField(db_column='Quantity')
     
     class Meta:
@@ -370,6 +382,14 @@ class RequiredPart(models.Model):
     
     def __str__(self):
         return f"{self.quantity} of {self.partinstation.part} for {self.providedservice}"
+    
+    def get_part_price(self):
+        """Calculates the price for this required part."""
+        return round(self.part_in_station.part.price_per_package / self.part_in_station.part.quantity_per_package, 2)
+    
+    def get_total_price(self):
+        """Calculates the total price for this required part record."""
+        return round(self.get_part_price() * self.quantity, 2)
 
 class Supplier(models.Model):
     supplier_id = models.AutoField(primary_key=True, db_column='SupplierID')

@@ -24,6 +24,8 @@ urlpatterns = [
     path('visit-detail/update-visit-car', views.update_visit_car, name='update-visit-car'),
     path('visit-detail/<int:visit_id>/', views.VisitDetailView.as_view(), name='visit-detail'),
 
+    path('visit-service/<int:visit_service_id>/', views.visit_service, name='visit-service'),
+
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]
