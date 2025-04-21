@@ -50,9 +50,21 @@
                                     {{ visit_form.payment_status|as_crispy_field }}                     
                                 </div>
                             </div>
+
                             <div class="mt-2">
                                 {{ visit_form.employee|as_crispy_field }}
                             </div>
+
+                            <div class="mt-2">
+                                Price:
+                                {% if visit %}
+                                    {{ visit.price }}
+                                {%else%}
+                                    0
+                                {% endif %}
+                                ₴
+                            </div>
+
                             <div class="mt-2">
                                 {{ visit_form.details|as_crispy_field }}
                             </div>
@@ -60,7 +72,7 @@
                             <input class='form-control' type="hidden" name="visit_id" id="visit-id-hidden-input" value="{{ visit.pk }}">
 
                             <div id="visit-car-input">
-                                <input class='form-control' type="hidden" name="car" id="car-id-input" value="{{ visit.car.pk }}">
+                                <input class='form-control' type="hidden" name="car" id="car-id-input" value="{{ visit_car.pk }}">
                             </div>                            
                               
                             <button type="submit" class="btn btn-primary mt-3">
@@ -70,6 +82,15 @@
                     </div>
                     
                     <div class="bg-warning col-7 shadow me-2 ms-2 align-self-start rounded" id="visit-car-details">
+                        {% if visit_form.car.errors %}
+                        <div class="alert alert-danger mt-1">
+                            <strong>Car field error:</strong>
+                            {% for error in visit_form.car.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
                         {% include 'service_site/visits/_visit_car_details.html' %}
                     </div>
                 </div>

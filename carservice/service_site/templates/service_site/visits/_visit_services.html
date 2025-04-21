@@ -1,18 +1,15 @@
-{% if visit_services %} 
-    <div class="list-group mb-2" id="visit-services">
-        
-            {% for v_service in visit_services %}
-                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                    x-data="{ editing: false }">
-                    {% include 'service_site/visits/_visit_service.html' %}
-                </div>
-            {% endfor %}
-        
-    </div>
-{% else %}
-    <div>
-        <span class="text-mutedfw-bold">No services added yet</span>
-    </div>
-{% endif %}
-
-
+<div class="list-group mb-2" id="visit-services">
+    {% if visit_services %} 
+        {% for v_service in visit_services %}
+            <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                x-data="{ editing: false }">
+                {% include 'service_site/visits/_visit_service.html' %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div>
+            <span class="text-mutedfw-bold">No services added yet</span>
+        </div>
+    {% endif %}
+    
+</div>

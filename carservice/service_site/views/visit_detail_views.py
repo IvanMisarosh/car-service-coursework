@@ -36,7 +36,6 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "visit_customer": visit.car.customer,
             "visit_form": forms.VisitForm(instance=visit),
         }
-        self.save_visit_data_in_session(request, visit)
 
         return render(request, "service_site/visits/visit_details.html", context)
     
@@ -59,19 +58,19 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
         else:
             print("Form is not valid")
             print(form.errors)
-            print(form.instance)
-            # If form is not valid, re-render the page with errors
-            print(form.instance.visit_services.all())
-            return render(request, "service_site/visits/visit_details.html", {
-                "visit_form": form,
-                "visit_car": form.instance.car,
-                "visit_customer": form.instance.car.customer, 
-                "visit": form.instance,
-                "visit_services": form.instance.visit_services.all(),
-            })
 
-    def save_visit_data_in_session(self, request, visit):
-        request.session['visit_id'] = visit.pk
+            car = getattr(form.instance, 'car', None)
+            visit_services = getattr(form.instance, 'visit_services', None)
+            
+            context = {
+                "visit_form": form,
+                "visit_car": form.instance.car if car else None,
+                "visit_customer": form.instance.car.customer if car else None, 
+                "visit": form.instance if form.instance.pk else None,
+                "visit_services": visit_services.all() if form.instance.pk else None,
+            }
+            print(context)
+            return render(request, "service_site/visits/visit_details.html", context)
 
 def visit_service(request, visit_service_id):
     visit_service = models.VisitService.objects.select_related(
@@ -258,6 +257,7 @@ def save_staged_services(request):
     visit_services = models.VisitService.objects.filter(visit=visit).select_related(
         'service', 'service__service_type', 'provided_service').order_by('-provided_service__provided_date')
     
+    print(visit_services)
     return render(request, 'service_site/visits/_visit_services.html', 
         {
             'visit_services': visit_services,
