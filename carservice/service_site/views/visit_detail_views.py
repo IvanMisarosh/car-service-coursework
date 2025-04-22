@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from .. import models
 from django.contrib.auth.decorators import permission_required
@@ -72,23 +72,38 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
             print(context)
             return render(request, "service_site/visits/visit_details.html", context)
 
-def visit_service(request, visit_service_id):
-    visit_service = models.VisitService.objects.select_related(
-        'service', 'service__service_type', 'provided_service', 'provided_service__employee').prefetch_related(
-            'provided_service__required_parts'
-        ).get(pk=visit_service_id)
-    
-    if request.method == 'POST':
+class VisitServiceView(View):
+    def get_object(self, visit_service_id):
+        return models.VisitService.objects.select_related(
+            'service', 'service__service_type', 'provided_service', 
+            'provided_service__employee', 'visit'
+        ).prefetch_related('provided_service__required_parts').get(pk=visit_service_id)
+
+    def post(self, request, visit_service_id):
+        visit_service = self.get_object(visit_service_id)
+
         qty = int(request.POST.get('quantity', 1))
         if qty > 0:
             visit_service.quantity = qty
             visit_service.save()
 
-    context = {
-        "v_service": visit_service,
-    }
+        context = {
+            "v_service": visit_service,
+            "v_price": float(visit_service.visit.price)
+        }
 
-    return render(request, "service_site/visits/_visit_service.html", context)
+        # TODO: find a way to update the visit price after adding/deleting a service without refreshing the page
+        response = render(request, "service_site/visits/_visit_service.html", context)
+        response["HX-Refresh"] = "true" 
+        return response
+
+    def delete(self, request, visit_service_id):
+        visit_service = get_object_or_404(models.VisitService, pk=visit_service_id)
+        visit_service.delete()
+        # TODO: find a way to update the visit price after adding/deleting a service without refreshing the page
+        response = HttpResponse("")
+        response["HX-Refresh"] = "true"
+        return response
 
 # Create your views here.
 @login_required()
@@ -274,11 +289,3 @@ def clear_staged_services(request):
     
     # Return an empty response or a success message
     return redirect('visit-detail', visit_id=visit_id)
-
-def delete_visit_service(request, visit_service_id):
-    
-    # Get the VisitService object and delete it
-    visit_service = models.VisitService.objects.get(pk=visit_service_id)
-    visit_service.delete()
-    
-    return HttpResponse("")

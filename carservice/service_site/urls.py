@@ -14,8 +14,6 @@ urlpatterns = [
     path('save-staged-services/', views.save_staged_services, name='save-staged-services'),
     path('clear-staged-services/', views.clear_staged_services, name='clear-staged-services'),
 
-    path('delete-visit-service/<int:visit_service_id>', views.delete_visit_service, name='delete-visit-service'),
-
     path('select-car-in-car-search-modal', views.select_car_in_car_search_modal, name='select-car-in-car-search-modal'),
 
     path('visit-detail/', views.VisitDetailView.as_view(), name='create-visit'),
@@ -24,7 +22,7 @@ urlpatterns = [
     path('visit-detail/update-visit-car', views.update_visit_car, name='update-visit-car'),
     path('visit-detail/<int:visit_id>/', views.VisitDetailView.as_view(), name='visit-detail'),
 
-    path('visit-service/<int:visit_service_id>/', views.visit_service, name='visit-service'),
+    path('visit-service/<int:visit_service_id>/', views.VisitServiceView.as_view(), name='visit-service'),
 
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),

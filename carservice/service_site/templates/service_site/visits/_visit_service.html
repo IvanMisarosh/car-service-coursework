@@ -30,7 +30,7 @@
             <span class="badge bg-warning rounded-pill">Pending</span>
         {% endif %}
     </div>
-    
+
     {% if v_service.provided_service %}
         <div x-data="{ show_used_parts: false, button_text: 'Show'}">
             <button class="btn btn-sm btn-outline-primary me-2 mt-2" @click="show_used_parts = !show_used_parts; button_text = show_used_parts ? 'Hide' : 'Show'">
@@ -84,11 +84,11 @@
 
         {% csrf_token %}
         <button class="btn btn-sm btn-close btn-danger" 
-                hx-delete="{% url 'delete-visit-service' v_service.pk %}" 
+                hx-delete="{% url 'visit-service' v_service.pk %}" 
                 hx-target="closest .list-group-item"
                 hx-swap="outerHTML"
-
-                aria-label="Delete">
+                hx-confirm="Are you sure you want to delete this service?"
+                >
                 
         </button>
     {% endif %}

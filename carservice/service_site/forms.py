@@ -19,13 +19,13 @@ class VisitForm(ModelForm):
             'payment_date': 'Payment Date',
         }
         widgets = {
-            'visit_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'visit_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'visit_status': forms.Select(attrs={'class': 'form-select'}),
             'car': forms.HiddenInput(attrs={'class': 'form-select', 'id': 'car-hidden-input'}),
             'employee': forms.Select(attrs={'class': 'form-select'}),
             'payment_status': forms.Select(attrs={'class': 'form-select'}),
             'details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'planned_end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'actual_end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'payment_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'planned_end_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'actual_end_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'payment_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
         }

@@ -18,7 +18,7 @@
         <div class="row flex-nowrap mt-2">
             <div class="bg-warning col-8 align-self-start me-2 ms-2 shadow rounded">
                 <div class="row flex-nowrap mt-2">
-                    <div class="bg-warning col-4 shadow me-2 ms-2 mb-2 mt-2 align-self-start rounded">
+                    <div class="bg-warning col-5 shadow me-2 ms-2 mb-2 mt-2 align-self-start rounded">
                         <form method="post" action={% if visit.pk %}"{% url 'visit-detail'  visit.pk  %}" {%else%} "{% url 'create-visit' %}" {% endif %}
                          id="visit-form" 
                          hx-target="#visit-details"
@@ -54,10 +54,10 @@
                             <div class="mt-2">
                                 {{ visit_form.employee|as_crispy_field }}
                             </div>
-
+                            
                             <div class="mt-2">
                                 Price:
-                                {% if visit %}
+                                {% if visit.price %}
                                     {{ visit.price }}
                                 {%else%}
                                     0
@@ -81,7 +81,7 @@
                         </form>
                     </div>
                     
-                    <div class="bg-warning col-7 shadow me-2 ms-2 align-self-start rounded" id="visit-car-details">
+                    <div class="bg-warning col-6 shadow me-2 ms-2 align-self-start rounded" id="visit-car-details">
                         {% if visit_form.car.errors %}
                         <div class="alert alert-danger mt-1">
                             <strong>Car field error:</strong>
