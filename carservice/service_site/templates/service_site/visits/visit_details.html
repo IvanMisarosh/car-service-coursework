@@ -9,22 +9,25 @@
 {% endblock %}
 
 {% block js_files %}
-    <script src="{% static 'service_site/js/car_search_modal.js' %}"></script>
+    <script src="{% static 'service_site/js/modals.js' %}"></script>
 {% endblock %}
 
 {% block content %}
     {% include 'service_site/includes/nav_bar.html'%}
-    <div class="container-fluid px-5 pt-2">
-        <div class="row flex-nowrap mt-2">
-            <div class="bg-warning col-8 align-self-start me-2 ms-2 shadow rounded">
-                <div class="row flex-nowrap mt-2">
-                    <div class="bg-warning col-5 shadow me-2 ms-2 mb-2 mt-2 align-self-start rounded">
-                        <form method="post" action={% if visit.pk %}"{% url 'visit-detail'  visit.pk  %}" {%else%} "{% url 'create-visit' %}" {% endif %}
+    <div class="container-fluid g-2 px-4 pt-2">
+        <div class="row flex-nowrap g-2 mt-2">
+            <div class="col-8 align-self-start g-2 mt-2 mx-1 visit-details-container">
+                <div class="row flex-nowrap g-2 mt-2">
+                    <div class="card col-5 px-0 mt-2 me-1 align-self-start rounded">
+                        <div class="card-header">
+                            <h5>Visit details: {{visit.visit_number}}</h5>
+                        </div>
+                        <form method="post" class='card-body' action={% if visit.pk %}"{% url 'visit-detail'  visit.pk  %}" {%else%} "{% url 'create-visit' %}" {% endif %}
                          id="visit-form" 
                          hx-target="#visit-details"
                          hx-push-url="true" 
                          hx-swap="innerHTML">
-                            <h5>Visit details: {{visit.visit_number}}</h5>
+                            
                             {% csrf_token %}
                             <div class="row">
                                 <div class="col-md-6">
@@ -75,13 +78,13 @@
                                 <input class='form-control' type="hidden" name="car" id="car-id-input" value="{{ visit_car.pk }}">
                             </div>                            
                               
-                            <button type="submit" class="btn btn-primary mt-3">
+                            <button type="submit" class="btn btn-primary mb-2 mx-2">
                                 {% if visit %} Save {% else %} Create {% endif %}
                             </button>
                         </form>
                     </div>
                     
-                    <div class="bg-warning col-6 shadow me-2 ms-2 align-self-start rounded" id="visit-car-details">
+                    <div class="col-7 g-2 mt-2 align-self-start rounded" id="visit-car-details">
                         {% if visit_form.car.errors %}
                         <div class="alert alert-danger mt-1">
                             <strong>Car field error:</strong>
@@ -96,11 +99,10 @@
                 </div>
             </div>
 
-            <div class="bg-warning col-4 shadow rounded me-2 ms-2 align-self-start" id="visit-services-details">
+            <div class="col-4 align-self-start" id="visit-services-details">
                 <h2> Services </h2>
                 {% if visit %}
                     {% include 'service_site/visits/_visit_services.html' %}
-                    <!-- Button trigger modal -->
                     <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#serviceSearchModal">
                         Add services to visit
                     </button> 
@@ -109,8 +111,6 @@
                 {% endif %}
             </div>
         </div>
-        
-        
     </div>
     <!-- Visit Service Search Modal -->
     <div class="modal fade" id="serviceSearchModal" tabindex="-1" aria-labelledby="serviceSearchModalLabel" aria-hidden="true">
@@ -123,7 +123,7 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 border rounded">
                                 {% include 'service_site/visits/_service_search.html' %}
                             </div>
                             <div class="col-md-6 ms-auto" id="staged-visit-services-container">
@@ -133,14 +133,14 @@
                             </div>
                         </div>
                     </div>
-                    
+                </div>
+                <div class="modal-footer">
                     <button id="add-services-button" type="button" class="btn btn-primary add-services-button" data-bs-dismiss="modal"
                             hx-post="{% url 'save-staged-services' %}" 
                             hx-target="#visit-services" 
                             hx-vals='{"visit_id": "{{ visit.pk }}"}'>
                         Add services to visit
                     </button>
-                    
                 </div>
             </div>
         </div>
@@ -148,7 +148,7 @@
 
         <!-- Car Search Modal -->
     <div class="modal fade" id="carSearchModal" tabindex="-1" aria-labelledby="carSearchModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="carSearchModalLabel">Search for a Car</h5>
@@ -156,24 +156,23 @@
                 </div>
                 <div class="modal-body">
                     <div id="selected-car-details-container">
-                        <div class="row bg-warning shadow me-2 ms-2 align-self-start rounded" id="selected-car-details">
+                        <div class="row align-self-start mx-2 mb-2" id="selected-car-details">
                         
                         </div>
                     </div>
-                    <div>
-                        <button id="confirm-car-button" type="button" class="btn btn-primary add-services-button" data-bs-dismiss="modal"
-                            hx-post="{% url 'update-visit-car'%}" 
-                            hx-target="#visit-car-details"
-                            hx-trigger="click"
-                            hx-swap="innerHTML"
-                            hx-include="#selected-car-id-hidden-input"
-                        >
-                            Confirm car in visit
-                        </button>
-                    </div>
-
-                    
                     {% include 'service_site/visits/_car_search.html' %}
+                </div>
+                <div class="modal-footer">
+                    <button id="confirm-car-button" type="button" class="btn btn-primary add-services-button" data-bs-dismiss="modal"
+                        hx-post="{% url 'update-visit-car'%}" 
+                        hx-target="#visit-car-details"
+                        hx-trigger="click"
+                        hx-swap="innerHTML"
+                        hx-include="#selected-car-id-hidden-input"
+                        hx-confirm="Are you sure you want to change the car in visit?"
+                    >
+                        Confirm car in visit
+                    </button>
                 </div>
             </div>
         </div>

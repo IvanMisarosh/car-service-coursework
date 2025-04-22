@@ -7,7 +7,8 @@
          hx-trigger="click"
          >
         <div class="d-flex justify-content-between">
-            <h5 class="mb-1">{{car.car_model.car_brand.brand_name}} {{car.car_model.model_name}}</h5>
+            <h5 class="mb-1">{{car.car_model.car_brand.brand_name}} {{car.car_model.model_name}} <span class="badge bg-secondary rounded-pill">{{car.vin}}</span></h5>
+            
             {% if car.manufacture_year%}
                 <small>{{car.manufacture_year}} year</small>
             {% endif %}

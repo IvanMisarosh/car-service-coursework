@@ -56,9 +56,6 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
             visit = form.save()
             return redirect('visit-detail', visit_id=visit.pk)
         else:
-            print("Form is not valid")
-            print(form.errors)
-
             car = getattr(form.instance, 'car', None)
             visit_services = getattr(form.instance, 'visit_services', None)
             
@@ -69,7 +66,6 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 "visit": form.instance if form.instance.pk else None,
                 "visit_services": visit_services.all() if form.instance.pk else None,
             }
-            print(context)
             return render(request, "service_site/visits/visit_details.html", context)
 
 class VisitServiceView(View):
@@ -271,8 +267,7 @@ def save_staged_services(request):
     
     visit_services = models.VisitService.objects.filter(visit=visit).select_related(
         'service', 'service__service_type', 'provided_service').order_by('-provided_service__provided_date')
-    
-    print(visit_services)
+
     return render(request, 'service_site/visits/_visit_services.html', 
         {
             'visit_services': visit_services,

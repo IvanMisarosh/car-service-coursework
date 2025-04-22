@@ -1,13 +1,19 @@
-<input class="border border-gray-300 rounded px-4 py-2 w-full" id="car-search-bar"
-        type="search"
-        name="search"
-        placeholder="Begin Typing To Search Cars..."
-        hx-get="{% url 'car-search' %}"
-        hx-trigger="input delay:0.2s"
-        hx-target="#car-search-results"
-    />
+<div class="mx-2 my-2">
+    <input class="border rounded mb-2 form-control" id="car-search-bar"
+            type="search"
+            name="search"
+            placeholder="Search Cars by brand, model and/or owner information..."
+            hx-get="{% url 'car-search' %}"
+            hx-trigger="input delay:0.2s"
+            hx-target="#car-search-results"
+        />
     <section> 
-        <div class="list-group" id="car-search-results">
+        <div class="list-group" id="car-search-results"
+            hx-get="{% url 'car-search' %}"
+            hx-trigger="load"
+            hx-target="#car-search-results"
+            >
             {% include "service_site/visits/_car_search_result.html" %}
         </div>
     </section>
+</div>
