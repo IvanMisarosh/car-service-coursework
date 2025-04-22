@@ -18,17 +18,30 @@
     <div class="container-fluid px-5 pt-2">
         <div class="row flex-nowrap mt-2">
             <h2 class="col-2">Visits</h2>
-            <div class="col-2 d-flex align-items-center">
-                <label for="sorting_method" class="mb-0 me-2" id='items-lable'>Sorting: </label>
+            <div class="col-4 rounded me-2 ms-2 align-self-start" id="visit-search-container">
+                <input class="border rounded px-4 py-2 my-2 form-control" id="visit-search-bar"
+                    type="search"
+                    name="search"
+                    placeholder="Begin Typing To Search services..."
+                    hx-get="{% url 'visits' %}"
+                    hx-trigger="input delay:0.2s"
+                    hx-include="#visit-filter-form"
+                    hx-target="#visit-list"
+                />
             </div>
+            {% comment %} <div class="col-2 d-flex align-items-center">
+                <label for="sorting_method" class="mb-0 me-2" id='items-lable'>Sorting: </label>
+            </div> {% endcomment %}
             <a class="col-2" method='GET' href="{% url 'create-visit' %}"><button class="btn btn-primary mt-2 mb-2">Add visit</button></a>
         </div>
         
         <div class="row flex-nowrap mt-2">
-            <div class="col-10 shadow rounded me-2 ms-2 align-self-start" id="visit-list">
+            <div class="col-3 shadow rounded me-2 ms-2 align-self-start" id="visit-filter-form-container">
+                {% crispy filter_form %}
+            </div>
+            <div class="col-9 shadow rounded me-2 ms-2 align-self-start" id="visit-list">
                 {% include 'service_site/visits/_visit_list.html' %}
             </div>
-
         </div>
     </div>
 {% endblock %}

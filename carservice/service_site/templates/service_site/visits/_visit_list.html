@@ -21,14 +21,32 @@
                     <a href="{% url 'visit-detail' visit.visit_id %}">{{ visit.visit_number }}</a>
                 </td>
                 <td>{{ visit.employee.first_name }} {{ visit.employee.last_name }}</td>
-                <td>{{ visit.car.vin}}</td>
+                <td>
+                    <div x-data="{ show_details: false }">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center"
+                                @click="show_details = !show_details"
+                                style="cursor: pointer;">
+                                <h6 class="mb-0">{{ visit.car.car_model.car_brand.brand_name }} {{ visit.car.car_model.model_name }}</h6>
+                                <i class="bi" :class="show_details ? 'bi-caret-up-fill' : 'bi-caret-down-fill'"></i>
+                            </div>
+                            <div class="card-body" x-show="show_details" x-transition>
+                                <div><strong>VIN:</strong> {{ visit.car.vin }}</div>
+                                <div><strong>Year:</strong> {{ visit.car.manufacture_year|default:'Unknown' }}</div>
+                                <div><strong>Owner:</strong> {{ visit.car.customer.first_name }} {{ visit.car.customer.last_name }}</div>
+                                <div><strong>Phone:</strong> {{ visit.car.customer.phone_number }}</div>
+                                <div><strong>Email:</strong> {{ visit.car.customer.email|default:'Not specified' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </td>                
                 <td>{{ visit.visit_date}}</td>
                 <td>{{ visit.visit_status.status_name }}</td>
-                <td>{{ visit.price }} ₴</td>
-                <td>{{ visit.payment_status.payment_name }}</td>
+                <td>{{ visit.price|default:'0'}} ₴</td>
+                <td>{{ visit.payment_status.payment_name|default:"Not specified"}}</td>
                 {% comment %} <td>{{ visit.payment_date }}</td> {% endcomment %}
                 {% comment %} <td>{{ visit.planned_end_date }}</td> {% endcomment %}
-                <td>{{ visit.actual_end_date }}</td>
+                <td>{{ visit.actual_end_date|default:"Not specified" }}</td>
             </tr>
             {% empty %}
             <tr>
@@ -44,6 +62,8 @@
         {% if visits.has_previous %}
         <button hx-get="{% url 'visits' %}?page={{ visits.previous_page_number }}&items_per_page={{ visits.paginator.per_page }}" 
                 hx-target="#visit-list"
+                hx-include="#visit-filter-form"
+                hx-vals='js:{"search": document.getElementById("visit-search-bar").value}'
                 class="btn btn-primary">Previous</button>
         {% endif %}
 
@@ -53,6 +73,8 @@
         <button hx-get="{% url 'visits' %}?page={{ visits.next_page_number }}&items_per_page={{ visits.paginator.per_page }}" 
                 hx-target="#visit-list"
                 hx-push-url="true"
+                hx-include="#visit-filter-form"
+                hx-vals='js:{"search": document.getElementById("visit-search-bar").value}'
                 class="btn btn-primary">Next</button>
         {% endif %}
     </div>
