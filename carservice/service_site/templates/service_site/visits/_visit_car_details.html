@@ -1,10 +1,17 @@
-<div class="mt-2 mb-2 rounded" id="customer-details">
+<div class="mb-2 rounded" id="customer-details">
                     
     {% if visit_customer %}
-        <h5>Owner details</h5>
         <div class="card">
-            <div class="card-header">
+            <div class="card-header bg-primary d-flex justify-content-between align-items-center text-white">
                 <h5>{{visit_customer.first_name}} {{visit_customer.last_name}}</h5>
+                <button id="change-customer-button" type="button" class="btn btn-sm btn-outline-light" x-show='editing_mode'
+                    hx-get="{% url 'customer-search-page' %}"
+                    hx-target="#visit-customer-details"
+                    hx-trigger="click"
+                    hx-swap="innerHTML"
+                    >
+                    Change customer
+                </button>
             </div>
             <div class="card-body">
                 <h7>
@@ -24,18 +31,28 @@
 
 
 <div id="selected-car">
-    {% if visit_car %}
-        {% include 'service_site/visits/_car_details.html'%}
-    {% else %}
-        Select the car to see the details
-    {% endif %}
-    
+    <div class="card rounded-4 overflow-hidden car-info-card">
+        {% if visit_car %}
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    {{ visit_car.car_model.car_brand.brand_name }} {{ visit_car.car_model.model_name }}
+                </h6>
+                <button id="change-customer-button" type="button" class="btn btn-sm btn-primary" x-show='editing_mode'
+                    hx-get="{% url 'select-visit-customer' %}"
+                    hx-target="#visit-customer-details"
+                    hx-trigger="click"
+                    hx-swap="innerHTML"
+                    hx-vals='{"customer_id": "{{ visit_customer.pk }}"}'
+                    >
+                    Change car
+                </button>
+            </div>
+            {% include 'service_site/visits/_car_details.html'%}
+        {% else %}
+            Select the car to see the details
+        {% endif %}
+    </div>
 </div>
-
-<button type="button" class="btn btn-primary my-2 mx-2" data-bs-toggle="modal" data-bs-target="#carSearchModal">
-    Change car in visit
-</button> 
-
 
 <div id="visit-car-input" hx-swap-oob="true" >
     <input type="hidden" name="car" id="car-id-input" value="{{ visit_car.pk }}">

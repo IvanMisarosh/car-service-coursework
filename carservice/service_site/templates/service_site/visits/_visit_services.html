@@ -1,15 +1,32 @@
-<div class="list-group mb-2" id="visit-services">
-    {% if visit_services %} 
-        {% for v_service in visit_services %}
-            <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                x-data="{ editing: false }">
-                {% include 'service_site/visits/_visit_service.html' %}
-            </div>
-        {% endfor %}
-    {% else %}
-        <div>
-            <span class="text-mutedfw-bold">No services added yet</span>
-        </div>
-    {% endif %}
+<div class="card mt-2" id="visit-services">
+    <div class="card-header mb-2 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Visit services</h5>
+        {% if visit_price > 0 %} 
+            <span id="visit-price" class="badge bg-success">Total: {{ visit_price }} ₴</span>
+        {% else %}
+            <span id="visit-price" class="badge bg-danger">No services added yet</span>
+        {% endif %}
+    </div>
     
+    <div class="card-body list-group mb-2 mx-2" id="visit-services-container">
+        {% if visit_services %} 
+            {% for v_service in visit_services %}
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                    x-data="{ editing: false }">
+                    {% include 'service_site/visits/_visit_service.html' %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div>
+                <span class="text-mutedfw-bold">No services added yet</span>
+            </div>
+        {% endif %}
+        
+    </div>
 </div>
+
+ {% comment %} WHY OOB DOESNT WORK???{% endcomment %} 
+{% comment %} <section id="messages" hx-swap-oob="true" hx-swap="innerHTML">
+    {% include 'service_site/visits/_toast.html'%}
+</section> {% endcomment %}
+

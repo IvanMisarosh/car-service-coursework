@@ -26,6 +26,7 @@
                     hx-get="{% url 'visits' %}"
                     hx-trigger="input delay:0.2s"
                     hx-include="#visit-filter-form"
+                    hx-vals='js:{"items_per_page": document.getElementById("items-per-page").value}'
                     hx-target="#visit-list"
                 />
             </div>

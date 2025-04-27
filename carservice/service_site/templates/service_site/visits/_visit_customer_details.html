@@ -1,0 +1,65 @@
+<div class="mt-2 mb-2 rounded" id="customer-details">      
+    {% if visit_customer %}
+        <div class="card">
+            <div class="card-header bg-primary d-flex justify-content-between align-items-center text-white">
+                <h5>{{visit_customer.first_name}} {{visit_customer.last_name}}</h5>
+                <button id="change-customer-button" type="button" class="btn btn-sm btn-outline-light"
+                    hx-get="{% url 'customer-search-page' %}"
+                    hx-target="#visit-customer-details"
+                    hx-trigger="click"
+                    hx-swap="innerHTML"
+                    >
+                    Change customer
+                </button>
+            </div>
+            <div class="card-body">
+                <h7>
+                    <i class="bi bi-phone"></i>
+                    {{visit_customer.phone_number}}
+                </h7>
+                <p>
+                    <i class="bi bi-envelope-at"></i>
+                    {{visit_customer.email}}
+                </p>
+            </div>
+        </div>
+
+        {{ visit_customer.first_name}}'s cars:
+        <div class="list-group" id="customer-cars-list">
+            {% for visit_car in visit_customer.cars.all %}
+                <div class="list-group-item p-0 mb-2 rounded">
+                    <div x-data="{ show_details: false }" class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center"
+                             @click="show_details = !show_details"
+                             style="cursor: pointer;">
+                            <h6 class="mb-0">
+                                {{ visit_car.car_model.car_brand.brand_name }} {{ visit_car.car_model.model_name }}
+                                ({{ visit_car.manufacture_year|default:'Unknown year' }})
+                            </h6>
+                            <button id="confirm-car-button" type="button" class="btn btn-sm btn-primary"
+                                hx-post="{% url 'update-visit-car'%}" 
+                                hx-target="#visit-customer-details"
+                                hx-trigger="click"
+                                hx-swap="innerHTML"
+                                hx-vals='{"selected_car_id": "{{ visit_car.pk }}"}'
+                            >
+                                Select car
+                            </button>
+                            <i class="bi" :class="show_details ? 'bi-caret-up-fill' : 'bi-caret-down-fill'"></i>
+                        </div>
+                        <div class="card-body" x-show="show_details" x-transition>
+                            {% include 'service_site/visits/_car_details.html' %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="alert alert-info">
+                    This customer has no registered cars.
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        Select customer 
+        {% include 'service_site/visits/_customer_search.html'%}
+    {% endif %}     
+</div>

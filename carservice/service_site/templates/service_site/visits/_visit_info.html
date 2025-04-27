@@ -1,0 +1,69 @@
+<div class="card-body">
+    <div class="row g-2">
+        <div class="col-5">
+            <!-- Visit State Card -->
+            <div class="card mb-2">
+                <div class="card-header pb-0 {% if visit.visit_status.status_name == 'Completed' %}bg-success{% elif visit.visit_status.status_name == 'Cancelled' %}bg-danger{% else %}bg-warning{% endif %} text-white">
+                    <h6>Visit State</h6>
+                </div>
+                <div class="card-body py-1 px-2">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <strong>Visit Date:</strong><br> {{ visit.visit_date|date:"Y-m-d H:i" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Status:</strong><br> {{ visit.visit_status}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Planned End Date:</strong><br> {{ visit.planned_end_date|date:"Y-m-d H:i"|default:"Not set" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Actual End Date:</strong><br> {{ visit.actual_end_date|date:"Y-m-d H:i"|default:"Not set"  }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Details Card -->
+            <div class="card mb-2">
+                <div class="card-header pb-0 {% if visit.payment_status.payment_name == 'Paid' %}bg-success{% elif visit.payment_status.payment_name == 'Pending' %}bg-warning{% else %}bg-danger{% endif %} text-white">
+                    <h6>Payment Details</h6>
+                </div>
+                <div class="card-body py-1 px-2">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <strong>Payment Date:</strong><br> {{ visit.payment_date|date:"Y-m-d H:i"|default:"Not set"  }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Payment Status:</strong><br> {{ visit.payment_status|default:"Not set"  }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visit Details Card -->
+            <div class="card mb-2">
+                <div class="card-header pb-0 bg-secondary text-white">
+                    <h6>Visit Details</h6>
+                </div>
+                <div class="card-body py-1 px-2">
+                    <div class="mb-2">
+                        <strong>Employee:</strong><br> {{ visit.employee }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Details:</strong><br> 
+                        {{ visit.details|default:"No details provided"|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Car Details -->
+        <div class="col-7 mt-2 align-self-start rounded" id="visit-customer-details-readonly">
+            {% include 'service_site/visits/_visit_car_details.html' %}
+        </div>
+    </div>
+</div>
+

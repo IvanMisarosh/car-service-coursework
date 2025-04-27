@@ -19,7 +19,7 @@
     overflow-y:scroll;
 }
 
-#visit-services{
+#visit-services-container{
     max-height: 450px;
     margin-bottom: 10px;
     overflow-y:scroll;
@@ -31,12 +31,14 @@
     overflow-y:scroll;
 }
 
-/* .car-info-card{
-    background: #00cfff;
-    color: #0d0d0d;
-} */
-/* 
-.visit-details-container{
-    background: #00cfff;
-    color: #0d0d0d;
-} */
+#customer-search-results{
+    max-height: 400px;
+    margin-bottom: 10px;
+    overflow-y:scroll;
+}
+
+#customer-cars-list{
+    max-height: 400px;
+    margin-bottom: 10px;
+    overflow-y:scroll;
+}

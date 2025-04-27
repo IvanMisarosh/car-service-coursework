@@ -1,0 +1,19 @@
+<div class="mx-2 my-2">
+    <input class="border rounded mb-2 form-control" id="customer-search-bar"
+            type="search"
+            name="search"
+            placeholder="Search Customers by name, phone number and/or email..."
+            hx-get="{% url 'customer-search' %}"
+            hx-trigger="input delay:0.2s"
+            hx-target="#customer-search-results"
+        />
+    <section> 
+        <div class="list-group" id="customer-search-results"
+            hx-get="{% url 'customer-search' %}"
+            hx-trigger="load"
+            hx-target="#customer-search-results"
+            >
+            {% include "service_site/visits/_customer_search_result.html" %}
+        </div>
+    </section>
+</div>

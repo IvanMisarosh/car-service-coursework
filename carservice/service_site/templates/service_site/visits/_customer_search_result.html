@@ -1,0 +1,19 @@
+{% csrf_token %}
+{% for customer in customers%}
+    <div class="list-group-item list-group-item-action flex-column align-items-start"
+         hx-get="{% url 'select-visit-customer'%}" 
+         hx-target="#visit-customer-details"
+         hx-vals='{"customer_id": "{{ customer.pk }}"}'
+         hx-trigger="click"
+         {% comment %} @click="change_customer = false" {% endcomment %}
+         hx-swap="innerHTML"
+         >
+        <div class="d-flex justify-content-between">
+            <h5 class="mb-1">{{customer.first_name}} {{customer.last_name}} <span class="badge bg-secondary rounded-pill">{{customer.phone_number}}</span></h5>
+            
+            {% if customer.cars%}
+                <small>{{customer.cars.count}} cars</small>
+            {% endif %}
+        </div>
+    </div> 
+{% endfor %}

@@ -1,0 +1,96 @@
+{% load crispy_forms_tags %}
+<div class="card-body">
+    <div class="row g-2">
+        <form method="post" class='col-5' action={% if visit.pk %}"{% url 'visit-detail'  visit.pk  %}" {%else%} "{% url 'create-visit' %}" {% endif %}
+        id="visit-form" 
+        hx-target="#visit-details"
+        hx-push-url="true" 
+        hx-swap="innerHTML"
+            >
+            
+            {% csrf_token %}
+            <div class='card'>
+                <div class="card-header pb-0">
+                    <h6>Visit state</h6>
+                </div>
+                <div class="card-body py-1 px-2">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ visit_form.visit_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ visit_form.visit_status|as_crispy_field }}                     
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ visit_form.planned_end_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ visit_form.actual_end_date|as_crispy_field }}                     
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-2">
+                <div class="card-header pb-0">
+                    <h6>Payment details</h6>
+                </div>
+                <div class="card-body py-1 px-2">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ visit_form.payment_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ visit_form.payment_status|as_crispy_field }}                     
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-2">
+                <div class="card-header pb-0">
+                    <h6>Visit details</h6>
+                </div>
+                <div class="card-body py-1 px-2">
+                    <div class="mt-2">
+                        {{ visit_form.employee|as_crispy_field }}
+                    </div>
+
+                    <div class="mt-2">
+                        {{ visit_form.details|as_crispy_field }}
+                    </div>
+                </div>
+            </div>
+            
+
+            <input class='form-control' type="hidden" name="visit_id" id="visit-id-hidden-input" value="{{ visit.pk }}">
+
+            <div id="visit-car-input">
+                <input class='form-control' type="hidden" name="car" id="car-id-input" value="{{ visit_car.pk }}">
+            </div>                            
+            
+            <button type="submit" class="btn btn-primary my-2 mx-2">
+                {% if visit %} Save {% else %} Create {% endif %}
+            </button>
+
+        </form>
+        <div class="col-7 g-2 mt-2 align-self-start rounded" id="visit-customer-details" x-data="{ change_customer: false}">
+            {% if visit_form.car.errors %}
+            <div class="alert alert-danger mt-1">
+                <strong>Car field error:</strong>
+                {% for error in visit_form.car.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if visit_car %}
+                {% include 'service_site/visits/_visit_car_details.html'%}
+            {% else %}
+                {% include 'service_site/visits/_visit_customer_details.html' %}
+            {% endif %}
+        </div>
+    </div>
+</div>

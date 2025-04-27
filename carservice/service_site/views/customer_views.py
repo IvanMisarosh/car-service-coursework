@@ -4,7 +4,7 @@ from .. import models
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from .. import filters
-
+from django.db.models import Q
 
 @login_required
 @permission_required('service_site.view_customer', raise_exception=True)
@@ -41,6 +41,43 @@ def customer_list(request):
     }
 
     return render_htmx(request, "service_site/customers/customers.html", "service_site/customers/_customers_list.html", context)
+
+@login_required
+@permission_required('service_site.view_customer', raise_exception=True)
+def customer_search(request):
+    search = request.GET.get("search", '')
+    search_terms = search.split()
+    search_query = Q()
+
+    for term in search_terms:
+        search_query |= Q(first_name__icontains=term) | \
+                Q(last_name__icontains=term) | \
+                Q(email__icontains=term) | \
+                Q(phone_number__icontains=term)
+
+    customers = models.Customer.objects.prefetch_related('cars').filter(search_query).distinct()
+    return render(request, "service_site/visits/_customer_search_result.html", 
+                  {"customers": customers})
+
+@login_required
+@permission_required('service_site.view_customer', raise_exception=True)
+def select_visit_customer(request):
+    customer_id = request.GET.get("customer_id", None)
+    customer = models.Customer.objects.prefetch_related(
+        'cars__car_model', 'cars__car_model__car_brand', 'cars__car_model__suspension_type', 'cars__car_model__engine_type',
+        'cars__car_model__transmission_type', 'cars__car_model__drive_type', 'cars__car_model__body_type'
+    ).get(pk=customer_id)
+
+    context = {
+        'visit_customer': customer,
+    }
+
+    return render(request, "service_site/visits/_visit_customer_details.html", context)
+
+
+def get_customer_search(request):
+    return render(request, "service_site/visits/_customer_search.html")
+
 
 
 def render_htmx(request, template_full, template_partial, context):
