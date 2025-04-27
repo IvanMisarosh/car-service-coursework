@@ -104,8 +104,9 @@ DATABASES = {
             'trust_server_certificate': 'yes'
         },
     }
-
 }
+
+AUTH_USER_MODEL = 'service_site.CustomUser'
 
 
 # Password validation
