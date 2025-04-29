@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.contrib import messages
 import uuid
 from .. import forms
+from ..views_utils import group_required
 
 
 class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -19,7 +20,7 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
         visit_id = kwargs.get('visit_id')
 
         if not visit_id:
-            return render(request, "service_site/visits/visit_details.html", {
+            return render(request, "service_site/visits/visit_details_manager_manager.html", {
                 "visit_form": forms.VisitForm(),
             })
         
@@ -35,11 +36,14 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "visit_services": visit.visit_services.all(),
             "visit_car": visit.car,
             "visit_customer": visit.car.customer,
-            "visit_form": forms.VisitForm(instance=visit),
             "visit_price": visit.price,
         }
 
-        return render(request, "service_site/visits/visit_details.html", context)
+        if request.user.is_authenticated and request.user.groups.filter(name='mechanic').exists():
+            return render(request, "service_site/visits/visit_details_mechanic.html", context)
+        
+        context['visit_form'] = forms.VisitForm(instance=visit)
+        return render(request, "service_site/visits/visit_details_manager.html", context)
     
     def post(self, request, *args, **kwargs):
         visit_id = kwargs.get('visit_id')
@@ -71,7 +75,7 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 "visit_services": visit_services.all() if form.instance.pk else None,
                 "visit_price": form.instance.price if form.instance.pk else None,
             }
-            return render(request, "service_site/visits/visit_details.html", context)
+            return render(request, "service_site/visits/visit_details_manager.html", context)
 
 class VisitServiceView(View):
     def get_object(self, visit_service_id):
@@ -79,6 +83,15 @@ class VisitServiceView(View):
             'service', 'service__service_type', 'provided_service', 
             'provided_service__employee', 'visit'
         ).prefetch_related('provided_service__required_parts').get(pk=visit_service_id)
+    
+    def get(self, request, visit_service_id):
+        visit_service = self.get_object(visit_service_id)
+        context = {
+            "visit_service": visit_service,
+            "visit": visit_service.visit,
+            "visit_price": visit_service.visit.price,
+        }
+        return render(request, "service_site/visits/_selected_visit_service.html", context)
 
     def post(self, request, visit_service_id):
         visit_service = self.get_object(visit_service_id)
@@ -265,3 +278,20 @@ def clear_staged_services(request):
         request.session.modified = True
     
     return HttpResponse("")
+
+def visit_service_with_part_search(request, visit_service_id):
+    visit_service = models.VisitService.objects.get(pk=visit_service_id)
+    part_brands = models.PartBrand.objects.all()
+    part_types = models.PartType.objects.all()
+
+    context = {
+        "visit_service": visit_service,
+        'part_brands': part_brands,
+        'part_types': part_types,
+    }
+
+    if f'staged_parts_{visit_service_id}' in request.session:
+        del request.session[f'staged_parts_{visit_service_id}']
+        request.session.modified = True
+
+    return render(request, "service_site/visits/_required_parts_search_widget.html", context)

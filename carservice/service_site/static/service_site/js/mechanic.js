@@ -1,9 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    document.getElementById('serviceSearchModal').addEventListener('hidden.bs.modal', function () {
-        document.getElementById('staged-visit-services').innerHTML = '';
-    });
-
     // Function to initialize toasts
     function initializeToasts() {
         var toastElements = document.querySelectorAll('.toast');
@@ -24,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Run on initial page load
     document.addEventListener('DOMContentLoaded', initializeToasts);
     
-    // Run when htmx swaps content
+    // // Run when htmx swaps content
     document.body.addEventListener('htmx:afterSwap', initializeToasts);
 
 });

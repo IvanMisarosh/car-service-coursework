@@ -7,7 +7,7 @@
             <form id="quantity-form-{{staged_service.temp_id}}">
                 <input type="hidden" name="temp_id" value="{{ staged_service.temp_id }}">
                 <input type="hidden" name="visit_id" value="{{ visit_id }}">
-                <input type="number" min='1' step='1' class="form-control" name="quantity" value="{{ staged_service.quantity }}"
+                <input type="number" min='1' step='1' class="form-control form-control-sm" name="quantity" value="{{ staged_service.quantity }}"
                     hx-post="{% url 'update-staged-service' %}" 
                     hx-trigger="input changed delay:300ms"
                     hx-swap="none"

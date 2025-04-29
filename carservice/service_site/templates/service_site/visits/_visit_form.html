@@ -71,12 +71,14 @@
                 <input class='form-control' type="hidden" name="car" id="car-id-input" value="{{ visit_car.pk }}">
             </div>                            
             
-            <button type="submit" class="btn btn-primary my-2 mx-2">
+            <button type="submit" class="btn btn-primary my-2 mx-2" :disabled="customer_editing_mode">
                 {% if visit %} Save {% else %} Create {% endif %}
+                <span x-show="customer_editing_mode"> (select customer and car to save)</span>
             </button>
+            
 
         </form>
-        <div class="col-7 g-2 mt-2 align-self-start rounded" id="visit-customer-details" x-data="{ change_customer: false}">
+        <div class="col-7 g-2 mt-2 align-self-start rounded" id="visit-customer-details">
             {% if visit_form.car.errors %}
             <div class="alert alert-danger mt-1">
                 <strong>Car field error:</strong>

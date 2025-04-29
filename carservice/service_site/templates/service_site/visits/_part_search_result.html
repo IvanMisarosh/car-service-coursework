@@ -1,0 +1,35 @@
+{% csrf_token %}
+{% for part_in_station in part_selection %}
+    <div class="list-group-item list-group-item-action flex-column align-items-start"
+         hx-post="{% url 'add-staged-part' %}" 
+         hx-target="#staged-required-parts"
+         hx-swap="beforeend"
+         hx-vals='{
+             "part_id": "{{ part_in_station.pk }}"
+         }'
+         hx-include="#visit_service_id"
+         hx-trigger="click"
+         @click="staged_part_count += 1;"
+         >
+        <div class="d-flex w-60 justify-content-between">
+            <div class="fw-bold">
+                {{ part_in_station.part.part_name }}
+            </div>
+            <small>
+                <span class='badge bg-secondary rounded-pill'>₴{{ part_in_station.part.get_price_per_unit }}</span>
+            </small>
+        </div>
+        <div>
+            {% if part_in_station.part.part_brand %}
+                <span class='badge bg-secondary rounded-pill'>Brand:</span> {{ part_in_station.part.part_brand.brand_name }}
+            {% endif %}
+            {% if part_in_station.part.part_type %}
+                <span class='badge bg-secondary rounded-pill'>Type:</span> {{ part_in_station.part.part_type.part_type_name }}
+            {% endif %}
+            <br>
+            Quantity in Station: {{ part_in_station.quantity }} packages
+            <br>
+            Units per Package: {{ part_in_station.part.quantity_per_package }}
+        </div>
+    </div> 
+{% endfor %}

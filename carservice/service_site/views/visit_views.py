@@ -5,6 +5,7 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from ..filters import VisitFilter
 from django.db.models import Q
+from ..views_utils import render_htmx
 
 
 class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -46,10 +47,3 @@ class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
 
         return render_htmx(request, "service_site/visits/visits.html", "service_site/visits/_visit_list.html", context)
-
-
-def render_htmx(request, template_full, template_partial, context):
-    if request.htmx:
-        return render(request, template_partial, context)
-    else:
-        return render(request, template_full, context)

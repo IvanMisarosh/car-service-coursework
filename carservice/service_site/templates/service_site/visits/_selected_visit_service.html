@@ -1,0 +1,58 @@
+{% load group_filters %}
+<input type="hidden" name="visit_service_id" value="{{ visit_service.pk }}" id="visit_service_id">
+<div class="fw-bold">{{visit_service.service.service_name}}</div>
+<div>Category: {{visit_service.service.service_type.service_type_name}}</div>
+
+<span>
+    Qty: {{visit_service.quantity}} x {{visit_service.service.price}} ₴,
+    {% if visit_service.provided_service %}
+        total (inclding parts): {{ visit_service.provided_service.get_total_price }} ₴
+    {% else %}
+        total: {{ visit_service.get_total_price }} ₴
+    {% endif %}
+</span>
+
+<div>
+    {% if visit_service.provided_service %}
+        <span class="badge bg-success rounded-pill">
+            Provided 
+            {% if visit_service.provided_service.provided_date %}
+                on: {{visit_service.provided_service.provided_date|date:"F j, Y" }}
+            {% endif %}
+        </span>
+        <span> by {{visit_service.provided_service.employee}}</span> 
+    {% else %}
+        <span class="badge bg-warning rounded-pill">Pending</span>
+    {% endif %}
+</div>
+
+{% if visit_service.provided_service %}
+    <div x-data="{ show_used_parts: false, button_text: 'Show'}">
+        <button class="btn btn-sm btn-outline-primary me-2 mt-2" @click="show_used_parts = !show_used_parts; button_text = show_used_parts ? 'Hide' : 'Show'">
+            <i class="bi bi-tools"></i> 
+            <span x-text='button_text'></span>
+            Used parts
+        </button>
+        <div x-show="show_used_parts" class="bg-light p-2 rounded mt-2 w-100">
+            <ul class="list-group">
+                {% for r_part in visit_service.provided_service.required_parts.all %}
+                    <li class="list-group-item">
+                        <div>
+                            <span class="fw-bold">  
+                                {{r_part.part_in_station.part.part_name}},
+                            </span>
+                            <span>  
+                                category: {{r_part.part_in_station.part.part_type.part_type_name}}
+                            </span>
+                        </div>
+                        <span>Qty: {{r_part.quantity}} x {{r_part.get_part_price}} ₴, total: {{ r_part.get_total_price }} ₴</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endif %}
+
+{% if visit_service.service.description %}
+    <p class="mb-1">{{service.description}}</p>
+{% endif %}

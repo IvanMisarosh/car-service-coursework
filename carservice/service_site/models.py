@@ -186,6 +186,10 @@ class Part(models.Model):
     
     def __str__(self):
         return self.part_name
+    
+    def get_price_per_unit(self):
+        """Calculates the price per unit of the part."""
+        return round(self.price_per_package / self.quantity_per_package, 2)
 
 class Station(models.Model):
     station_id = models.AutoField(primary_key=True, db_column='StationID')

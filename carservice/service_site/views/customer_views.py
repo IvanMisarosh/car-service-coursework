@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from .. import filters
 from django.db.models import Q
+from ..views_utils import render_htmx
 
 @login_required
 @permission_required('service_site.view_customer', raise_exception=True)
@@ -80,8 +81,4 @@ def get_customer_search(request):
 
 
 
-def render_htmx(request, template_full, template_partial, context):
-    if request.htmx:
-        return render(request, template_partial, context)
-    else:
-        return render(request, template_full, context)
+

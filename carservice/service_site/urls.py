@@ -19,6 +19,11 @@ urlpatterns = [
     path('save-staged-services/', views.save_staged_services, name='save-staged-services'),
     path('clear-staged-services/', views.clear_staged_services, name='clear-staged-services'),
 
+    path('add-staged-part/', views.add_staged_part, name='add-staged-part'),
+    path('update-staged-part/', views.update_staged_part, name='update-staged-part'),
+    path('remove-staged-part/', views.remove_staged_part, name='remove-staged-part'),
+    path('save-staged-parts/', views.save_staged_parts, name='save-staged-parts'),
+
     path('select-car-in-car-search-modal', views.select_car_in_car_search_modal, name='select-car-in-car-search-modal'),
 
     path('visit-detail/', views.VisitDetailView.as_view(), name='create-visit'),
@@ -29,6 +34,9 @@ urlpatterns = [
 
     path('visit-service/<int:visit_service_id>/', views.VisitServiceView.as_view(), name='visit-service'),
     path('visit-services/<int:visit_id>/', views.visit_services, name='visit-services'),
+
+    path('visit-service/part-search', views.part_search, name='part-search'),
+    path('service-part-search/<int:visit_service_id>', views.visit_service_with_part_search, name='service-part-search'),
 
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),

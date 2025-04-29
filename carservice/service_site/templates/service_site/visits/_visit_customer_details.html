@@ -42,6 +42,7 @@
                                 hx-trigger="click"
                                 hx-swap="innerHTML"
                                 hx-vals='{"selected_car_id": "{{ visit_car.pk }}"}'
+                                @click="customer_editing_mode = false"
                             >
                                 Select car
                             </button>

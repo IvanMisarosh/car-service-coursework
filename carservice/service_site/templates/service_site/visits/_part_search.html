@@ -1,0 +1,46 @@
+<select name="part_brand" id="part-brand-select" class="form-select form-select-sm mb-2"
+    hx-get="{% url 'part-search' %}"
+    hx-trigger="change"
+    hx-target="#part-search-results"
+    hx-include="#part-brand-select, #part-type-select, #station-id-hidden-input, #part-search-bar"
+>
+    <option value="">Select part brand</option>
+    {% for part_brand in part_brands %}
+        <option value="{{ part_brand.pk }}">{{ part_brand.brand_name }}</option>
+    {% endfor %}
+</select>
+
+<select name="part_type" id="part-type-select" class="form-select form-select-sm pb-2"
+    hx-get="{% url 'part-search' %}"
+    hx-trigger="change"
+    hx-target="#part-search-results"
+    hx-include="#part-brand-select, #part-type-select, #station-id-hidden-input, #part-search-bar"
+>
+    <option value="">Select part type</option>
+    {% for part_type in part_types %}
+        <option value="{{ part_type.pk }}">{{ part_type.part_type_name }}</option>
+    {% endfor %}
+</select>
+
+<input class="border rounded px-4 py-2 my-2 form-control" id="part-search-bar"
+    type="search"
+    name="search"
+    placeholder="Begin Typing To Search Parts..."
+    hx-get="{% url 'part-search' %}"
+    hx-trigger="input delay:0.2s"
+    hx-target="#part-search-results"
+    hx-include="#part-brand-select, #part-type-select, #station-id-hidden-input"
+    {% comment %} hx-vals='js:{"part_brand_id": document.getElementById("part-brand-select").value,
+        "part_type_id": document.getElementById("part-type-select").value,
+        "station_id": document.getElementById("station-id-hidden-input").value}' {% endcomment %}
+/>
+<section> 
+    <div class="list-group mb-2" id="part-search-results"
+        hx-get="{% url 'part-search' %}"
+        hx-trigger="load"
+        hx-include="#station-id-hidden-input"
+        hx-target="#part-search-results"
+        >
+        {% include "service_site/visits/_part_search_result.html" %}
+    </div>
+</section>
