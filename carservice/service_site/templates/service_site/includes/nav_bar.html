@@ -1,9 +1,21 @@
+{% load group_filters %}
 <nav class="navbar navbar-expand-lg bg-primary">
     <div class="container-fluid">
         <a class="navbar-brand text-light" method='GET' href="/">CarService</a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <a class="nav-link text-light" method='GET' href="{%url 'customers'%}">Customers</a>
-            <a class="nav-link text-light" method='GET' href="{%url 'visits'%}">Visits</a>
+            {% if request.user|has_group:"manager" %}
+                <a class="nav-link text-light" method='GET' href="{%url 'customers'%}">Customers</a>
+                <a class="nav-link text-light" method='GET' href="{%url 'visits'%}">Visits</a>
+            {% elif request.user|has_group:"mechanic" %}
+                <a class="nav-link text-light" method='GET' href="{%url 'visits'%}">Visits</a>
+            {% elif request.user|has_group:"part_manager" %}
+                <a class="nav-link text-light" method='GET' href="{%url 'procurement-orders'%}">Procurement</a>
+            {% elif requestuser.is_superuser %}
+                <a class="nav-link text-light" method='GET' href="{%url 'customers'%}">Customers</a>
+                <a class="nav-link text-light" method='GET' href="{%url 'visits'%}">Visits</a>
+                <a class="nav-link text-light" method='GET' href="{%url 'procurement-orders'%}">Procurement</a>
+            {% endif %}
+
         </div>
         <div class="d-flex text-light me-2">
             {{request.user.employee.first_name}} {{request.user.employee.last_name}},

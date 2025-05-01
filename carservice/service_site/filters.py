@@ -1,8 +1,36 @@
 import django_filters
 from django import forms
-from .models import Customer, Visit, CarBrand
+from .models import Customer, Visit, CarBrand, ProcurementOrder, Supplier, ProcurementStatus
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit
+
+class ProcurementOrderFilter(django_filters.FilterSet):
+    class Meta:
+        model = ProcurementOrder
+        fields = {}
+    
+    order_date__gte = django_filters.DateFilter(
+        field_name='order_date', lookup_expr='gte', label='Дата замовлення з',
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control form-control-sm'})
+    )
+    order_date__lte = django_filters.DateFilter(
+        field_name='order_date', lookup_expr='lte', label='Дата замовлення до',
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control form-control-sm'})
+    )
+
+    procurement_status = django_filters.ModelChoiceFilter(
+        field_name='procurement_status__status_name',
+        queryset=ProcurementStatus.objects.all(),
+        label='Статус замовлення',
+        widget=forms.Select(attrs={'class': 'form-select form-select-sm'})
+    )
+
+    supplier = django_filters.ModelChoiceFilter(
+        field_name='supplier__supplier_name',
+        queryset=Supplier.objects.all(),
+        label='Постачальник',
+        widget=forms.Select(attrs={'class': 'form-select select2'})
+    )
 
 class CustomerFilter(django_filters.FilterSet):
     first_name = django_filters.CharFilter(
