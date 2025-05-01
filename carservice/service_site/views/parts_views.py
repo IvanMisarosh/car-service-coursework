@@ -100,7 +100,6 @@ def update_staged_part(request):
 def remove_staged_part(request):
     temp_id = request.POST.get('temp_id')
     v_service_id = request.POST.get('visit_service_id')
-    print(temp_id, v_service_id)
 
     staged_parts = request.session.get(f'staged_parts_{v_service_id}', [])
     staged_parts = [p for p in staged_parts if p['temp_id'] != temp_id]
@@ -112,7 +111,6 @@ def remove_staged_part(request):
 
 def save_staged_parts(request):
     v_service_id = request.POST.get('visit_service_id')
-    print(v_service_id)
     staged_parts = request.session.get(f'staged_parts_{v_service_id}', [])
     visit_service = models.VisitService.objects.get(pk=v_service_id)
     employee = request.user.employee

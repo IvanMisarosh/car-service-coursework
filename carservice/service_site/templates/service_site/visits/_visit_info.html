@@ -12,7 +12,15 @@
                             <strong>Visit Date:</strong><br> {{ visit.visit_date|date:"Y-m-d H:i" }}
                         </div>
                         <div class="col-md-6">
-                            <strong>Status:</strong><br> {{ visit.visit_status}}
+                            {% if visit.visit_status.status_name == "Pending" %}
+                                <strong>Status:</strong><br><span class="badge bg-warning text-dark">Pending</span>
+                            {% elif visit.visit_status.status_name == "In Progress" %}
+                                <strong>Status:</strong><br><span class="badge bg-primary">In Progress</span>
+                            {% elif visit.visit_status.status_name == "Completed" %}
+                                <strong>Status:</strong><br><span class="badge bg-success">Completed</span>
+                            {% elif visit.visit_status.status_name == "Cancelled" %}
+                                <strong>Status:</strong><br><span class="badge bg-danger">Cancelled</span>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="row">
@@ -37,7 +45,17 @@
                             <strong>Payment Date:</strong><br> {{ visit.payment_date|date:"Y-m-d H:i"|default:"Not set"  }}
                         </div>
                         <div class="col-md-6">
-                            <strong>Payment Status:</strong><br> {{ visit.payment_status|default:"Not set"  }}
+                            {% if visit.payment_status.payment_name == "Pending" %}
+                                <strong>Payment Status:</strong><br> <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif visit.payment_status.payment_name == "Paid" %}
+                                <strong>Payment Status:</strong><br> <span class="badge bg-success">Paid</span>
+                            {% elif visit.payment_status.payment_name == "Refunded" %}
+                                <strong>Payment Status:</strong><br> <span class="badge bg-info text-dark">Refunded</span>
+                            {% elif visit.payment_status.payment_name == "Cancelled" %}
+                                <strong>Payment Status:</strong><br> <span class="badge bg-danger">Cancelled</span>
+                            {% else %}
+                                <strong>Payment Status:</strong><br> <span class="badge bg-secondary">Not set</span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

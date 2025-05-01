@@ -19,30 +19,34 @@
             <div class="col-8 align-self-start g-2 mt-2 mx-1 visit-details-container">
                 <div class="row flex-nowrap g-2 mt-2">
                     <div class="card px-0 mt-2 me-1 align-self-start rounded" 
-                        x-data="{editing_mode: {% if visit.pk %} false {% else %} true {% endif %},
+                        x-data="{editing_mode: {% if visit.pk and not is_edit_form %} false {% else %} true {% endif %},
                                 visit_id: '{{ visit.pk }}',
                                 customer_editing_mode: false}" 
                         id="visit-details-card">
                         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <h5>Visit details: {{ visit.visit_number }}</h5>
-                            <template x-if='customer_editing_mode && editing_mode'>
-                                <a class="btn btn-sm btn-outline-light" href='{% url "visit-detail" visit.pk %}'
-                                        @click="customer_editing_mode = false
-                                                editing_mode = !editing_mode" 
+                            <h5>Visit details: {{ visit.visit_number }}{% if visit %}, станція: {{visit.employee.station.address}}{% endif %}</h5>
+                            {% if visit.visit_status.status_name != "Completed"%}
+                                <template x-if='customer_editing_mode && editing_mode'>
+                                    <a class="btn btn-sm btn-outline-light" href={% if visit.pk %}'{% url "visit-detail"  visit.pk%}'{% endif %}
+                                            @click="customer_editing_mode = false
+                                                    editing_mode = !editing_mode" 
+                                            x-show="visit_id">
+                                        <i class="bi bi-pencil"></i> 
+                                        <span x-text="customer_editing_mode ? 'Cancel' : 'Edit'"></span>
+                                    </a>
+                                </template>
+                                <template x-if='!customer_editing_mode'>
+                                    <button class="btn btn-sm btn-outline-light" 
+                                        @click="editing_mode = !editing_mode,
+                                                customer_editing_mode = false" 
                                         x-show="visit_id">
-                                    <i class="bi bi-pencil"></i> 
-                                    <span x-text="customer_editing_mode ? 'Cancel' : 'Edit'"></span>
-                                </a>
-                            </template>
-                            <template x-if='!customer_editing_mode'>
-                                <button class="btn btn-sm btn-outline-light" 
-                                    @click="editing_mode = !editing_mode,
-                                            customer_editing_mode = false" 
-                                    x-show="visit_id">
-                                    <i class="bi bi-pencil"></i> 
-                                    <span x-text="editing_mode ? 'Cancel' : 'Edit'"></span>
-                                </button>
-                            </template>
+                                        <i class="bi bi-pencil"></i> 
+                                        <span x-text="editing_mode ? 'Cancel' : 'Edit'"></span>
+                                    </button>
+                                </template>
+                            {% else %}
+                                <h5> <span class="badge bg-success">Візит закінчений, редагування даних не можливе</span></h5>
+                            {% endif %}
                             
                         </div>
                        
@@ -60,9 +64,11 @@
             <div class="col-4 align-self-start" id="visit-services-details">
                 {% if visit %}
                     {% include 'service_site/visits/_visit_services.html' %}
-                    <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#serviceSearchModal">
-                        Add services to visit
-                    </button> 
+                    {% if visit.visit_status.status_name != "Completed"%}
+                        <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#serviceSearchModal">
+                            Add services to visit
+                        </button>
+                    {% endif %} 
                 {% else %}
                     <p>Select/create a visit to see the services</p>
                 {% endif %}

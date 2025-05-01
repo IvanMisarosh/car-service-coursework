@@ -19,7 +19,7 @@
             <div class="col-4 align-self-start g-2 mt-2 visit-details-container">
                 <div class="card px-0 mt-2 me-1 align-self-start rounded" id="visit-details-card">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h5>Visit details: {{ visit.visit_number }}</h5>
+                        <h6>Visit details: {{ visit.visit_number }}{% if visit %}, станція: {{visit.employee.station.address}}{% endif %}</h6>
                     </div>
                     <div class="card-body">
                         <input type="hidden" name="station_id" id="station-id-hidden-input" value="{{ visit.employee.station.pk }}">
@@ -35,7 +35,15 @@
                                             <strong>Visit Date:</strong><br> {{ visit.visit_date|date:"Y-m-d H:i" }}
                                         </div>
                                         <div class="col-md-6">
-                                            <strong>Status:</strong><br> {{ visit.visit_status}}
+                                            {% if visit.visit_status.status_name == "Pending" %}
+                                                <strong>Status:</strong><br><span class="badge bg-warning text-dark">Pending</span>
+                                            {% elif visit.visit_status.status_name == "In Progress" %}
+                                                <strong>Status:</strong><br><span class="badge bg-primary">In Progress</span>
+                                            {% elif visit.visit_status.status_name == "Completed" %}
+                                                <strong>Status:</strong><br><span class="badge bg-success">Completed</span>
+                                            {% elif visit.visit_status.status_name == "Cancelled" %}
+                                                <strong>Status:</strong><br><span class="badge bg-danger">Cancelled</span>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="row">
@@ -135,7 +143,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {% comment %} {% include "service_site/visits/_car_details.html" %} {% endcomment %}
                                 </div>
                             </div>
                         </div>

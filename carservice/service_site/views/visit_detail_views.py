@@ -20,7 +20,7 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
         visit_id = kwargs.get('visit_id')
 
         if not visit_id:
-            return render(request, "service_site/visits/visit_details_manager_manager.html", {
+            return render(request, "service_site/visits/visit_details_manager.html", {
                 "visit_form": forms.VisitForm(),
             })
         
@@ -50,10 +50,20 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         if not visit_id:
             visit_id = request.POST.get('visit_id', None)
-
+        
+        # is_valid = True
         if visit_id:
             visit = models.Visit.objects.get(pk=visit_id)
             form = forms.VisitForm(request.POST, instance=visit)
+            # form_visit_status = models.VisitStatus.objects.get(pk=request.POST.get('visit_status'))
+            # if  form_visit_status.status_name == "Completed":
+            #     print("Checking if all services are completed...")
+            #     if visit.visit_services.exists():
+            #         if visit.visit_services.filter(provided_service__isnull=True).exists():
+            #             is_valid = False
+            #     else:
+            #         is_valid = False
+            #     print("All services completed:", is_valid)
         else:
             form = forms.VisitForm(request.POST)
             form.instance.visit_number = models.Visit.generate_visit_number()
@@ -65,18 +75,23 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
         else:
             car = getattr(form.instance, 'car', None)
             visit_services = getattr(form.instance, 'visit_services', None)
-            messages.error(request, "Error saving visit details. Please check the form.")
+            # if not is_valid:
+            #     messages.error(request, "Всі послуги мають бути завершеними перед зміною статуса на 'Completed'.")
+            # messages.error(request, "Error saving visit details. Please check the form.")
             
             context = {
                 "visit_form": form,
                 "visit_car": form.instance.car if car else None,
-                "visit_customer": form.instance.car.customer if car else None, 
+                "visit_customer": form.instance.car.customer if car else None,
+                #TODO: add services button disappears whe trying to save with invalid status because we get visit
+                # from instance (where status is wrong) and it is not saved yet
                 "visit": form.instance if form.instance.pk else None,
                 "visit_services": visit_services.all() if form.instance.pk else None,
                 "visit_price": form.instance.price if form.instance.pk else None,
+                "is_edit_form": True,
             }
             return render(request, "service_site/visits/visit_details_manager.html", context)
-
+        
 class VisitServiceView(View):
     def get_object(self, visit_service_id):
         return models.VisitService.objects.select_related(

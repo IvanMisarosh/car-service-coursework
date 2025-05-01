@@ -19,15 +19,15 @@ class VisitForm(ModelForm):
             'payment_date': 'Payment Date',
         }
         widgets = {
-            'visit_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
-            'visit_status': forms.Select(attrs={'class': 'form-select'}),
+            'visit_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control form-control-sm'}),
+            'visit_status': forms.Select(attrs={'class': 'form-select form-select-sm'}),
             'car': forms.HiddenInput(attrs={'class': 'form-select', 'id': 'car-hidden-input'}),
-            'employee': forms.Select(attrs={'class': 'form-select'}),
+            'employee': forms.Select(attrs={'class': 'form-select select2'}),
             'payment_status': forms.Select(attrs={'class': 'form-select'}),
             'details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'planned_end_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
-            'actual_end_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
-            'payment_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'planned_end_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control form-control-sm'}),
+            'actual_end_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control form-control-sm'}),
+            'payment_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control form-control-sm'}),
         }
 
     def __init__(self, *args, **kwargs):

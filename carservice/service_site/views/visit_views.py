@@ -31,6 +31,9 @@ class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
                 visit_status__status_name__icontains=term) | Q(
                 payment_status__payment_name__icontains=term) | Q(
                 car__customer__phone_number__icontains=term)
+            
+        if request.user.is_authenticated and request.user.groups.filter(name='mechanic').exists():
+            query &= Q(employee__station=request.user.employee.station)
 
         visits = models.Visit.objects.all().select_related(
             'visit_status', 'car', 'car__customer', 'car__car_model', 'employee', 'payment_status').filter(query).order_by('-visit_date')
