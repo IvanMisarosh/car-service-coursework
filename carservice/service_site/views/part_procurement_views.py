@@ -1,10 +1,11 @@
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from .. import models
-from ..filters import ProcurementOrderFilter  
+from ..filters import ProcurementOrderFilter 
+from ..forms import ProcurementOrderForm 
 
 def procurement_order_list(request):
     search_query = request.GET.get('search', '')
@@ -13,7 +14,7 @@ def procurement_order_list(request):
 
     queryset = models.ProcurementOrder.objects.select_related(
         'employee', 'supplier', 'procurement_status'
-    ).prefetch_related('procurementunit_set__part__part_type')
+    ).prefetch_related('procurementunit_set__part__part_type').order_by("-order_date")
 
     if search_query:
         queryset = queryset.filter(
@@ -35,7 +36,31 @@ def procurement_order_list(request):
     }
 
     if request.htmx:
-        html = render_to_string('part_procurement/procurement_order_list.html', context, request=request)
+        html = render_to_string('part_procurement/_procurement_order_list.html', context, request=request)
         return HttpResponse(html)
 
     return render(request, 'part_procurement/procurement_orders.html', context)
+
+def create_procurement_order(request):
+    if request.method == 'POST':
+        print(request.POST)
+        form = ProcurementOrderForm(request.POST)
+        if form.is_valid():
+            form.instance.order_number = models.ProcurementOrder.generate_order_number()
+            form.save()
+            response = HttpResponse("")
+            response['HX-Refresh'] = 'true'
+            return response
+    else:
+        form = ProcurementOrderForm()
+
+    return render(request, 'part_procurement/_order_form.html', 
+                  {'form': form,
+                   'employees': models.Employee.objects.all(),
+                   })
+
+def employee_info(request):
+    employee_id = request.GET.get('employee')
+    employee = get_object_or_404(models.Employee, pk=employee_id)
+    return render(request, 'part_procurement/_employee_info_card.html', {'employee': employee})
+

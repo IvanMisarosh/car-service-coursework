@@ -313,7 +313,7 @@ class Visit(models.Model):
     def generate_visit_number():
         """Generates a unique visit number."""
         while True:
-            visit_number = random.randint(1000, 9999)
+            visit_number = random.randint(1000, 999999999)
             if not Visit.objects.filter(visit_number=visit_number).exists():
                 break
         return visit_number
@@ -411,6 +411,15 @@ class ProcurementOrder(models.Model):
     
     def __str__(self):
         return f"Order {self.order_number}"
+    
+    @staticmethod
+    def generate_order_number():
+        """Generates a unique visit number."""
+        while True:
+            order_number = random.randint(1, 999999999)
+            if not ProcurementOrder.objects.filter(order_number=order_number).exists():
+                break
+        return order_number
 
 class ProcurementUnit(models.Model):
     procurement_unit_id = models.AutoField(primary_key=True, db_column='ProcurementUnitID')

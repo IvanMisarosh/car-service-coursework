@@ -2,6 +2,17 @@ from django.forms import ModelForm
 from . import models
 from django import forms
 
+class ProcurementOrderForm(forms.ModelForm):
+    class Meta:
+        model = models.ProcurementOrder
+        fields = ['order_date', 'supplier', 'procurement_status', 'employee']
+        widgets = {
+            'order_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'supplier': forms.Select(attrs={'class': 'form-select select2'}),
+            'procurement_status': forms.Select(attrs={'class': 'form-select'}),
+            'employee': forms.HiddenInput(attrs={'class': 'form-select', 'id': 'employee-select'}),
+        }
+
 class VisitForm(ModelForm):
     class Meta:
         model = models.Visit

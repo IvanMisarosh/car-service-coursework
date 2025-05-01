@@ -14,8 +14,8 @@
     {% include 'service_site/includes/nav_bar.html' %}
     <div class="container-fluid px-5 pt-2">
         <div class="row flex-nowrap mt-2">
-            <h3 class="col-6">Замовлення запчастин</h3>
-            <div class="col-4" id="search-container">
+            <h3 class="col-4">Замовлення запчастин</h3>
+            <div class="col-4 d-flex align-items-center" id="search-container">
                 <input class="form-control" id="order-search-bar" type="search" name='search'
                     placeholder="Шукай за номером замовлення, постачальником, працівником..."
                     hx-get="{% url 'procurement-orders' %}"
@@ -25,9 +25,16 @@
                     hx-target="#order-list"
                 />
             </div>
-            {% comment %} <a class="col-2" href="{% url 'create-procurement-order' %}">
-                <button class="btn btn-primary">Add Order</button>
-            </a> {% endcomment %}
+            <button class="btn btn-primary col-2"
+                hx-get="{% url 'create-procurement-order' %}"
+                hx-target="#modal-body"
+                hx-trigger="click"
+                hx-swap="innerHTML"
+                data-bs-toggle="modal"
+                data-bs-target="#modal">
+                Створити замовлення
+            </button>
+        
         </div>
 
         <div class="row mt-2">
@@ -59,8 +66,32 @@
                 </button>
             </form>
             <div class="col-9 rounded" id="order-list">
-                {% include 'part_procurement/procurement_order_list.html' %}
+                {% include 'part_procurement/_procurement_order_list.html' %}
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalLabel">Додати замовлення</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body">
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      {% comment %} <script>
+        document.body.addEventListener('htmx:afterSwap', (e) => {
+            if (e.target.querySelector('#employee-select')) {
+                $('#employee-select').select2({
+                    width: '100%',
+                    placeholder: "Select employee"
+                });
+            }
+        });
+      </script> {% endcomment %}
+      
 {% endblock %}
