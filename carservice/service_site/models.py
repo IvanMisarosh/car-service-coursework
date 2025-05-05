@@ -6,6 +6,7 @@
 #   * Remove `` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.db.models import Sum
 from django.utils import timezone
 import random
 from django.contrib.auth.models import AbstractUser
@@ -426,17 +427,24 @@ class ProcurementUnit(models.Model):
     part = models.ForeignKey(Part, on_delete=models.CASCADE, db_column='PartID')
     quantity = models.IntegerField(db_column='Quantity')
     price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, db_column='PricePerUnit')
-    procurement_order = models.ForeignKey(ProcurementOrder, null=True, blank=True, on_delete=models.SET_NULL, db_column='ProcurementOrderID')
+    procurement_order = models.ForeignKey(ProcurementOrder, null=True, blank=True, on_delete=models.SET_NULL, db_column='ProcurementOrderID', related_name='units')
     
     class Meta:
         db_table = 'ProcurementUnit'  
     
     def __str__(self):
         return f"{self.quantity} of {self.part}"
+    
+    def get_total_price(self):
+        return self.quantity * self.price_per_unit
+    
+    def get_placed_count(self):
+        result = self.placements.aggregate(total_placed=Sum('quantity'))
+        return result['total_placed'] or 0
 
 class StoragePlacement(models.Model):
     storage_placement_id = models.AutoField(primary_key=True, db_column='StoragePlacementID')
-    procurement_unit = models.ForeignKey(ProcurementUnit, on_delete=models.CASCADE, db_column='ProcurementUnitID')
+    procurement_unit = models.ForeignKey(ProcurementUnit, on_delete=models.CASCADE, db_column='ProcurementUnitID', related_name='placements')
     part_in_station = models.ForeignKey(PartInStation, on_delete=models.CASCADE, db_column='PartInStationID')
     quantity = models.IntegerField(null=True, blank=True, db_column='Quantity')
     placement_date = models.DateTimeField(null=True, blank=True, db_column='PlacementDate')

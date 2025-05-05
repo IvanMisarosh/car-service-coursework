@@ -1,13 +1,17 @@
 {% extends 'base.html' %}
+{% comment %} part_procurement/procurement_orders {% endcomment %}
 {% load static %}
 {% load crispy_forms_tags %}
 
 {% block title %}Procurement Orders{% endblock %}
 
 {% block css_files %}
+    <link rel="stylesheet" href="{% static 'service_site/order_list.css' %}">
+    <link rel="stylesheet" href="{% static 'service_site/order_details.css' %}"> 
 {% endblock %}
 
 {% block js_files %}
+    <script src="{% static 'service_site/js/procurement_orders.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -26,7 +30,7 @@
                 />
             </div>
             <button class="btn btn-primary col-2"
-                hx-get="{% url 'create-procurement-order' %}"
+                {% comment %} hx-get="{% url 'create-procurement-order' %}" {% endcomment %}
                 hx-target="#modal-body"
                 hx-trigger="click"
                 hx-swap="innerHTML"
@@ -56,7 +60,8 @@
                 </div>
                
             
-                <button hx-get="{% url 'procurement-orders' %}"
+                <button 
+                        hx-get="{% url 'procurement-orders' %}"
                         hx-target="#order-list"
                         hx-include="#filter-form, #order-search-bar"
                         hx-push-url="true"
@@ -70,28 +75,6 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="modalLabel">Додати замовлення</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="modal-body">
-              
-            </div>
-          </div>
-        </div>
-      </div>
-      {% comment %} <script>
-        document.body.addEventListener('htmx:afterSwap', (e) => {
-            if (e.target.querySelector('#employee-select')) {
-                $('#employee-select').select2({
-                    width: '100%',
-                    placeholder: "Select employee"
-                });
-            }
-        });
-      </script> {% endcomment %}
+    
       
 {% endblock %}

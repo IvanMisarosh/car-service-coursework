@@ -1,0 +1,7 @@
+<label for="part" class="form-label">Запчастина</label>
+<select name="part_id" id="part" class="form-select form-select-sm" required>
+    <option value="">Оберіть запчастину</option>
+    {% for part in parts %}
+    <option value="{{ part.part_id }}">{{ part.part_name }}</option>
+    {% endfor %}
+</select>

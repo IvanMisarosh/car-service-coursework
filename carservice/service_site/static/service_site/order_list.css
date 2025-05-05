@@ -1,0 +1,24 @@
+.order-card-container {
+    transition: all 0.4s ease-in-out;
+  }
+  
+  .expanded-card {
+    width: 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+    z-index: 10;
+  }
+  
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  
+  /* Optional animation for height */
+  .card-body {
+    transition: max-height 0.4s ease-in-out;
+    overflow: hidden;
+  }
+  
+  .expanded-card .card {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }

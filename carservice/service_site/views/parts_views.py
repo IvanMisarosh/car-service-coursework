@@ -38,6 +38,22 @@ def part_search(request):
     parts = station_parts.filter(search_query).distinct()
     return render(request, "service_site/visits/_part_search_result.html", {'part_selection': parts})
 
+def part_search_for_unit(request):
+    brand_id = request.GET.get("part_brand", None)
+    part_type_id = request.GET.get("part_type", None)
+
+    search_query = Q()
+
+    parts = models.Part.objects.prefetch_related('part_brand', 'part_type')
+        
+    if brand_id:
+        search_query &= Q(part_brand__part_brand_id=brand_id)
+    if part_type_id:
+        search_query &= Q(part_type__part_type_id=part_type_id)
+        
+    parts = parts.filter(search_query).distinct()
+    return render(request, "part_procurement/_unit_part_select.html", {'parts': parts})
+
 def add_staged_part(request):
     part_id = request.POST.get('part_id')
     v_service_id = request.POST.get('visit_service_id')

@@ -1,0 +1,15 @@
+<tr class="{% if placed_count == unit.quantity %}table-success{% elif placed_count > 0 %}table-warning{% endif %}">
+    <td>{{ unit.part.part_name }}</td>
+    <td>{{ unit.part.part_brand.brand_name|default:"N/A" }}</td>
+    <td>{{ unit.part.part_type.part_type_name|default:"N/A" }}</td>
+    <td>{{ unit.quantity }}</td>
+    <td>{{ unit.price_per_unit|default:unit.part.get_price_per_unit }} ₴</td>
+    <td>{{ unit.get_total_price }} ₴</td>
+    <td>
+      <div class="d-flex align-items-center">
+        <span class="ms-2 badge {% if placed_count == unit.quantity %}bg-success{% elif placed_count > 0 %}bg-warning{% else %}bg-secondary{% endif %}">
+          {{ placed_count }}/{{ unit.quantity }}
+        </span>
+      </div>
+    </td>
+</tr>
