@@ -1,6 +1,17 @@
 
-// // Listen for the form submission completion
-// document.querySelector('#placement-form-{{ unit.pk }}').addEventListener('htmx:afterSwap', function(event) {
-//     // After form submission, trigger the button's hx-get request
-//     document.querySelector('#view-placement-btn-{{ unit.pk }}').click();
-// });
+// Function to initialize toasts
+function initializeToasts() {
+    var toastElements = document.querySelectorAll('.toast');
+    toastElements.forEach(function(toastElement) {
+        var toast = new bootstrap.Toast(toastElement, {
+            autohide: true,
+            delay: 3000
+        });
+        toast.show();
+    });
+    toastElements.forEach(function(toastElement) {
+        toastElement.addEventListener('hidden.bs.toast', function() {
+            toastElement.remove(); // Remove the toast element from the DOM after hiding
+        });
+    });
+}

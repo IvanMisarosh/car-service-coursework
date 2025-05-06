@@ -18,57 +18,39 @@
         },
     }"
       >
-      <table class="table table-sm table-striped">
+      <table class="table table-sm table-striped" id="order-units-table-{{order.pk}}">
         <thead>
           <tr>
-            <th>Part</th>
-            <th>Brand</th>
-            <th>Type</th>
-            <th>Quantity</th>
-            <th>Price/Unit</th>
-            <th>Subtotal</th>
-            <th>Placement Status</th>
-            <th>Actions</th>
+            <th>Запчастина</th>
+            <th>Бренд</th>
+            <th>Тип</th>
+            <th>Кількість</th>
+            <th>Ціна за одиницю</th>
+            <th>Загальна ціна</th>
+            <th>Статус розміщення</th>
+            <th>Дії</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="order-units-table-body-{{order.pk}}">
           {% for unit in order.units.all %}
           {% with placed_count=unit.get_placed_count %}
             {% include 'part_procurement/_unit_row_with_placement.html'%}
           {% endwith %}
           {% empty %}
           <tr>
-            <td colspan="7" class="text-center">No items in this order</td>
+            <td colspan="7" class="text-center">Немає запчастин в замовленні</td>
           </tr>
           {% endfor %}
         </tbody>
-        <tfoot>
-          <tr class="table-dark">
-            <td colspan="5" class="text-end"><strong>Total:</strong></td>
-            <td><strong>{{ order.total_price|default:"0.00" }} ₴</strong></td>
-            <td></td>
-          </tr>
-        </tfoot>
       </table>
     </div>
     
     <div class="mt-3 d-flex justify-content-between">
       <button class="btn btn-sm btn-outline-success" 
-              {% comment %} hx-get="{% url 'add-procurement-item' order.procurement_order_id %}" {% endcomment %}
-              hx-target="#modal-content"
-              data-bs-toggle="modal" 
-              data-bs-target="#procurementModal">
-        <i class="bi bi-plus-circle"></i> Add Item
+              hx-get="{% url 'add-order-unit' order.pk%}"
+              hx-target="#placement-form-container-{{ order.pk }}"
+              >
+        <i class="bi bi-plus-circle"></i> Додати запчастину
       </button>
-      
-      {% if order.procurement_status.status_name == "Delivered" %}
-      <button class="btn btn-sm btn-outline-primary"
-              {% comment %} hx-get="{% url 'place-procurement-items' order.procurement_order_id %}" {% endcomment %}
-              hx-target="#modal-content"
-              data-bs-toggle="modal" 
-              data-bs-target="#procurementModal">
-        <i class="bi bi-box-arrow-in-down"></i> Place Items in Storage
-      </button>
-      {% endif %}
     </div>
 </div>

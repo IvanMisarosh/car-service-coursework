@@ -1,17 +1,17 @@
 {% comment %} part_procurement/_procurement_order_list.html {% endcomment %}
 <!-- Table-based Layout for Procurement Orders using Alpine.js -->
-<div class="container-fluid" 
+<div class="container-fluid"
     x-data="{
       expandedOrders: new Set(),
       toggleOrder(orderId) {
-        if (this.expandedOrders.has(orderId)) {
+      if (this.expandedOrders.has(orderId)) {
           this.expandedOrders.delete(orderId);
-        } else {
+      } else {
           this.expandedOrders.add(orderId);
-        }
+      }
       },
       isExpanded(orderId) {
-        return this.expandedOrders.has(orderId);
+      return this.expandedOrders.has(orderId);
       }
     }"
     >

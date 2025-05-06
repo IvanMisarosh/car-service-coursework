@@ -53,6 +53,36 @@ def procurement_order_items(request, order_id):
         'order': order
     })
 
+def add_order_unit(request, order_id):
+
+    if request.method == "GET":
+        parts = models.Part.objects.select_related('part_brand').all()
+        part_brands = models.PartBrand.objects.all()
+        part_types = models.PartType.objects.all()
+        context = {
+            'parts' : parts,
+            'part_brands' : part_brands,
+            "part_types" : part_types,
+            'order_id' : order_id 
+        }
+        return render(request, 'part_procurement/_add_order_unit.html', context)
+    elif request.method == 'POST':
+        #TODO: add validation
+        part_id = request.POST.get('part_id', None)
+        quantity = int(request.POST.get('quantity', 1))
+        price_per_unit = float(request.POST.get('price_per_unit', 1))
+        part = get_object_or_404(models.Part, pk=part_id)
+        order = models.ProcurementOrder.objects.get(pk=order_id)
+        order_unit = models.ProcurementUnit.objects.create(
+            procurement_order=order,
+            quantity=quantity,
+            price_per_unit=price_per_unit,
+            part=part
+        )
+        # messages.error(request, "Quantity must be greater than 0.")
+        return render(request, 'part_procurement/_unit_row_with_placement.html', 
+                      {'unit': order_unit, "placed_count": order_unit.get_placed_count})
+
 def edit_unit(request, unit_id):
     unit = get_object_or_404(models.ProcurementUnit, pk=unit_id)
     # print(request.POST)

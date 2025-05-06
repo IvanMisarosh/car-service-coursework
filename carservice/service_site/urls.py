@@ -43,6 +43,7 @@ urlpatterns = [
 
     path('procurement/unit/<int:unit_id>', views.edit_unit, name="edit_unit"),
 
+    path('procurement/order/<int:order_id>/unit/add', views.add_order_unit, name='add-order-unit'),
     path('unit/<int:pk>/placements/', views.unit_placements, name='unit_placements'),
     path('unit/<int:unit_id>/add-placement/', views.add_placement, name='add_placement'),
     path('unit/<int:unit_id>/update/', views.update_row, name='update-unit'),

@@ -1,0 +1,60 @@
+<form class="row"
+    hx-post="{% url 'add-order-unit' order_id %}"
+    hx-target="#order-units-table-body-{{order_id}}" 
+    hx-swap="afterbegin"
+    class="order-unit-form"
+    >
+    <input type="hidden", name='order-id-hidden-input-{{order_id}}' value='{{order_id}}'>
+    <div class="col-md-3 mb-3" id="part-select-container-{{order_id}}">
+        {% include "part_procurement/_unit_part_select.html" %}
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="part_brand" class="form-label">Бренд запчастини</label>
+        <select name="part_brand" id="part-brand-select-{{order_id}}" class="form-select form-select-sm mb-2"
+            hx-get="{% url 'unit-part-search' %}"
+            hx-trigger="change"
+            hx-target="#part-select-container-{{order_id}}"
+            hx-include="#part-brand-select-{{order_id}}, #part-type-select-{{order_id}}"
+            hx-swap='innerHTML'
+        >
+            <option value="">Виберіть бренд запчастини</option>
+            {% for part_brand in part_brands %}
+                <option value="{{ part_brand.pk }}">{{ part_brand.brand_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3 mb-3">
+        <label for="part_type" class="form-label">Тип запчастини</label>
+        <select name="part_type" id="part-type-select-{{order_id}}" class="form-select form-select-sm mb-2"
+            hx-get="{% url 'unit-part-search' %}"
+            hx-trigger="change"
+            hx-target="#part-select-container-{{order_id}}"
+            hx-include="#part-brand-select-{{order_id}}, #part-type-select-{{order_id}}"
+            hx-swap='innerHTML'
+        >
+            <option value="">Виберіть тип запчастини</option>
+            {% for part_type in part_types %}
+                <option value="{{ part_type.pk }}">{{ part_type.part_type_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <div class="col-md-1 mb-3">
+        <label for="quantity" class="form-label">Кількість</label>
+        <input type="number" class="form-control form-select-sm" id="quantity" name="quantity" 
+               min="1" required value="1">
+    </div>
+    
+    <div class="col-md-2 mb-3">
+        <label for="price_per_unit" class="form-label">Ціна за одиницю</label>
+        <input type="number" class="form-control form-select-sm" id="price_per_unit" name="price_per_unit" 
+               min="0" step="0.01" required>
+    </div>
+
+    <button type="button" class="btn btn-secondary me-2" @click="event.target.closest('form').remove();">
+        Скасувати
+    </button>
+    <button type="submit" class="btn btn-primary">
+        Зберегти
+    </button>
+    </form>
