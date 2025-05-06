@@ -41,6 +41,10 @@ urlpatterns = [
     path('procurement/orders/', views.procurement_orders, name='procurement-orders'),
     path('procurement/order/<int:order_id>/items/', views.procurement_order_items, name='procurement-order-items'),
 
+    path('order-info/<int:pk>/', views.order_info, name='order-info'),
+    path('order/<int:order_id>/update/', views.update_order_row, name='update-order'),
+    path('edit-order-info/<int:pk>/', views.edit_order_info, name='edit-order-info'),
+
     path('procurement/unit/<int:unit_id>', views.edit_unit, name="edit_unit"),
 
     path('procurement/order/<int:order_id>/unit/add', views.add_order_unit, name='add-order-unit'),

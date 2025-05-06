@@ -31,66 +31,7 @@
       </thead>
       <tbody>
         {% for order in procurement_orders %}
-        <tr id="row-{{ order.procurement_order_id }}">
-          <td>
-            <span class="order-number cursor-pointer" data-order-id="{{ order.procurement_order_id }}">
-              {{ order.order_number }}
-            </span>
-          </td>
-          <td>
-            {{ order.employee.first_name }} {{ order.employee.last_name }}
-            <span class="text-muted">({{ order.employee.employee_position.position_name }})</span>
-          </td>
-          <td>{{ order.supplier.supplier_name }}</td>
-          <td>{{ order.units.count }}</td>
-          <td>{{ order.total_price|default:"0.00" }} ₴</td>
-          <td>{{ order.order_date|date:"Y-m-d" }}</td>
-          <td>
-            {% if order.procurement_status.status_name == "In progress" %}
-              <span class="badge bg-info">In progress</span>
-            {% elif order.procurement_status.status_name == "Delivered" %}
-              <span class="badge bg-success">Delivered</span>
-            {% elif order.procurement_status.status_name == "Rejected" %}
-              <span class="badge bg-danger">Rejected</span>
-            {% elif order.procurement_status.status_name == "Approved" %}
-              <span class="badge bg-primary">Approved</span>
-            {% else %}
-              <span class="badge bg-secondary">{{ order.procurement_status.status_name|default:"Unknown" }}</span>
-            {% endif %}
-          </td>
-          <td class="text-end">
-            <button 
-              class="btn btn-sm btn-outline-primary"
-              @click="toggleOrder('{{ order.procurement_order_id }}')"
-              title="View order details"
-              x-show="!isExpanded('{{ order.procurement_order_id }}')"
-              hx-get="{% url 'procurement-order-items' order.procurement_order_id %}"
-              hx-target='#order-items-{{ order.procurement_order_id }}'
-              >
-              <i class="bi bi-eye"></i>
-            </button>
-            <button 
-              class="btn btn-sm btn-outline-primary"
-              @click="toggleOrder('{{ order.procurement_order_id }}')"
-              title="View order details"
-              x-show="isExpanded('{{ order.procurement_order_id }}')"
-              >
-              <i class="bi bi-eye-slash"></i>
-            </button>
-          </td>
-        </tr>
-        <!-- Row for expanded content, controlled by Alpine.js -->
-        
-        <tr class="expandable-row" 
-            id="expanded-row-{{ order.procurement_order_id }}"
-            x-show="isExpanded('{{ order.procurement_order_id }}')"
-            x-cloak>
-          <td colspan="8">
-            <div id="order-items-{{ order.procurement_order_id }}">
-            </div>
-          </td>
-        </tr>
-
+          {% include 'part_procurement/_order_row_expandable.html'%}
         {% empty %}
         <tr>
           <td colspan="8" class="text-center py-4">No procurement orders found.</td>

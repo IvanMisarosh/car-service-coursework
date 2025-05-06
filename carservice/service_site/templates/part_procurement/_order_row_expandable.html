@@ -1,0 +1,12 @@
+{% include 'part_procurement/_order_row.html' %}
+  <!-- Row for expanded content, controlled by Alpine.js -->
+  
+  <tr class="expandable-row" 
+      id="expanded-row-{{ order.procurement_order_id }}"
+      x-show="isExpanded('{{ order.procurement_order_id }}')"
+      x-cloak>
+    <td colspan="8">
+      <div id="order-items-{{ order.procurement_order_id }}">
+      </div>
+    </td>
+  </tr>

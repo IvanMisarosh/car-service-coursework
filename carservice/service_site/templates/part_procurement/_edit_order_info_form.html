@@ -1,0 +1,34 @@
+<form 
+  hx-post="{% url 'edit-order-info' order.pk %}" 
+  hx-target="#order-info-fields-{{ order.pk }}" 
+  hx-swap="innerHTML"
+  @htmx:after-request="htmx.ajax('GET', '{% url 'update-order' order.pk %}', {target: '#row-{{ order.pk }}', swap: 'outerHTML'})"
+  >
+    <!-- WHY htmx:afterRequest DOESNT WORK -->
+  
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-6">
+      {{ form.supplier.label_tag }} {{ form.supplier }}
+    </div>
+    <div class="col-md-6">
+      {{ form.employee.label_tag }} {{ form.employee }}
+    </div>
+  </div>
+  <div class="row mt-2">
+    <div class="col-md-6">
+      {{ form.procurement_status.label_tag }} {{ form.procurement_status }}
+    </div>
+    <div class="col-md-6">
+      {{ form.order_date.label_tag }} {{ form.order_date }}
+    </div>
+  </div>
+  <div class="mt-2">
+    <button type="submit" class="btn btn-sm btn-success">Зберегти</button>
+    <button type="button" class="btn btn-sm btn-secondary"
+            hx-get="{% url 'order-info' order.pk %}"
+            hx-target="#order-info-fields-{{ order.pk }}">
+      Скасувати
+    </button>
+  </div>
+</form>

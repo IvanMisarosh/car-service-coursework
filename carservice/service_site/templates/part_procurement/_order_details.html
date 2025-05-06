@@ -1,5 +1,14 @@
 <!--_order_details.html-->
 <div>
+    <div class='row' id='order-info--{{ order.pk }}'>
+      <div class="mb-3" 
+          id="order-info-fields-{{ order.pk }}"
+          hx-get="{% url 'order-info' order.pk %}" 
+          hx-trigger="load" 
+          hx-target="#order-info-fields-{{ order.pk }}" 
+          hx-swap="innerHTML">
+      </div>
+    </div>
     <h6 class="border-bottom pb-2 mb-3">Order Items</h6>
     <div id="placement-form-container-{{ order.pk }}">
     </div>

@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .. import models
 from .. import filters
+from .. import forms
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -46,6 +47,21 @@ def procurement_orders(request):
         return render(request, 'part_procurement/_procurement_order_list.html', context)
     
     return render(request, 'part_procurement/procurement_orders.html', context)
+
+def order_info(request, pk):
+    order = get_object_or_404(models.ProcurementOrder, pk=pk)
+    return render(request, 'part_procurement/_order_info_fields.html', {'order': order})
+
+def edit_order_info(request, pk):
+    order = get_object_or_404(models.ProcurementOrder, pk=pk)
+    if request.method == 'POST':
+        form = forms.ProcurementOrderInfoForm(request.POST, instance=order)
+        if form.is_valid():
+            form.save()
+            return order_info(request, pk)  # Rerender view mode
+    else:
+        form = forms.ProcurementOrderInfoForm(instance=order)
+    return render(request, 'part_procurement/_edit_order_info_form.html', {'form': form, 'order': order})
 
 def procurement_order_items(request, order_id):
     order = models.ProcurementOrder.objects.prefetch_related("units", "units__part", "units__part__part_type", "units__part__part_brand").get(pk=order_id)
@@ -167,4 +183,11 @@ def update_row(request, unit_id):
     return render(request, "part_procurement/_unit_row.html", {
         "unit": unit,
         "placed_count": placed_count
+    })
+
+def update_order_row(request, order_id):
+    order = get_object_or_404(models.ProcurementOrder, pk=order_id)
+
+    return render(request, "part_procurement/_order_row.html", {
+        "order": order,
     })
