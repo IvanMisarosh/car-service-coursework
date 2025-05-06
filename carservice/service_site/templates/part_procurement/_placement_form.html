@@ -1,0 +1,101 @@
+<!-- templates/create_placement_form.html -->
+<form 
+    hx-post="{% url 'add_placement' unit.pk %}"
+    hx-target="#unit-row-{{ unit.pk }}"
+    hx-swap="outerHTML"
+    class="placement-form"
+    hx-on="htmx:afterRequest: this.remove(); 
+                htmx.ajax('GET', '{% url 'unit_placements' unit.pk %}', {target: '#placement-detail-{{ unit.pk }}'})"
+    >
+    {% csrf_token %}
+    
+    <div class="row mb-4">
+        <!-- Інформація про запчастину -->
+        <div class="col-md-5">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-gear"></i> {{ unit.part.part_name }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        {% if unit.part.part_brand %}
+                            <span class="badge bg-info text-dark rounded-pill me-2">
+                                <i class="bi bi-tag"></i> Бренд: {{ unit.part.part_brand.brand_name }}
+                            </span>
+                        {% endif %}
+                        
+                        {% if unit.part.part_type %}
+                            <span class="badge bg-secondary rounded-pill">
+                                <i class="bi bi-layers"></i> Тип: {{ unit.part.part_type.part_type_name }}
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex flex-column mt-3">
+                        <div class="mb-2">
+                            <span class="fw-bold me-2"><i class="bi bi-box-seam"></i> Одиниць в упаковці:</span>
+                            <span class="text-dark">{{ unit.part.quantity_per_package }}</span>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <span class="fw-bold me-2"><i class="bi bi-boxes"></i> Загальна кількість:</span>
+                            <span class="text-dark">{{ unit.quantity }}</span>
+                        </div>
+                        
+                        <div>
+                            <span class="fw-bold me-2"><i class="bi bi-currency-dollar"></i> Ціна за одиницю:</span>
+                            <span class="text-dark">{{ unit.price_per_unit }} грн</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Форма розміщення -->
+        <div class="col-md-7">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-plus-circle"></i> Додати розміщення
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="station" class="form-label">
+                            <i class="bi bi-building"></i> Станція
+                        </label>
+                        <select name="station_id" id="station" class="form-select" required>
+                            <option value="">Оберіть станцію</option>
+                            {% for station in stations %}
+                            <option value="{{ station.station_id }}">{{ station.address }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">
+                            <i class="bi bi-123"></i> Кількість
+                        </label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" 
+                               min="1" max="{{ unit.get_avaliable_for_placement }}" 
+                               required value="1">
+                        <small class="form-text text-muted">
+                            <i class="bi bi-info-circle"></i> 
+                            Доступно для розміщення: <span class="fw-bold text-success">{{ unit.get_avaliable_for_placement }}</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary me-2" @click="event.target.closest('form').remove();">
+            Скасувати
+        </button>
+        <button type="submit" class="btn btn-primary">Зберегти</button>
+    </div>
+</form>

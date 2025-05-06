@@ -1,0 +1,38 @@
+<tr class="placement-row" id="placements-unit-{{unit.pk}}">
+    <td colspan="100">
+        {% if unit.placements.exists %}
+        <table class="table table-sm table-bordered mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Quantity</th>
+                    <th>Station</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for placement in unit.placements.all %}
+                <tr id="placement-{{ placement.pk }}">
+                    <td>{{ placement.placement_date|date:"Y-m-d H:i" }}</td>
+                    <td>{{ placement.quantity }}</td>
+                    <td>{{ placement.part_in_station.station.address }}</td>
+                    <td>
+                        <button 
+                            class="btn btn-sm btn-danger"
+                            hx-post="{% url 'remove-placement' placement.pk %}"
+                            hx-target="#unit-row-{{ unit.pk }}"
+                            hx-swap="outerHTML"
+                            hx-on="htmx:afterRequest: this.closest('tr').remove()"
+                            >
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-muted">No placements for this unit.</div>
+        {% endif %}
+    </td>
+</tr>

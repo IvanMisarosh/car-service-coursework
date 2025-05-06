@@ -1,6 +1,23 @@
+<!--_order_details.html-->
 <div>
     <h6 class="border-bottom pb-2 mb-3">Order Items</h6>
-    <div class="table-responsive" id='units-container'>
+    <div id="placement-form-container-{{ order.pk }}">
+    </div>
+    <div class="table-responsive" id='units-container'
+      x-data="{
+        expandedUnits: new Set(),
+        toggleUnit(unitId) {
+          if (this.expandedUnits.has(unitId)) {
+            this.expandedUnits.delete(unitId);
+          } else {
+            this.expandedUnits.add(unitId);
+          }
+        },
+        isExpanded(unitId) {
+          return this.expandedUnits.has(unitId);
+        },
+    }"
+      >
       <table class="table table-sm table-striped">
         <thead>
           <tr>
@@ -11,12 +28,13 @@
             <th>Price/Unit</th>
             <th>Subtotal</th>
             <th>Placement Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for unit in order.units.all %}
           {% with placed_count=unit.get_placed_count %}
-            {% include 'part_procurement/_unit_row.html'%}
+            {% include 'part_procurement/_unit_row_with_placement.html'%}
           {% endwith %}
           {% empty %}
           <tr>

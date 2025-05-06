@@ -41,6 +41,13 @@ urlpatterns = [
     path('procurement/orders/', views.procurement_orders, name='procurement-orders'),
     path('procurement/order/<int:order_id>/items/', views.procurement_order_items, name='procurement-order-items'),
 
+    path('procurement/unit/<int:unit_id>', views.edit_unit, name="edit_unit"),
+
+    path('unit/<int:pk>/placements/', views.unit_placements, name='unit_placements'),
+    path('unit/<int:unit_id>/add-placement/', views.add_placement, name='add_placement'),
+    path('unit/<int:unit_id>/update/', views.update_row, name='update-unit'),
+    path("unit/<int:placement_id>/remove-placement/", views.remove_placement, name="remove-placement"),
+
     path('populate-unit-part-select', views.part_search_for_unit, name='unit-part-search'),
 
     path('login/', auth_views.LoginView.as_view(), name='login'),

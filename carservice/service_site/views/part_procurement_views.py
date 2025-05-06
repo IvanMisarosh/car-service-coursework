@@ -1,14 +1,15 @@
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, F
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .. import models
 from .. import filters
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.utils.dateparse import parse_date
+from datetime import datetime
+from django.template.loader import render_to_string
+import json
 
 @login_required
 def procurement_orders(request):
@@ -50,4 +51,90 @@ def procurement_order_items(request, order_id):
     order = models.ProcurementOrder.objects.prefetch_related("units", "units__part", "units__part__part_type", "units__part__part_brand").get(pk=order_id)
     return render(request, 'part_procurement/_order_details.html', {
         'order': order
+    })
+
+def edit_unit(request, unit_id):
+    unit = get_object_or_404(models.ProcurementUnit, pk=unit_id)
+    # print(request.POST)
+    price = float(request.POST.get("price", unit.price_per_unit))
+    quantity = int(request.POST.get("quantity", unit.quantity))
+
+    # TODO: validate input
+
+    unit.quantity = quantity
+    unit.price_per_unit = price
+    unit.save()
+
+    return render(request, 'part_procurement/_unit_row.html', {'unit': unit, "placed_count": unit.get_placed_count})
+
+def unit_placements(request, pk):
+    unit = get_object_or_404(models.ProcurementUnit.objects.prefetch_related('placements__part_in_station__station'), pk=pk)
+    return render(request, 'part_procurement/_unit_placements.html', {'unit': unit})
+
+def add_placement(request, unit_id):
+    print(request.method)
+    unit = get_object_or_404(models.ProcurementUnit, procurement_unit_id=unit_id)
+    if request.method == "GET":
+        
+        stations = models.Station.objects.all()
+        context = {
+            'unit': unit,
+            'stations': stations
+        }
+        return render(request, 'part_procurement/_placement_form.html', context)
+    elif request.method == "POST":
+        station_id = request.POST.get('station_id')
+        quantity = int(request.POST.get('quantity', 0))
+
+        placed_count = unit.get_placed_count()
+        available_quantity = unit.quantity - placed_count
+
+        if quantity <= 0 or quantity > available_quantity:
+            return HttpResponse("Неправильна кількість", status=400)
+
+        station = get_object_or_404(models.Station, station_id=station_id)
+
+        part_in_station, created = models.PartInStation.objects.get_or_create(
+            station=station,
+            part=unit.part,
+            defaults={'quantity': 0}
+        )
+
+        part_in_station.quantity += quantity
+        part_in_station.save()
+
+        models.StoragePlacement.objects.create(
+            procurement_unit=unit,
+            part_in_station=part_in_station,
+            quantity=quantity,
+            placement_date=datetime.now()
+        )
+
+        # Refresh the unit instance and re-fetch placed_count
+        unit.refresh_from_db()
+        placed_count = unit.get_placed_count()
+
+        # Render only this updated row
+        rendered_row = render_to_string("part_procurement/_unit_row.html", {
+            "unit": unit,
+            "placed_count": placed_count
+        }, request=request)
+
+        return HttpResponse(rendered_row)
+    
+def remove_placement(request, placement_id):
+    placement = get_object_or_404(models.StoragePlacement, pk=placement_id)
+    unit_id=placement.procurement_unit.pk
+    placement.delete()
+    return redirect("update-unit", unit_id)
+
+
+def update_row(request, unit_id):
+    unit = get_object_or_404(models.ProcurementUnit, procurement_unit_id=unit_id)
+    unit.refresh_from_db()
+    placed_count = unit.get_placed_count()
+
+    return render(request, "part_procurement/_unit_row.html", {
+        "unit": unit,
+        "placed_count": placed_count
     })

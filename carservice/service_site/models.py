@@ -441,6 +441,9 @@ class ProcurementUnit(models.Model):
     def get_placed_count(self):
         result = self.placements.aggregate(total_placed=Sum('quantity'))
         return result['total_placed'] or 0
+    
+    def get_avaliable_for_placement(self):
+        return self.quantity - self.get_placed_count()
 
 class StoragePlacement(models.Model):
     storage_placement_id = models.AutoField(primary_key=True, db_column='StoragePlacementID')

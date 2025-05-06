@@ -1,0 +1,10 @@
+<!--_unit_row.html-->
+{% include 'part_procurement/_unit_row.html'%}
+<tr 
+  id="expanded-placement-{{ unit.pk }}" 
+  x-show="isExpanded('{{ unit.pk }}')" 
+  x-cloak>
+  <td colspan="100">
+    <div id="placement-detail-{{ unit.pk }}"></div> <!-- This is where HTMX injects -->
+  </td>
+</tr>
