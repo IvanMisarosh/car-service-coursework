@@ -1,29 +1,51 @@
-<div class="row">
-    <div class="col-md-6">
-      <strong>Постачальник:</strong> {{ order.supplier.supplier_name }}<br>
-      <small>Email: {{ order.supplier.email }} | Телефон: {{ order.supplier.phone_number }}</small>
-    </div>
-    <div class="col-md-6">
-      <strong>Працівник:</strong> {{ order.employee.first_name }} {{ order.employee.last_name }}<br>
-      <small>Посада: {{ order.employee.employee_position }} | Email: {{ order.employee.email }}</small>
-    </div>
-  </div>
-  <div class="row mt-2">
-    <div class="col-md-6">
-      <strong>Статус:</strong> {{ order.procurement_status }}
-    </div>
-    <div class="col-md-6">
-      <strong>Дата замовлення:</strong> {{ order.order_date|date:"Y-m-d H:i" }}
-    </div>
-  </div>
+<div class="card mb-1">
+    <div class="card-body p-1">
+      <div class="row">
+        <div class="col-md-6 mb-1">
+          <h6 class="mb-1 text-muted">Постачальник</h6>
+          <div>{{ order.supplier.supplier_name }}</div>
+          <small class="text-muted d-block">
+            <i class="bi bi-envelope"></i> {{ order.supplier.email }} &nbsp;|&nbsp;
+            <i class="bi bi-telephone"></i> {{ order.supplier.phone_number }}
+          </small>
+        </div>
+        <div class="col-md-6 mb-1">
+          <h6 class="mb-1 text-muted">Працівник</h6>
+          <div>{{ order.employee.first_name }} {{ order.employee.last_name }}</div>
+          <small class="text-muted d-block">
+            <i class="bi bi-person-badge"></i> {{ order.employee.employee_position }} &nbsp;|&nbsp;
+            <i class="bi bi-envelope"></i> {{ order.employee.email }}
+          </small>
+        </div>
+      </div>
   
-  <!-- Кнопка редагування -->
-  <div class="mt-2">
-    <button class="btn btn-sm btn-outline-primary"
-            hx-get="{% url 'edit-order-info' order.pk %}"
-            hx-target="#order-info-fields-{{ order.pk }}"
-            hx-swap="innerHTML">
-      Редагувати
-    </button>
-  </div>
+      <div class="row mt-1">
+        <div class="col-md-6 mb-1">
+          <h6 class="mb-1 text-muted">Статус</h6>
+          <span class="badge 
+            {% if order.procurement_status.status_name == 'In progress' %} bg-info
+            {% elif order.procurement_status.status_name == 'Delivered' %} bg-success
+            {% elif order.procurement_status.status_name == 'Rejected' %} bg-danger
+            {% elif order.procurement_status.status_name == 'Approved' %} bg-primary
+            {% else %} bg-secondary
+            {% endif %}
+          ">
+            {{ order.procurement_status }}
+          </span>
+        </div>
+        <div class="col-md-6 mb-1">
+          <h6 class="mb-1 text-muted">Дата замовлення</h6>
+          <div>{{ order.order_date|date:"Y-m-d H:i" }}</div>
+        </div>
+      </div>
   
+      <div class="mt-3 text-end">
+        <button class="btn btn-sm btn-outline-primary"
+                hx-get="{% url 'edit-order-info' order.pk %}"
+                hx-target="#order-info-fields-{{ order.pk }}"
+                hx-swap="innerHTML">
+          <i class="bi bi-pencil"></i> Редагувати
+        </button>
+      </div>
+    </div>
+  </div>

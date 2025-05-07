@@ -1,48 +1,56 @@
-<tr id="row-{{ order.procurement_order_id }}">
-    <td>
-      <span class="order-number cursor-pointer" data-order-id="{{ order.procurement_order_id }}">
-        {{ order.order_number }}
-      </span>
-    </td>
-    <td>
-      {{ order.employee.first_name }} {{ order.employee.last_name }}
-      <span class="text-muted">({{ order.employee.employee_position.position_name }})</span>
-    </td>
-    <td>{{ order.supplier.supplier_name }}</td>
-    <td>{{ order.units.count }}</td>
-    <td>{{ order.total_price|default:"0.00" }} ₴</td>
-    <td>{{ order.order_date|date:"Y-m-d" }}</td>
-    <td>
-      {% if order.procurement_status.status_name == "In progress" %}
-        <span class="badge bg-info">In progress</span>
-      {% elif order.procurement_status.status_name == "Delivered" %}
-        <span class="badge bg-success">Delivered</span>
-      {% elif order.procurement_status.status_name == "Rejected" %}
-        <span class="badge bg-danger">Rejected</span>
-      {% elif order.procurement_status.status_name == "Approved" %}
-        <span class="badge bg-primary">Approved</span>
-      {% else %}
-        <span class="badge bg-secondary">{{ order.procurement_status.status_name|default:"Unknown" }}</span>
+<tr id="row-{{ order.procurement_order_id }}"
+    class="
+      {% if order.procurement_status.status_name == 'In progress' %} table-info
+      {% elif order.procurement_status.status_name == 'Delivered' %} table-success
+      {% elif order.procurement_status.status_name == 'Rejected' %} table-danger
+      {% elif order.procurement_status.status_name == 'Approved' %} table-primary
+      {% else %} table-secondary
       {% endif %}
-    </td>
-    <td class="text-end">
-      <button 
-        class="btn btn-sm btn-outline-primary"
-        @click="toggleOrder('{{ order.procurement_order_id }}')"
-        title="View order details"
-        x-show="!isExpanded('{{ order.procurement_order_id }}')"
-        hx-get="{% url 'procurement-order-items' order.procurement_order_id %}"
-        hx-target='#order-items-{{ order.procurement_order_id }}'
-        >
-        <i class="bi bi-eye"></i>
-      </button>
-      <button 
-        class="btn btn-sm btn-outline-primary"
-        @click="toggleOrder('{{ order.procurement_order_id }}')"
-        title="View order details"
-        x-show="isExpanded('{{ order.procurement_order_id }}')"
-        >
-        <i class="bi bi-eye-slash"></i>
-      </button>
-    </td>
-  </tr>
+      align-middle
+    ">
+  <td class="py-1 px-2">
+    <span class="order-number cursor-pointer fw-bold" data-order-id="{{ order.procurement_order_id }}">
+      {{ order.order_number }}
+    </span>
+  </td>
+  <td class="py-1 px-2">
+    {{ order.employee.first_name }} {{ order.employee.last_name }}
+    <span class="text-muted small d-block">({{ order.employee.employee_position.position_name }})</span>
+  </td>
+  <td class="py-1 px-2">{{ order.supplier.supplier_name }}</td>
+  <td class="py-1 px-2">{{ order.units.count }}</td>
+  <td class="py-1 px-2">{{ order.total_price|default:"0.00" }} ₴</td>
+  <td class="py-1 px-2">{{ order.order_date|date:"Y-m-d" }}</td>
+  <td class="py-1 px-2">
+    <span class="badge
+      {% if order.procurement_status.status_name == 'In progress' %} bg-info
+      {% elif order.procurement_status.status_name == 'Delivered' %} bg-success
+      {% elif order.procurement_status.status_name == 'Rejected' %} bg-danger
+      {% elif order.procurement_status.status_name == 'Approved' %} bg-primary
+      {% else %} bg-secondary
+      {% endif %}
+    ">
+      {{ order.procurement_status.status_name|default:"Unknown" }}
+    </span>
+  </td>
+  <td class="py-1 px-2">
+    <button 
+      class="btn btn-sm btn-primary me-1"
+      @click="toggleOrder('{{ order.procurement_order_id }}')"
+      title="View order details"
+      x-show="!isExpanded('{{ order.procurement_order_id }}')"
+      hx-get="{% url 'procurement-order-items' order.procurement_order_id %}"
+      hx-target="#order-items-{{ order.procurement_order_id }}"
+    >
+      Деталі замовлення
+    </button>
+    <button 
+      class="btn btn-sm btn-primary me-1"
+      @click="toggleOrder('{{ order.procurement_order_id }}')"
+      title="Hide order details"
+      x-show="isExpanded('{{ order.procurement_order_id }}')"
+    >
+      приховати деталі
+    </button>
+  </td>
+</tr>

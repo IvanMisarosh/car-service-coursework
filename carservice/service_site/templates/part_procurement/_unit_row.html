@@ -11,99 +11,95 @@
             this.editMode = false;
         }
     }"
-     class="{% if placed_count == unit.quantity %}table-success{% elif placed_count > 0 %}table-warning{% endif %}">
-    
-    <!-- Your other <td> fields here... -->
-    <td>{{ unit.part.part_name }}</td>
-    <td>{{ unit.part.part_brand.brand_name|default:"N/A" }}</td>
-    <td>{{ unit.part.part_type.part_type_name|default:"N/A" }}</td>
+    class="align-middle {% if placed_count == unit.quantity %}table-success{% elif placed_count > 0 %}table-warning{% else %}table-light{% endif %}">
+
+    <!-- Part name -->
+    <td class="py-1 px-2 small">{{ unit.part.part_name }}</td>
+
+    <!-- Brand -->
+    <td class="py-1 px-2 small">{{ unit.part.part_brand.brand_name|default:"N/A" }}</td>
+
+    <!-- Type -->
+    <td class="py-1 px-2 small">{{ unit.part.part_type.part_type_name|default:"N/A" }}</td>
 
     <!-- Quantity -->
-    <td>
+    <td class="py-1 px-2 small">
         <template x-if="editMode">
             <input type="number" class="form-control form-control-sm" x-model="quantity">
         </template>
         <template x-if="!editMode">
             <span x-text="quantity"></span>
         </template>
-        </td>
-    
-        <!-- Price -->
-        <td>
+    </td>
+
+    <!-- Price -->
+    <td class="py-1 px-2 small">
         <template x-if="editMode">
-            <input type="number" step="0.01" class="form-control form-control-sm" x-model="price" name='price'>
+            <input type="number" step="0.01" class="form-control form-control-sm" x-model="price" name="price">
         </template>
         <template x-if="!editMode">
-            <span x-text="price + ' ₴'"></span>
+            <span x-text="price.toFixed(2) + ' ₴'"></span>
         </template>
-        </td>
-    
-        <!-- Total -->
-        <td>
-        <span x-text="(quantity * price).toFixed(2) + ' ₴'"></span>
-        </td>
-    
-        <!-- Placed -->
-        <td>
-        <div class="d-flex align-items-center">
-            <span class="ms-2 badge {% if placed_count == unit.quantity %}bg-success{% elif placed_count > 0 %}bg-warning{% else %}bg-secondary{% endif %}">
-            {{ placed_count }}/<span x-text="quantity"></span>
-            </span>
-        </div>
-        </td>
+    </td>
 
-    <!-- Hidden fields to send via HTMX -->
+    <!-- Total -->
+    <td class="py-1 px-2 small">
+        <span x-text="(quantity * price).toFixed(2) + ' ₴'"></span>
+    </td>
+
+    <!-- Placement Status -->
+    <td class="py-1 px-2 small">
+        <span class="badge {% if placed_count == unit.quantity %}bg-success{% elif placed_count > 0 %}bg-warning{% else %}bg-secondary{% endif %}">
+            {{ placed_count }}/<span x-text="quantity"></span>
+        </span>
+    </td>
+
+    <!-- Hidden Inputs -->
     <input type="hidden" name="quantity" x-model="quantity">
     <input type="hidden" name="price" x-model="price">
 
     <!-- Actions -->
-    <td>
-      <div class="btn-group">
-        <button 
-            class="btn btn-sm btn-outline-primary" 
-            @click="editMode ? cancelEdit() : editMode = true" 
-            x-text="editMode ? 'Cancel' : 'Edit'">
-        </button>
+    <td class="py-1 px-2 small text-nowrap">
+        <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-outline-primary" 
+                @click="editMode ? cancelEdit() : editMode = true" 
+                x-text="editMode ? 'Cancel' : 'Edit'">
+            </button>
 
+            <button class="btn btn-outline-success" x-show="editMode"
+                hx-post="{% url 'edit_unit' unit.pk %}"
+                hx-include="closest tr"
+                hx-target="closest tr"
+                hx-swap="outerHTML"
+                @click="
+                    editMode = false;
+                    originalQuantity = quantity;
+                    originalPrice = price;
+                ">
+                Save
+            </button>
 
-        <button class="btn btn-sm btn-outline-success" x-show="editMode"
-            hx-post="{% url 'edit_unit' unit.pk %}"
-            hx-include="closest tr"
-            hx-target="closest tr"
-            hx-swap="outerHTML"
-            @click="
-                editMode = false;
-                originalQuantity = quantity;
-                originalPrice = price;
-            "
-            >
-        Save
-        </button>
+            <button class="btn btn-outline-info"
+                @click="toggleUnit('{{ unit.pk }}')"
+                x-show="!isExpanded('{{ unit.pk }}')"
+                hx-get="{% url 'unit_placements' unit.pk %}"
+                hx-target="#placement-detail-{{ unit.pk }}"
+                hx-swap="innerHTML">
+                <i class="bi bi-eye"></i>
+            </button>
 
-        <!-- Placements Toggle Button -->
-        <button 
-            class="btn btn-sm btn-outline-info"
-            @click="toggleUnit('{{ unit.pk }}')"
-            x-show="!isExpanded('{{ unit.pk }}')"
-            hx-get="{% url 'unit_placements' unit.pk %}"
-            hx-target="#placement-detail-{{ unit.pk }}"
-            hx-swap="innerHTML">
-        <i class="bi bi-eye"></i>
-        </button>
-        <button 
-            class="btn btn-sm btn-outline-info"
-            @click="toggleUnit('{{ unit.pk }}')"
-            x-show="isExpanded('{{ unit.pk }}')">
-            <i class="bi bi-eye-slash"></i>
-        </button>
-        <button
-            class="btn btn-sm btn-outline-info"
-            hx-get="{% url 'add_placement' unit.pk %}"
-            hx-target="#placement-form-container-{{ unit.procurement_order.pk }}"
-            hx-swap="innerHTML"
-            >
-            add placement
-        </button>
-      </div>
+            <button class="btn btn-outline-info"
+                @click="toggleUnit('{{ unit.pk }}')"
+                x-show="isExpanded('{{ unit.pk }}')">
+                <i class="bi bi-eye-slash"></i>
+            </button>
+
+            <button class="btn btn-outline-secondary"
+                hx-get="{% url 'add_placement' unit.pk %}"
+                hx-target="#placement-form-container-{{ unit.procurement_order.pk }}"
+                hx-swap="innerHTML">
+                <i class="bi bi-plus-circle"></i>
+            </button>
+        </div>
     </td>
 </tr>
