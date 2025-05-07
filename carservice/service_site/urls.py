@@ -38,9 +38,10 @@ urlpatterns = [
     path('visit-service/part-search', views.part_search, name='part-search'),
     path('service-part-search/<int:visit_service_id>', views.visit_service_with_part_search, name='service-part-search'),
 
+    path('procurement/orders/add/', views.add_order, name='add-procurement-order'),
     path('procurement/orders/', views.procurement_orders, name='procurement-orders'),
     path('procurement/order/<int:order_id>/items/', views.procurement_order_items, name='procurement-order-items'),
-
+    
     path('order-info/<int:pk>/', views.order_info, name='order-info'),
     path('order/<int:order_id>/update/', views.update_order_row, name='update-order'),
     path('edit-order-info/<int:pk>/', views.edit_order_info, name='edit-order-info'),

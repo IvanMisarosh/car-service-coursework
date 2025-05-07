@@ -48,6 +48,24 @@ def procurement_orders(request):
     
     return render(request, 'part_procurement/procurement_orders.html', context)
 
+def add_order(request):
+    if request.method == "GET":
+        form = forms.ProcurementOrderInfoForm()
+        # messages.add_message(request, *(messages.SUCCESS, "Congratulations! You did it."))
+        # messages.error(request, 'words')
+        return render(request, 'part_procurement/_add_order_form.html', {'form': form})
+    if request.method == 'POST':
+        form = forms.ProcurementOrderInfoForm(request.POST)
+        
+        if form.is_valid():
+            form.instance.order_number = models.ProcurementOrder.generate_order_number()
+            form.instance.total_price = 0
+            order = form.save()
+            # messages.error(request, 'words')
+            return render(request, "part_procurement/_order_row_expandable.html", {"order": order})
+    # messages.error(request, 'words')
+    return render(request, 'part_procurement/_add_order_form.html', {'form': form}, status=400)
+    
 def order_info(request, pk):
     order = get_object_or_404(models.ProcurementOrder, pk=pk)
     return render(request, 'part_procurement/_order_info_fields.html', {'order': order})

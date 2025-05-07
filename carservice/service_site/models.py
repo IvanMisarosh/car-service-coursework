@@ -142,7 +142,7 @@ class Car(models.Model):
     color = models.ForeignKey(Color, on_delete=models.CASCADE, db_column='ColorID')
     manufacture_year = models.IntegerField(null=True, blank=True, db_column='ManufactureYear')
     note = models.CharField(max_length=255, null=True, blank=True, db_column='Note')
-    vin = models.CharField(max_length=17, unique=True, null=True, blank=True, db_column='VIN')
+    vin = models.CharField(max_length=17, unique=True, db_column='VIN')
     mileage = models.IntegerField(null=True, blank=True, db_column='Mileage')
     
     class Meta:
@@ -173,8 +173,8 @@ class PartBrand(models.Model):
 
 class Part(models.Model):
     part_id = models.AutoField(primary_key=True, db_column='PartID')
-    part_brand = models.ForeignKey(PartBrand, null=True, blank=True, on_delete=models.SET_NULL, db_column='PartBrandID')
-    part_type = models.ForeignKey(PartType, null=True, blank=True, on_delete=models.SET_NULL, db_column='PartTypeID')
+    part_brand = models.ForeignKey(PartBrand, null=True, on_delete=models.SET_NULL, db_column='PartBrandID')
+    part_type = models.ForeignKey(PartType, null=True, on_delete=models.SET_NULL, db_column='PartTypeID')
     part_name = models.CharField(max_length=100, db_column='PartName')
     weight = models.DecimalField(max_digits=10, decimal_places=2, db_column='Weight')
     dimensions = models.CharField(max_length=100, null=True, blank=True, db_column='Dimensions')
@@ -228,7 +228,7 @@ class EmployeePosition(models.Model):
 
 class Employee(models.Model):
     employee_id = models.AutoField(primary_key=True, db_column='EmployeeID')
-    employee_position = models.ForeignKey(EmployeePosition, null=True, blank=True, on_delete=models.SET_NULL, db_column='EmployeePositionID')
+    employee_position = models.ForeignKey(EmployeePosition, null=True, on_delete=models.SET_NULL, db_column='EmployeePositionID')
     station = models.ForeignKey(Station, on_delete=models.CASCADE, db_column='StationID')
     first_name = models.CharField(max_length=50, db_column='FirstName')
     last_name = models.CharField(max_length=50, db_column='LastName')
@@ -338,7 +338,7 @@ class VisitService(models.Model):
 
 class ProvidedService(models.Model):
     provided_service_id = models.AutoField(primary_key=True, db_column='ProvidedServiceID')
-    employee = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.SET_NULL, db_column='EmployeeID')
+    employee = models.ForeignKey(Employee, null=True, on_delete=models.SET_NULL, db_column='EmployeeID')
     visit_service = models.OneToOneField(VisitService, on_delete=models.CASCADE, db_column='VisitServiceID', related_name='provided_service')
     provided_date = models.DateTimeField(null=True, blank=True, db_column='ProvidedDate')
     
@@ -380,7 +380,7 @@ class Supplier(models.Model):
     supplier_id = models.AutoField(primary_key=True, db_column='SupplierID')
     email = models.CharField(max_length=100, null=True, blank=True, db_column='Email')
     phone_number = models.CharField(max_length=15, null=True, blank=True, db_column='PhoneNumber')
-    supplier_name = models.CharField(max_length=100, null=True, blank=True, db_column='SupplierName')
+    supplier_name = models.CharField(max_length=100, db_column='SupplierName')
     
     class Meta:
         db_table = 'Supplier'   
@@ -390,7 +390,7 @@ class Supplier(models.Model):
 
 class ProcurementStatus(models.Model):
     procurement_status_id = models.AutoField(primary_key=True, db_column='ProcurementStatusID')
-    status_name = models.CharField(max_length=50, null=True, blank=True, db_column='StatusName')
+    status_name = models.CharField(max_length=50, unique=True, db_column='StatusName')
     
     class Meta:
         db_table = 'ProcurementStatus'  
@@ -400,12 +400,12 @@ class ProcurementStatus(models.Model):
 
 class ProcurementOrder(models.Model):
     procurement_order_id = models.AutoField(primary_key=True, db_column='ProcurementOrderID')
-    employee = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.SET_NULL, db_column='EmployeeID')
-    supplier = models.ForeignKey(Supplier, null=True, blank=True, on_delete=models.SET_NULL, db_column='SupplierID')
-    procurement_status = models.ForeignKey(ProcurementStatus, null=True, blank=True, on_delete=models.SET_NULL, db_column='ProcurementStatusID')
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, db_column='TotalPrice')
-    order_date = models.DateTimeField(null=True, blank=True, db_column='OrderDate')
-    order_number = models.CharField(max_length=50, null=True, blank=True, db_column='OrderNumber')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, db_column='EmployeeID')
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, db_column='SupplierID')
+    procurement_status = models.ForeignKey(ProcurementStatus, null=True, on_delete=models.SET_NULL, db_column='ProcurementStatusID')
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, db_column='TotalPrice')
+    order_date = models.DateTimeField(null=True, db_column='OrderDate')
+    order_number = models.CharField(max_length=50, unique=True, db_column='OrderNumber')
     
     class Meta:
         db_table = 'ProcurementOrder'   
@@ -426,8 +426,8 @@ class ProcurementUnit(models.Model):
     procurement_unit_id = models.AutoField(primary_key=True, db_column='ProcurementUnitID')
     part = models.ForeignKey(Part, on_delete=models.CASCADE, db_column='PartID')
     quantity = models.IntegerField(db_column='Quantity')
-    price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, db_column='PricePerUnit')
-    procurement_order = models.ForeignKey(ProcurementOrder, null=True, blank=True, on_delete=models.SET_NULL, db_column='ProcurementOrderID', related_name='units')
+    price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, db_column='PricePerUnit')
+    procurement_order = models.ForeignKey(ProcurementOrder, on_delete=models.CASCADE, db_column='ProcurementOrderID', related_name='units')
     
     class Meta:
         db_table = 'ProcurementUnit'  
@@ -449,8 +449,8 @@ class StoragePlacement(models.Model):
     storage_placement_id = models.AutoField(primary_key=True, db_column='StoragePlacementID')
     procurement_unit = models.ForeignKey(ProcurementUnit, on_delete=models.CASCADE, db_column='ProcurementUnitID', related_name='placements')
     part_in_station = models.ForeignKey(PartInStation, on_delete=models.CASCADE, db_column='PartInStationID')
-    quantity = models.IntegerField(null=True, blank=True, db_column='Quantity')
-    placement_date = models.DateTimeField(null=True, blank=True, db_column='PlacementDate')
+    quantity = models.IntegerField(db_column='Quantity')
+    placement_date = models.DateTimeField(db_column='PlacementDate')
     
     class Meta:
         db_table = 'StoragePlacement'   

@@ -29,7 +29,7 @@
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="order-table-body">
         {% for order in procurement_orders %}
           {% include 'part_procurement/_order_row_expandable.html'%}
         {% empty %}

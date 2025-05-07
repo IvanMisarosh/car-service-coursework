@@ -33,12 +33,14 @@
 
     </head>
 
-    <body 
-        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
         >
         {% block content %}
         {% endblock %}
+        {% include '_toasts.html'%}
+        <script src="{% static 'service_site/js/toast.js' %}" defer></script>
     </body>
+
     <script>
         $(document).ready(function() {
             $('.select2').select2({

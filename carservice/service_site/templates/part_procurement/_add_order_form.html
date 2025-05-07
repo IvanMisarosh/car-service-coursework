@@ -1,0 +1,37 @@
+<form 
+  hx-post="{% url 'add-procurement-order'%}" 
+  hx-target="#order-table-body" 
+  hx-swap="afterbegin"
+  hx-target-error="#errors"
+  {% comment %} hx-on:htmx:response-error='alert("sdf!")' {% endcomment %}
+  {% comment %} @htmx:after-request="event.target.closest('form').remove();" {% endcomment %}
+  id="add-order-form"
+  >
+    <!-- WHY htmx:afterRequest DOESNT WORK -->
+    <div id="errors">
+    </div>
+  
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-6">
+      {{ form.supplier.label_tag }} {{ form.supplier }}
+    </div>
+    <div class="col-md-6">
+      {{ form.employee.label_tag }} {{ form.employee }}
+    </div>
+  </div>
+  <div class="row mt-2">
+    <div class="col-md-6">
+      {{ form.procurement_status.label_tag }} {{ form.procurement_status }}
+    </div>
+    <div class="col-md-6">
+      {{ form.order_date.label_tag }} {{ form.order_date }}
+    </div>
+  </div>
+  <div class="mt-2">
+    <button type="submit" class="btn btn-sm btn-success">Зберегти</button>
+    <button type="button" class="btn btn-sm btn-secondary" @click="event.target.closest('form').remove();">
+      Скасувати
+    </button>
+  </div>
+</form>

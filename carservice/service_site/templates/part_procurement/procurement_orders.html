@@ -12,6 +12,7 @@
 
 {% block js_files %}
     <script src="{% static 'service_site/js/procurement_orders.js' %}" defer></script>
+    {% comment %} <script src="{% static 'service_site/js/toast.js' %}" defer></script> {% endcomment %}
 {% endblock %}
 
 {% block content %}
@@ -30,12 +31,10 @@
                 />
             </div>
             <button class="btn btn-primary col-2"
-                {% comment %} hx-get="{% url 'create-procurement-order' %}" {% endcomment %}
-                hx-target="#modal-body"
+                hx-get="{% url 'add-procurement-order' %}"
+                hx-target="#add-order-form"
                 hx-trigger="click"
-                hx-swap="innerHTML"
-                data-bs-toggle="modal"
-                data-bs-target="#modal">
+                hx-swap="innerHTML">
                 Створити замовлення
             </button>
         
@@ -70,13 +69,13 @@
                     Відфільтрувати
                 </button>
             </form>
-            <div class="col-9 rounded" id="order-list">
-                {% include 'part_procurement/_procurement_order_list.html' %}
+            <div class="col-9 rounded">
+                <div id="add-order-form">
+                </div>
+                <div id="order-list">
+                    {% include 'part_procurement/_procurement_order_list.html' %}
+                </div>
             </div>
         </div>
     </div>
-    
-    <section id="messages">
-        {% include 'service_site/visits/_toast.html'%}
-    </section>
 {% endblock %}
