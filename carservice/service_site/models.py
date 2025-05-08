@@ -159,7 +159,7 @@ class PartType(models.Model):
         db_table = 'PartType'   
     
     def __str__(self):
-        return self.parttype_name
+        return self.part_type_name
 
 class PartBrand(models.Model):
     part_brand_id = models.AutoField(primary_key=True, db_column='PartBrandID')

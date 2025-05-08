@@ -1,0 +1,20 @@
+{% load group_filters %}
+<tr>
+    <td class="py-1 px-1">{{ part.part_name }}</td>
+    <td>{{ part.part_brand.brand_name|default:"Не вказано" }}</td>
+    <td>{{ part.part_type.part_type_name|default:"Не вказано" }}</td>
+    <td>{{ part.weight }}</td>
+    <td>{{ part.dimensions|default:"Не вказано" }}</td>
+    <td>{{ part.description|default:"Не вказано" }}</td>
+    <td>{{ part.quantity_per_package }}</td>
+    <td>{{ part.price_per_package }}</td>
+    <td>{{ part.get_price_per_unit }}</td>
+    <td>
+        <button class="btn btn-sm btn-primary"
+                hx-get="{% url 'edit-part-form' part.part_id %}"
+                hx-target="closest tr"
+                hx-swap="outerHTML">
+            <i class="bi bi-pencil-fill"></i> Редагувати
+        </button>
+    </td>
+</tr>

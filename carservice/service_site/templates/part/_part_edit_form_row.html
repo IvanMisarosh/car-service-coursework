@@ -1,0 +1,68 @@
+<tr>
+    <td class="py-1 px-1">
+        <input type="text" value="{{ part.part_name }}" class="form-control form-control-sm" id="part_name_{{ part.part_id }}">
+    </td>
+    <td>
+        <select value="{{ part.part_brand.part_brand_id }}" class="form-control form-control-sm" id="part_brand_{{ part.part_id }}">
+            <option value="">Не вказано</option>
+            {% for brand in part_brands %}
+                <option value="{{ brand.part_brand_id }}" {% if part.part_brand.part_brand_id == brand.part_brand_id %}selected{% endif %}>
+                    {{ brand.brand_name }}
+                </option>
+            {% endfor %}
+        </select>
+    </td>
+    <td>
+        <select value="{{ part.part_type.part_type_id }}" class="form-control form-control-sm" id="part_type_{{ part.part_id }}">
+            <option value="">Не вказано</option>
+            {% for type in part_types %}
+                <option value="{{ type.part_type_id }}" {% if part.part_type.part_type_id == type.part_type_id %}selected{% endif %}>
+                    {{ type.part_type_name }}
+                </option>
+            {% endfor %}
+        </select>
+    </td>
+    <td>
+        <input type="number" value="{{ part.weight }}" step="0.01" class="form-control form-control-sm" id="weight_{{ part.part_id }}">
+    </td>
+    <td>
+        <input type="text" value="{{ part.dimensions|default:'' }}" class="form-control form-control-sm" id="dimensions_{{ part.part_id }}">
+    </td>
+    <td>
+        <input type="text" value="{{ part.description|default:'' }}" class="form-control form-control-sm" id="description_{{ part.part_id }}">
+    </td>
+    <td>
+        <input type="number" value="{{ part.quantity_per_package }}" class="form-control form-control-sm" id="quantity_per_package_{{ part.part_id }}">
+    </td>
+    <td>
+        <input type="number" value="{{ part.price_per_package }}" step="0.01" class="form-control form-control-sm" id="price_per_package_{{ part.part_id }}">
+    </td>
+    <td>{{ part.get_price_per_unit }}</td>
+    <td>
+        <button type="button"
+            hx-post="{% url 'edit-part' part.part_id %}"
+            hx-target="closest tr"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            hx-vals='js:{
+                "part_name": document.getElementById("part_name_{{ part.part_id }}").value,
+                "part_brand": document.getElementById("part_brand_{{ part.part_id }}").value,
+                "part_type": document.getElementById("part_type_{{ part.part_id }}").value,
+                "weight": document.getElementById("weight_{{ part.part_id }}").value,
+                "dimensions": document.getElementById("dimensions_{{ part.part_id }}").value,
+                "description": document.getElementById("description_{{ part.part_id }}").value,
+                "quantity_per_package": document.getElementById("quantity_per_package_{{ part.part_id }}").value,
+                "price_per_package": document.getElementById("price_per_package_{{ part.part_id }}").value
+            }'
+            hx-swap="outerHTML"
+            class="btn btn-sm btn-success me-1">
+            <i class="bi bi-check-lg"></i> Зберегти
+        </button>
+
+        <button type="button" class="btn btn-sm btn-secondary"
+                hx-get="{% url 'get-part-row' part.part_id %}"
+                hx-target="closest tr"
+                hx-swap="outerHTML">
+            Скасувати
+        </button>
+    </td>
+</tr>

@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from .. import models
+from .. import forms
+from ..views_utils import render_htmx
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from django.views.generic import View 
@@ -9,6 +11,151 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib import messages
 import uuid
 from datetime import datetime
+from django.core.paginator import Paginator
+import json
+
+
+
+class PartsView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['service_site.view_part']
+    login_url = '/login/'
+
+    def get(self, request, *args, **kwargs):
+        page_number = request.GET.get("page", 1)
+        items_per_page = int(request.GET.get("items_per_page", 10))
+        search_query = request.GET.get("search", '')
+
+        search_terms = search_query.split()
+        query = Q()
+
+        for term in search_terms:
+            query |= Q(part_name__icontains=term) | Q(
+                description__icontains=term) | Q(
+                part_brand__brand_name__icontains=term) | Q(
+                part_type__part_type_name__icontains=term)
+
+        parts = models.Part.objects.filter(query).select_related('part_brand', 'part_type').order_by('part_name')
+
+        paginator = Paginator(parts, items_per_page)
+        page_obj = paginator.get_page(page_number)
+
+        part_types = models.PartType.objects.all().order_by('part_type_name')
+        part_brands = models.PartBrand.objects.all().order_by('brand_name')
+
+        context = {
+            "parts": page_obj,
+            "part_types": part_types,
+            "part_brands": part_brands,
+        }
+
+        return render_htmx(request, "part/parts.html", "part/_part_list.html", context)
+
+
+class PartFormView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['service_site.add_part']
+    login_url = '/login/'
+
+    def get(self, request):
+        form = forms.PartForm()
+        part_types = models.PartType.objects.all().order_by('part_type_name')
+        part_brands = models.PartBrand.objects.all().order_by('brand_name')
+        
+        context = {
+            "form": form,
+            "part_types": part_types,
+            "part_brands": part_brands,
+        }
+        return render_htmx(request, None, "part/_add_part_form.html", context)
+
+    def post(self, request):
+        form = forms.PartForm(request.POST)
+        if form.is_valid():
+            part = form.save()
+            # Get part types and brands for the template
+            part_types = models.PartType.objects.all().order_by('part_type_name')
+            part_brands = models.PartBrand.objects.all().order_by('brand_name')
+            
+            # Render the new row for the part table
+            return render_htmx(request, None, "part/_part_list_row.html", {
+                "part": part, 
+                "part_types": part_types,
+                "part_brands": part_brands
+            })
+        
+        print(form.errors)
+
+        return HttpResponseBadRequest("")
+
+
+class PartEditView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['service_site.change_part']
+    login_url = '/login/'
+
+    def get(self, request, part_id):
+        part = get_object_or_404(models.Part, pk=part_id)
+        part_types = models.PartType.objects.all().order_by('part_type_name')
+        part_brands = models.PartBrand.objects.all().order_by('brand_name')
+        
+        context = {
+            "part": part,
+            "part_types": part_types,
+            "part_brands": part_brands,
+        }
+        return render_htmx(request, None, "part/_part_edit_form_row.html", context)
+    
+    def post(self, request, part_id):
+        part = get_object_or_404(models.Part, pk=part_id)
+        print(f"Request Body: {request.POST}") 
+        data = request.POST
+
+        # Update the part with the data from HTMX
+        part.part_name = data.get('part_name', part.part_name)
+        part.weight = float(data.get('weight', part.weight))
+        part.dimensions = data.get('dimensions', part.dimensions) or None
+        part.description = data.get('description', part.description) or None
+        part.quantity_per_package = int(data.get('quantity_per_package', part.quantity_per_package))
+        part.price_per_package = float(data.get('price_per_package', part.price_per_package))
+        
+        # Handle foreign keys
+        brand_id = data.get('part_brand')
+        if brand_id:
+            part.part_brand_id = brand_id
+        else:
+            part.part_brand = None
+            
+        type_id = data.get('part_type')
+        if type_id:
+            part.part_type_id = type_id
+        else:
+            part.part_type = None
+        
+        # Save the part object after updating it
+        part.save()
+
+        # Prepare the context for the updated part
+        context = {
+            'part': part,
+        }
+        
+        # Return the updated part row as HTMX response
+        return render_htmx(request, None, "part/_part_list_row.html", context)
+
+
+class PartRowView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['service_site.view_part']
+    login_url = '/login/'
+    
+    def get(self, request, part_id):
+        part = get_object_or_404(models.Part, pk=part_id)
+        part_types = models.PartType.objects.all().order_by('part_type_name')
+        part_brands = models.PartBrand.objects.all().order_by('brand_name')
+        
+        context = {
+            'part': part,
+            'part_types': part_types,
+            'part_brands': part_brands,
+        }
+        return render_htmx(request, None, "part/_part_list_row.html", context)
 
 def part_search(request):
     search = request.GET.get("search", '')

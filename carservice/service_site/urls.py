@@ -67,6 +67,13 @@ urlpatterns = [
 
     path('carmodels/check-model-name', views.check_model_name, name='check-model-name'),
 
+    # Part URLs
+    path('parts/', views.PartsView.as_view(), name='parts'),
+    path('part/add/', views.PartFormView.as_view(), name='add-part-form'),
+    path('part/<int:part_id>/edit/', views.PartEditView.as_view(), name='edit-part'),
+    path('part/<int:part_id>/edit-form/', views.PartEditView.as_view(), name='edit-part-form'),
+    path('part/<int:part_id>/row/', views.PartRowView.as_view(), name='get-part-row'),
+
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 

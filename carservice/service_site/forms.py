@@ -3,6 +3,22 @@ from . import models
 from django import forms
 from django.urls import reverse_lazy
 
+class PartForm(forms.ModelForm):
+    class Meta:
+        model = models.Part
+        fields = ['part_name', 'part_brand', 'part_type', 'weight', 'dimensions', 
+                  'description', 'quantity_per_package', 'price_per_package']
+        widgets = {
+            'part_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+            'part_brand': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'part_type': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'weight': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'step': '0.01'}),
+            'dimensions': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+            'description': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+            'quantity_per_package': forms.NumberInput(attrs={'class': 'form-control form-control-sm'}),
+            'price_per_package': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'step': '0.01'}),
+        }
+
 class CarModelForm(forms.ModelForm):
     class Meta:
         model = models.CarModel

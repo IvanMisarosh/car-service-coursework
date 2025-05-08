@@ -1,0 +1,47 @@
+{% load crispy_forms_tags %}
+<div class="card">
+    <div class="card-header">
+        <h5>Додати нову запчастину</h5>
+    </div>
+    <div class="card-body">
+        <form 
+            hx-post="{% url 'add-part-form' %}" 
+            hx-target="#parts-table-body"
+            hx-swap="afterbegin"
+        >
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-4 mb-2">
+                    {{ form.part_name|as_crispy_field }}
+                </div>
+                <div class="col-4 mb-2">
+                    {{ form.part_brand|as_crispy_field }}
+                </div>
+                <div class="col-4 mb-2">
+                    {{ form.part_type|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3 mb-2">
+                    {{ form.weight|as_crispy_field }}
+                </div>
+                <div class="col-3 mb-2">
+                    {{ form.dimensions|as_crispy_field }}
+                </div>
+                <div class="col-6 mb-2">
+                    {{ form.description|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6 mb-2">
+                    {{ form.quantity_per_package|as_crispy_field }}
+                </div>
+                <div class="col-6 mb-2">
+                    {{ form.price_per_package|as_crispy_field }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-sm btn-primary">Зберегти</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('add-part-form-container').innerHTML = '';">Скасувати</button>
+        </form>
+    </div>
+</div>
