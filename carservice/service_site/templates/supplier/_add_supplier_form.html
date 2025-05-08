@@ -1,20 +1,27 @@
-<form 
-  hx-post="{% url 'add-supplier-form' %}" 
-  hx-target="#suppliers-table-body"
-  hx-swap="afterbegin"
->
-  {% csrf_token %}
-  <div class='row'>
-    <div class="col-4 mb-2">
-      {{ form.supplier_name.label_tag }} {{ form.supplier_name }}
-    </div>
-    <div class="col-4 mb-2">
-      {{ form.email.label_tag }} {{ form.email }}
-    </div>
-    <div class="col-4 mb-2">
-      {{ form.phone_number.label_tag }} {{ form.phone_number }}
-    </div>
-  </div>  
-  <button type="submit" class="btn btn-sm btn-primary">Зберегти</button>
-  <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('add-supplier-form-container').innerHTML = '';">Скасувати</button>
-</form>
+<div class="card">
+  <div class="card-header">
+    <h5>Додати нового постачальника</h5>
+  </div>
+  <div class="card-body">
+    <form 
+      hx-post="{% url 'add-supplier-form' %}" 
+      hx-target="#suppliers-table-body"
+      hx-swap="afterbegin"
+    >
+      {% csrf_token %}
+      <div class='row'>
+        <div class="col-4 mb-2">
+          {{ form.supplier_name.label_tag }} {{ form.supplier_name }}
+        </div>
+        <div class="col-4 mb-2">
+          {{ form.email.label_tag }} {{ form.email }}
+        </div>
+        <div class="col-4 mb-2">
+          {{ form.phone_number.label_tag }} {{ form.phone_number }}
+        </div>
+      </div>  
+      <button type="submit" class="btn btn-sm btn-primary">Зберегти</button>
+      <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('add-supplier-form-container').innerHTML = '';">Скасувати</button>
+    </form>
+  </div>
+</div>

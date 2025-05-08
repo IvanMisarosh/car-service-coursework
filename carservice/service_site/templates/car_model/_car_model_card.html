@@ -1,0 +1,44 @@
+<!-- This is a single car model card with edit functionality -->
+<div class="col-lg-3 col-md-4 col-sm-6 mb-4 model-card" id="car-model-{{ car_model.car_model_id }}">
+    <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                {{ car_model.car_brand.brand_name }} {{ car_model.model_name }}
+            </h5>
+            <div>
+                <button class="btn btn-sm btn-light" 
+                    hx-get="{% url 'edit-car-model' car_model.car_model_id %}" 
+                    hx-target="#car-model-{{ car_model.car_model_id }}"
+                    hx-swap="outerHTML"
+                    title="Редагувати">
+                    <i class="bi bi-pencil-fill"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled mb-0">
+                <li class="mb-2">
+                    <span><i class="bi bi-building me-1 text-secondary"></i><strong>Бренд:</strong> {{ car_model.car_brand.brand_name|default:"Не вказано" }}</span>
+                </li>
+                <li class="mb-2">
+                    <span><i class="bi bi-car-front-fill me-1 text-secondary"></i><strong>Тип кузова:</strong> {{ car_model.body_type.body_type_name|default:"Не вказано" }}</span>
+                </li>
+                <li class="mb-2">
+                    <span><i class="bi bi-speedometer2 me-1 text-secondary"></i><strong>Двигун:</strong> {{ car_model.engine_type.engine_type_name|default:"Не вказано" }}</span>
+                </li>
+                <li class="mb-2">
+                    <span><i class="bi bi-gear-fill me-1 text-secondary"></i><strong>Трансмісія:</strong> {{ car_model.transmission_type.transmission_type_name|default:"Не вказано" }}</span>
+                </li>
+                <li class="mb-2">
+                    <span><i class="bi bi-arrows-fullscreen me-1 text-secondary"></i><strong>Габарити:</strong> {{ car_model.dimensions|default:"Не вказано" }} см</span>
+                </li>
+                <li class="mb-2">
+                    <span><i class="bi bi-gear-wide-connected me-1 text-secondary"></i><strong>Тип приводу:</strong> {{ car_model.drive_type.drive_type_name|default:"Не вказано" }}</span>
+                </li>
+                <li>
+                    <span><i class="bi bi-arrow-repeat me-1 text-secondary"></i><strong>Тип підвіски:</strong> {{ car_model.suspension_type.suspension_type_name|default:"Не вказано" }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

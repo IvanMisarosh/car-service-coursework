@@ -1,0 +1,43 @@
+{% load crispy_forms_tags %}
+<div class="card">
+    <div class="card-header">
+        <h5>Додати нову модель автомобіля</h5>
+    </div>
+    <div class="card-body">
+        <form 
+            hx-post="{% url 'add-car-model' %}" 
+            hx-target="#car-model-list"
+            hx-swap="innerHTML"
+        >
+            {% csrf_token %}
+            <div class='row'>
+                <div class="col-3 mb-2">
+                    {{form.model_name|as_crispy_field}}
+                </div>
+                <div class="col-3 mb-2">
+                    {{ form.dimensions|as_crispy_field }}
+                </div>
+                <div class="col-3 mb-2">
+                    {{ form.car_brand|as_crispy_field }}
+                </div>
+                <div class="col-3 mb-2">
+                    {{ form.body_type|as_crispy_field }}
+                </div>
+                <div class="col-3 mb-2">
+                    {{ form.engine_type|as_crispy_field }}
+                </div>
+                <div class="col-3 mb-2">
+                    {{ form.transmission_type|as_crispy_field }}
+                </div>
+                <div class="col-3 mb-2">
+                    {{ form.drive_type|as_crispy_field }}
+                </div>
+                <div class="col-3 mb-2">
+                    {{ form.suspension_type|as_crispy_field }}
+                </div>
+            </div>  
+            <button type="submit" class="btn btn-sm btn-primary">Зберегти</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('add-car-model-form-container').innerHTML = '';">Скасувати</button>
+        </form>
+    </div>
+</div>

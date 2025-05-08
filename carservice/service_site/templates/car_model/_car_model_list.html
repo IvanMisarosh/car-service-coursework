@@ -1,0 +1,45 @@
+<div class="container mt-2">
+    <div class="row" id="car-models-container">
+        {% for car_model in car_models %}
+            {% include 'car_model/_car_model_card.html'%}
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="lead">Моделі автомобілів не знайдено.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center align-items-center mb-3 mt-4">
+        <div class="d-flex justify-content-center align-items-center flex-grow-1">
+            {% if car_models.has_previous %}
+            <button hx-get="{% url 'car-models' %}?page={{ car_models.previous_page_number }}&items_per_page={{ car_models.paginator.per_page }}" 
+                    hx-target="#car-model-list"
+                    hx-vals='js:{"search": document.getElementById("car-model-search-bar").value}'
+                    class="btn btn-primary">Попередня</button>
+            {% endif %}
+            <span class="mx-3">Сторінка {{ car_models.number }} з {{ car_models.paginator.num_pages }}</span>
+
+            {% if car_models.has_next %}
+            <button hx-get="{% url 'car-models' %}?page={{ car_models.next_page_number }}&items_per_page={{ car_models.paginator.per_page }}" 
+                    hx-target="#car-model-list"
+                    hx-push-url="true"
+                    hx-vals='js:{"search": document.getElementById("car-model-search-bar").value}'
+                    class="btn btn-primary">Наступна</button>
+            {% endif %}
+        </div>
+
+        <div class="d-flex align-items-center">
+            <label for="items-per-page" class="mb-0 me-2" id='items-label'>Моделей на сторінку: </label>
+            <select id="items-per-page" name="items_per_page" 
+                    hx-get="{% url 'car-models' %}" 
+                    hx-target="#car-model-list" 
+                    hx-push-url="true"
+                    class="form-select">
+                <option value="12" {% if car_models.paginator.per_page == 12 %}selected{% endif %}>12</option>
+                <option value="24" {% if car_models.paginator.per_page == 24 %}selected{% endif %}>24</option>
+                <option value="48" {% if car_models.paginator.per_page == 48 %}selected{% endif %}>48</option>
+            </select>
+        </div>
+    </div>
+</div>

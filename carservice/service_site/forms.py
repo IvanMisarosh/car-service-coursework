@@ -1,6 +1,38 @@
 from django.forms import ModelForm
 from . import models
 from django import forms
+from django.urls import reverse_lazy
+
+class CarModelForm(forms.ModelForm):
+    class Meta:
+        model = models.CarModel
+        fields = [
+            'model_name', 'car_brand', 'body_type', 'engine_type',
+            'transmission_type', 'drive_type', 'suspension_type', 'dimensions'
+        ]
+        widgets = {
+            'model_name': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Назва моделі',
+                'hx-get': reverse_lazy('check-model-name'),
+                'hx-trigger': 'keyup',
+                'hx-target': '#div_id_model_name',
+                'hx-swap': 'outerHTML'
+                },),
+            'dimensions': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Розміри'}),
+            'car_brand': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
+            'body_type': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
+            'engine_type': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
+            'transmission_type': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
+            'drive_type': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
+            'suspension_type': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
+        }
+
+        def clean_model_name(self):
+            model_name = self.clean_data["model_name"]
+            if models.CarModel.objects.exists(model_name=model_name):
+                return forms.ValidationError("Назва моделі має бути унікальна")
+            return model_name
 
 class SupplierForm(forms.ModelForm):
     class Meta:

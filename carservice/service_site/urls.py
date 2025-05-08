@@ -60,6 +60,13 @@ urlpatterns = [
     path('suppliers/<int:supplier_id>/edit/', views.SupplierView.as_view(), name='edit-supplier'),
     path('suppliers/add-supplier-form', views.SupplierView.as_view(), name='add-supplier-form'),
 
+    path('car-models/', views.CarModelsView.as_view(), name='car-models'),
+    path('car-models/add', views.add_car_model, name="add-car-model"),
+    path('get-car-model-card/<int:pk>', views.view_car_model, name="view-car-model"),
+    path('edit-car-model/<int:pk>', views.edit_car_model, name='edit-car-model'),
+
+    path('carmodels/check-model-name', views.check_model_name, name='check-model-name'),
+
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
