@@ -1,0 +1,82 @@
+<!-- This is a single station card with edit functionality and tabs for employees and equipment -->
+<div class="col-lg-12 col-md-6 col-sm-12 mb-4 station-card" id="station-{{ station.station_id }}">
+    <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                Станція: {{ station.address }}
+            </h5>
+            <div>
+                <button class="btn btn-sm btn-light" 
+                    hx-get="{% url 'edit-station' station.station_id %}" 
+                    hx-target="#station-{{ station.station_id }}"
+                    hx-swap="outerHTML"
+                    title="Редагувати">
+                    <i class="bi bi-pencil-fill"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled mb-3">
+                <li class="mb-2">
+                    <span><i class="bi bi-geo-alt-fill me-1 text-secondary"></i><strong>Адреса:</strong> {{ station.address|default:"Не вказано" }}</span>
+                </li>
+                <li class="mb-2">
+                    <span><i class="bi bi-telephone-fill me-1 text-secondary"></i><strong>Телефон:</strong> {{ station.phone_number|default:"Не вказано" }}</span>
+                </li>
+                <li class="mb-2">
+                    <span><i class="bi bi-people-fill me-1 text-secondary"></i><strong>Працівників:</strong> {{ station.employee_count }}</span>
+                </li>
+            </ul>
+            
+            <!-- Tabs navigation -->
+            <ul class="nav nav-tabs mb-3" id="stationTabs-{{ station.station_id }}" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if active_tab == 'summary' %}active{% endif %}" 
+                            id="summary-tab-{{ station.station_id }}" 
+                            data-bs-toggle="tab"
+                            hx-get="{% url 'station-summary' station.station_id %}"
+                            hx-target="#stationTabContent-{{ station.station_id }}" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="summary" 
+                            aria-selected="false">Загальна</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if active_tab == 'employees' %}active{% endif %}" 
+                            id="employees-tab-{{ station.station_id }}" 
+                            data-bs-toggle="tab" 
+                            hx-get="{% url 'station-employees' station.station_id %}"
+                            hx-target="#stationTabContent-{{ station.station_id }}"
+                            type="button" 
+                            role="tab" 
+                            aria-controls="employees" 
+                            aria-selected="true">Працівники</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if active_tab == 'equipment' %}active{% endif %}" 
+                            id="equipment-tab-{{ station.station_id }}" 
+                            data-bs-toggle="tab"
+                            hx-get="{% url 'station-equipment' station.station_id %}"
+                            hx-target="#stationTabContent-{{ station.station_id }}" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="equipment" 
+                            aria-selected="false">Обладнання</button>
+                </li>
+            </ul>
+            
+            <!-- Tab content -->
+            <div class="tab-content" id="stationTabContent-{{ station.station_id }}">
+                {% if active_tab == 'employees' %}
+                    {% include 'station/_station_employees_tab.html' %}
+                {% elif active_tab == 'equipment' %}
+                    {% include 'station/_station_equipment_tab.html' %}
+                {% elif active_tab == 'summary' %}
+                    {% include 'station/_station_summary_tab.html' %}
+                {% else %}
+                    {% include 'station/_station_summary_tab.html' %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

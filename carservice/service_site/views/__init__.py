@@ -6,3 +6,4 @@ from .parts_views import *
 from .part_procurement_views import *
 from .supplier_views import *
 from .car_model_views import *
+from .station_views import *

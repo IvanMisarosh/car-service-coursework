@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load group_filters %}
+
+{% block title %}Станції обслуговування{% endblock %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'service_site/stations.css' %}">
+{% endblock %}
+
+{% block js_files %}
+{% endblock %}
+
+{% block content %}
+    {% include 'service_site/includes/nav_bar.html'%}
+    <div class="container-fluid px-5 pt-2">
+        <div class="row flex-nowrap mt-2">
+            <h3 class="col-5">Станції обслуговування</h3>
+        
+            <div class="col-4 rounded me-2 ms-2 align-self-start" id="station-search-container">
+                <input class="border rounded px-4 py-2 my-2 form-control" id="station-search-bar"
+                    type="search"
+                    name="search"
+                    placeholder="Шукайте за адресою або номером телефону..."
+                    hx-get="{% url 'stations' %}"
+                    hx-trigger="input delay:0.2s"
+                    hx-vals='js:{"items_per_page": document.getElementById("items-per-page").value}'
+                    hx-target="#station-list"
+                />
+            </div>
+
+            <div class="col-3 rounded me-2 ms-2 align-self-start">
+                <button 
+                    class="btn btn-sm btn-primary px-4 py-2 my-2"
+                    hx-get="{% url 'add-station' %}"
+                    hx-target="#add-station-form-container"
+                    hx-swap="innerHTML"
+                    type="button"
+                >
+                Додати станцію
+              </button>
+            </div>
+        </div>
+        
+        <div id="add-station-form-container" class="mb-3"></div>
+
+        <div class="row flex-nowrap mt-2">
+            <div class="col-12 rounded me-2 ms-2 align-self-start" id="station-list">
+                {% include 'station/_station_list.html' %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

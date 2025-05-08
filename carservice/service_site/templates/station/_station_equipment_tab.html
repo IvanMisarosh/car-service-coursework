@@ -1,0 +1,31 @@
+<!-- Table of equipment/parts for a station -->
+<div class="tab-pane fade show active station-tab" id="equipment-{{ station.station_id }}" role="tabpanel" aria-labelledby="equipment-tab">
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Назва деталі</th>
+                    <th scope="col">Бренд</th>
+                    <th scope="col">Тип</th>
+                    <th scope="col">Кількість</th>
+                    <th scope="col">Ціна од.</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for part_in_station in parts_in_station %}
+                <tr>
+                    <td>{{ part_in_station.part.part_name }}</td>
+                    <td>{{ part_in_station.part.part_brand.brand_name }}</td>
+                    <td>{{ part_in_station.part.part_type.part_type_name }}</td>
+                    <td>{{ part_in_station.quantity }}</td>
+                    <td>{{ part_in_station.part.get_price_per_unit }} грн</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">Немає обладнання на станції</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

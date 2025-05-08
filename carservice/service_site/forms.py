@@ -3,6 +3,21 @@ from . import models
 from django import forms
 from django.urls import reverse_lazy
 
+class StationForm(forms.ModelForm):
+    class Meta:
+        model = models.Station
+        fields = ['address', 'phone_number']
+        widgets = {
+            'address': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Адреса станції',
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Номер телефону',
+            }),
+        }
+
 class PartForm(forms.ModelForm):
     class Meta:
         model = models.Part

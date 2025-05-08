@@ -76,6 +76,15 @@ urlpatterns = [
     path('part/<int:part_id>/edit-form/', views.PartEditView.as_view(), name='edit-part-form'),
     path('part/<int:part_id>/row/', views.PartRowView.as_view(), name='get-part-row'),
 
+    # Маршрути для станцій
+    path('stations/', views.StationsView.as_view(), name='stations'),
+    path('add-station/', views.add_station, name='add-station'),
+    path('view-station/<int:pk>/', views.view_station, name='view-station'),
+    path('edit-station/<int:pk>/', views.edit_station, name='edit-station'),
+    path('station-employees/<int:pk>/', views.station_employees, name='station-employees'),
+    path('station-equipment/<int:pk>/', views.station_equipment, name='station-equipment'),
+    path('station-empty/<int:pk>/', views.station_empty, name='station-summary'),
+
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 

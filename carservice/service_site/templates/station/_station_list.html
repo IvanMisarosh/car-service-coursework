@@ -1,0 +1,45 @@
+<div class="container mt-2">
+    <div class="row" id="stations-container">
+        {% for station in stations %}
+            {% include 'station/_station_card.html'%}
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="lead">Станції обслуговування не знайдено.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center align-items-center mb-3 mt-4">
+        <div class="d-flex justify-content-center align-items-center flex-grow-1">
+            {% if stations.has_previous %}
+            <button hx-get="{% url 'stations' %}?page={{ stations.previous_page_number }}&items_per_page={{ stations.paginator.per_page }}" 
+                    hx-target="#station-list"
+                    hx-vals='js:{"search": document.getElementById("station-search-bar").value}'
+                    class="btn btn-primary">Попередня</button>
+            {% endif %}
+            <span class="mx-3">Сторінка {{ stations.number }} з {{ stations.paginator.num_pages }}</span>
+
+            {% if stations.has_next %}
+            <button hx-get="{% url 'stations' %}?page={{ stations.next_page_number }}&items_per_page={{ stations.paginator.per_page }}" 
+                    hx-target="#station-list"
+                    hx-push-url="true"
+                    hx-vals='js:{"search": document.getElementById("station-search-bar").value}'
+                    class="btn btn-primary">Наступна</button>
+            {% endif %}
+        </div>
+
+        <div class="d-flex align-items-center">
+            <label for="items-per-page" class="mb-0 me-2" id='items-label'>Станцій на сторінку: </label>
+            <select id="items-per-page" name="items_per_page" 
+                    hx-get="{% url 'stations' %}" 
+                    hx-target="#station-list" 
+                    hx-push-url="true"
+                    class="form-select">
+                <option value="12" {% if stations.paginator.per_page == 12 %}selected{% endif %}>12</option>
+                <option value="24" {% if stations.paginator.per_page == 24 %}selected{% endif %}>24</option>
+                <option value="48" {% if stations.paginator.per_page == 48 %}selected{% endif %}>48</option>
+            </select>
+        </div>
+    </div>
+</div>

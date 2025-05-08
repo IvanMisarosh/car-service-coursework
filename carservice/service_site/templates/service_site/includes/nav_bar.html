@@ -13,12 +13,15 @@
                 <a class="nav-link text-light" method='GET' href="{%url 'procurement-orders'%}">Закупки</a>
                 <a class="nav-link text-light" method='GET' href="{%url 'suppliers'%}">Постачальники</a>
                 <a class="nav-link text-light" method='GET' href="{%url 'parts'%}">Запчастини</a>
+                
+                <a class="nav-link text-light" method='GET' href="{%url 'stations'%}">Станції</a>
             {% elif requestuser.is_superuser %}
                 <a class="nav-link text-light" method='GET' href="{%url 'customers'%}">Клієнти</a>
                 <a class="nav-link text-light" method='GET' href="{%url 'visits'%}">Візити</a>
                 <a class="nav-link text-light" method='GET' href="{%url 'procurement-orders'%}">Закупки</a>
                 <a class="nav-link text-light" method='GET' href="{%url 'car-models'%}">Моделі авто</a>
                 <a class="nav-link text-light" method='GET' href="{%url 'parts'%}">Запчастини</a>
+                <a class="nav-link text-light" method='GET' href="{%url 'stations'%}">Станції</a>
             {% endif %}
 
         </div>

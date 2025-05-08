@@ -1,0 +1,25 @@
+{% load crispy_forms_tags %}
+<div class="card">
+    <div class="card-header">
+        <h5>Додати нову станцію обслуговування</h5>
+    </div>
+    <div class="card-body">
+        <form 
+            hx-post="{% url 'add-station' %}" 
+            hx-target="#station-list"
+            hx-swap="innerHTML"
+        >
+            {% csrf_token %}
+            <div class='row'>
+                <div class="col-6 mb-2">
+                    {{form.address|as_crispy_field}}
+                </div>
+                <div class="col-6 mb-2">
+                    {{ form.phone_number|as_crispy_field }}
+                </div>
+            </div>  
+            <button type="submit" class="btn btn-sm btn-primary">Зберегти</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('add-station-form-container').innerHTML = '';">Скасувати</button>
+        </form>
+    </div>
+</div>
