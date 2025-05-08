@@ -2,6 +2,16 @@ from django.forms import ModelForm
 from . import models
 from django import forms
 
+class SupplierForm(forms.ModelForm):
+    class Meta:
+        model = models.Supplier
+        fields = ['supplier_name', 'email', 'phone_number']
+        widgets = {
+            'supplier_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control form-control-sm'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+        }
+
 class ProcurementOrderInfoForm(forms.ModelForm):
     class Meta:
         model = models.ProcurementOrder

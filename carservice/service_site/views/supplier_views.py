@@ -1,0 +1,91 @@
+from django.shortcuts import render, redirect
+from django.core.paginator import Paginator
+from django.views.generic import View
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.db.models import Q, Count, Max, F
+from ..models import Supplier, ProcurementOrder, ProcurementUnit
+from ..forms import SupplierForm
+from ..views_utils import render_htmx
+from django.http import HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import json
+from django.shortcuts import get_object_or_404
+
+
+class SuppliersView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['service_site.view_supplier']
+    login_url = '/login/'
+
+    def get(self, request, *args, **kwargs):
+        page_number = request.GET.get("page", 1)
+        items_per_page = int(request.GET.get("items_per_page", 10))
+        search_query = request.GET.get("search", '')
+
+        search_terms = search_query.split()
+        query = Q()
+
+        for term in search_terms:
+            query |= Q(supplier_name__icontains=term) | Q(
+                email__icontains=term) | Q(
+                phone_number__icontains=term)
+
+        # Get suppliers with annotations for items supplied count and last order date
+        suppliers = Supplier.objects.annotate(
+            items_supplied=Count('procurementorder__units'),
+            last_order_date=Max('procurementorder__order_date')
+        ).filter(query).order_by('supplier_name')
+
+
+        paginator = Paginator(suppliers, items_per_page)
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            "suppliers": page_obj,
+        }
+
+        return render_htmx(request, "supplier/suppliers.html", "supplier/_supplier_list.html", context)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SupplierView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['service_site.change_supplier', 'service_site.add_supplier']
+    login_url = '/login/'
+
+    def put(self, request, supplier_id):
+        try:
+            data = json.loads(request.body)
+        except Exception:
+            return HttpResponseBadRequest("Invalid JSON")
+
+        supplier = get_object_or_404(Supplier, pk=supplier_id)
+        supplier.supplier_name = data.get('supplier_name', supplier.supplier_name)
+        supplier.email = data.get('email', supplier.email)
+        supplier.phone_number = data.get('phone_number', supplier.phone_number)
+        supplier.save()
+
+        # Recalculate items_supplied and last_order_date for this supplier
+        items_supplied = ProcurementUnit.objects.filter(procurement_order__supplier=supplier).count()
+        last_order_date = ProcurementOrder.objects.filter(supplier=supplier).aggregate(Max('order_date'))['order_date__max']
+
+        supplier.items_supplied = items_supplied
+        supplier.last_order_date = last_order_date
+
+        context = {
+            'supplier': supplier,
+            'request': request,
+        }
+        return render_htmx(request, None, "supplier/_supplier_list_row.html", context)
+    
+    def get(self, request):
+        form = SupplierForm()
+        return render_htmx(request, None, "supplier/_add_supplier_form.html", {"form": form})
+
+    def post(self, request):
+        form = SupplierForm(request.POST)
+        if form.is_valid():
+            supplier = form.save()
+            # Render the new row for the supplier table
+            return render_htmx(request, None, "supplier/_supplier_list_row.html", {"supplier": supplier, "request": request})
+        return render_htmx(request, None, "supplier/_add_supplier_form.html", {"form": form})
+    

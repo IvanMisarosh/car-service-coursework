@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load group_filters %}
+
+{% block title %}Постачальники{% endblock %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static 'service_site/suppliers.css' %}">
+{% endblock %}
+
+{% block js_files %}
+{% endblock %}
+
+{% block content %}
+    {% include 'service_site/includes/nav_bar.html'%}
+    <div class="container-fluid px-5 pt-2">
+        <div class="row flex-nowrap mt-2">
+            <h3 class="col-5">Постачальники</h3>
+        
+            <div class="col-4 rounded me-2 ms-2 align-self-start" id="supplier-search-container">
+                <input class="border rounded px-4 py-2 my-2 form-control" id="supplier-search-bar"
+                    type="search"
+                    name="search"
+                    placeholder="Шукайте за іменем, поштою, телефоном..."
+                    hx-get="{% url 'suppliers' %}"
+                    hx-trigger="input delay:0.2s"
+                    hx-vals='js:{"items_per_page": document.getElementById("items-per-page").value}'
+                    hx-target="#supplier-list"
+                />
+                
+            </div>
+
+            <div class="col-3 rounded me-2 ms-2 align-self-start">
+                <button 
+                    class="btn btn-sm btn-primary px-4 py-2 my-2"
+                    hx-get="{% url 'add-supplier-form' %}"
+                    hx-target="#add-supplier-form-container"
+                    hx-swap="innerHTML"
+                    type="button"
+                >
+                Додати постачальника
+              </button>
+            </div>
+        </div>
+
+        <div id="add-supplier-form-container" class="mb-3"></div>
+        
+        <div class="row flex-nowrap mt-2">
+            <div class="col-12 shadow rounded me-2 ms-2 align-self-start" id="supplier-list">
+                {% include 'supplier/_supplier_list.html' %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

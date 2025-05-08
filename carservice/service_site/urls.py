@@ -56,6 +56,10 @@ urlpatterns = [
 
     path('populate-unit-part-select', views.part_search_for_unit, name='unit-part-search'),
 
+    path('suppliers/', views.SuppliersView.as_view(), name='suppliers'),
+    path('suppliers/<int:supplier_id>/edit/', views.SupplierView.as_view(), name='edit-supplier'),
+    path('suppliers/add-supplier-form', views.SupplierView.as_view(), name='add-supplier-form'),
+
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 

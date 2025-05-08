@@ -1,0 +1,70 @@
+{% load group_filters %}
+<tr x-data="{
+    edit: false,
+    form: {
+        supplier_name: '{{ supplier.supplier_name|escapejs }}',
+        email: '{{ supplier.email|default:""|escapejs }}',
+        phone_number: '{{ supplier.phone_number|default:""|escapejs }}'
+    },
+    original: {},
+    startEdit() {
+        this.original = JSON.parse(JSON.stringify(this.form));
+        this.edit = true;
+    },
+    cancelEdit() {
+        this.form = JSON.parse(JSON.stringify(this.original));
+        this.edit = false;
+    }
+}">
+    <td class="py-1 px-1">
+        <template x-if="!edit">
+            <span x-text="form.supplier_name"></span>
+        </template>
+        <template x-if="edit">
+            <input type="text" class="form-control form-control-sm" x-model="form.supplier_name">
+        </template>
+    </td>
+    <td>
+        <template x-if="!edit">
+            <span x-text="form.email || 'Not specified'"></span>
+        </template>
+        <template x-if="edit">
+            <input type="email" class="form-control form-control-sm" x-model="form.email">
+        </template>
+    </td>
+    <td>
+        <template x-if="!edit">
+            <span x-text="form.phone_number || 'Not specified'"></span>
+        </template>
+        <template x-if="edit">
+            <input type="text" class="form-control form-control-sm" x-model="form.phone_number">
+        </template>
+    </td>
+    <td> {{supplier.items_supplied|default:"0"}}</td>
+    <td>{{ supplier.last_order_date|default:"Never" }}</td>
+    <td>
+        <template x-if="!edit">
+            <button class="btn btn-sm btn-primary" @click="startEdit()">
+                <i class="bi bi-pencil-fill"></i> Редагувати
+            </button>
+        </template>
+        <template x-if="edit">
+            <button 
+                class="btn btn-sm btn-success me-1"
+                hx-put="{% url 'edit-supplier' supplier.supplier_id %}"
+                hx-include="closest tr"
+                hx-vals='js:form'
+                hx-target="closest tr"
+                hx-swap="outerHTML"
+                @click="edit = false"
+            >
+                <i class="bi bi-check-lg"></i> Зберегти
+            </button>
+        </template>
+        <button class="btn btn-sm btn-secondary" 
+            @click="cancelEdit()"
+            x-show="edit">
+            Скасувати
+        </button>
+    </td>
+</tr>
