@@ -59,6 +59,8 @@ urlpatterns = [
     path('suppliers/', views.SuppliersView.as_view(), name='suppliers'),
     path('suppliers/<int:supplier_id>/edit/', views.SupplierView.as_view(), name='edit-supplier'),
     path('suppliers/add-supplier-form', views.SupplierView.as_view(), name='add-supplier-form'),
+    path('suppliers/edit-row/<int:pk>/', views.get_supplier_edit_row, name="edit-supplier-row"),
+    path('suppliers/get-list-row/<int:pk>/', views.get_supplier_row, name="get-list-row"),
 
     path('car-models/', views.CarModelsView.as_view(), name='car-models'),
     path('car-models/add', views.add_car_model, name="add-car-model"),

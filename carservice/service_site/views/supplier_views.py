@@ -45,20 +45,25 @@ class SuppliersView(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
 
         return render_htmx(request, "supplier/suppliers.html", "supplier/_supplier_list.html", context)
+    
 
+def get_supplier_edit_row(request, pk):
+    if request.method == 'GET':
+        supplier = get_object_or_404(Supplier, pk=pk)
+        items_supplied = ProcurementUnit.objects.filter(procurement_order__supplier=supplier).count()
+        last_order_date = ProcurementOrder.objects.filter(supplier=supplier).aggregate(Max('order_date'))['order_date__max']
 
-@method_decorator(csrf_exempt, name='dispatch')
-class SupplierView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['service_site.change_supplier', 'service_site.add_supplier']
-    login_url = '/login/'
+        supplier.items_supplied = items_supplied
+        supplier.last_order_date = last_order_date
 
-    def put(self, request, supplier_id):
-        try:
-            data = json.loads(request.body)
-        except Exception:
-            return HttpResponseBadRequest("Invalid JSON")
-
-        supplier = get_object_or_404(Supplier, pk=supplier_id)
+        context = {
+            'supplier': supplier,
+        }
+        return render_htmx(request, None, "supplier/_supplier_edit_row.html", context)
+    elif request.method == "POST":
+        data = request.POST
+        print(data)
+        supplier = get_object_or_404(Supplier, pk=pk)
         supplier.supplier_name = data.get('supplier_name', supplier.supplier_name)
         supplier.email = data.get('email', supplier.email)
         supplier.phone_number = data.get('phone_number', supplier.phone_number)
@@ -73,9 +78,28 @@ class SupplierView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         context = {
             'supplier': supplier,
-            'request': request,
         }
         return render_htmx(request, None, "supplier/_supplier_list_row.html", context)
+
+def get_supplier_row(request, pk):
+    supplier = get_object_or_404(Supplier, pk=pk)
+    items_supplied = ProcurementUnit.objects.filter(procurement_order__supplier=supplier).count()
+    last_order_date = ProcurementOrder.objects.filter(supplier=supplier).aggregate(Max('order_date'))['order_date__max']
+
+    supplier.items_supplied = items_supplied
+    supplier.last_order_date = last_order_date
+
+    context = {
+        'supplier': supplier,
+    }
+    return render_htmx(request, None, "supplier/_supplier_list_row.html", context)
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SupplierView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['service_site.change_supplier', 'service_site.add_supplier']
+    login_url = '/login/'
     
     def get(self, request):
         form = SupplierForm()
