@@ -6,6 +6,41 @@ from django.contrib.auth.decorators import login_required
 from .. import filters
 from django.db.models import Q
 from ..views_utils import render_htmx
+from .. import resources
+from datetime import datetime
+from django.http import HttpResponse
+
+@login_required
+def export_customers(request):
+    """
+    Export customer data with their cars to various formats.
+    Supported formats: csv, xlsx, json
+    """
+    format = request.GET.get('format', 'csv')
+    if request.htmx:
+        return HttpResponse(headers={'HX-Redirect': request.get_full_path()})
+    
+    customers = models.Customer.objects.all()
+    customer_filter = filters.CustomerFilter(request.GET, customers)
+
+    resource = resources.CustomerResource()
+    dataset = resource.export(customer_filter.qs)
+    
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f'customers_with_cars_{timestamp}'
+    
+    if format == 'csv':
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+    elif format == 'json':
+        response = HttpResponse(dataset.json, content_type='application/json')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.json"'
+    else:
+        # Default to CSV if format not recognized
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+    
+    return response
 
 @login_required
 @permission_required('service_site.view_customer', raise_exception=True)

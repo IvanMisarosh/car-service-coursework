@@ -18,9 +18,9 @@
     {% include 'service_site/includes/nav_bar.html'%}
     <div class="container-fluid px-5 pt-2">
         <div class="row flex-nowrap mt-2">
-            <h2 class="col-2">Customers</h2>
+            <h2 class="col-2">Клієнти</h2>
             <div class="col-2 d-flex align-items-center">
-                <label for="sorting_method" class="mb-0 me-2" id='items-lable'>Sorting: </label>
+                <label for="sorting_method" class="mb-0 me-2" id='items-lable'>Сортування: </label>
                 <select id="sorting_method" name="sorting_method" 
                         hx-get="{% url 'customers' %}" 
                         hx-target="#customer-list" 
@@ -28,15 +28,26 @@
                         hx-push-url="true"
                         hx-vals='js:{"items_per_page": document.getElementById("items-per-page").value}'
                         class="form-select">
-                    <option value="first_name">First name asc</option>
-                    <option value="-first_name">First name desc</option>
-                    <option value="last_name">Last Name asc</option>
-                    <option value="-last_name">Last Name desc</option>
-                    <option value="phone_number">Phone number asc</option>
-                    <option value="-phone_number">Phone number desc</option>
+                    <option value="first_name">За ім'ям в зростаючому</option>
+                    <option value="-first_name">За ім'ям в спадаючому</option>
+                    <option value="last_name">За прізвищем в зростаючому</option>
+                    <option value="-last_name">За прізвищем в спадаючому</option>
                 </select>
             </div>
-            <a class="col-2" href="/"><button class="btn btn-primary mt-2 mb-2">Add customer</button></a>
+            <a class="col-2" href="/"><button class="btn btn-primary mt-2 mb-2">Додати клієнта</button></a>
+            <div class="col-2 dropdown">
+                <button class="btn btn-primary dropdown-toggle mt-2 mb-2 w-100" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Експортувати вибірку
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                    <li><a class="dropdown-item" hx-get="{% url 'export-customers' %}?format=csv"
+                        hx-include="#filter-form">
+                        CSV</a></li>
+                    <li><a class="dropdown-item" hx-get="{% url 'export-customers' %}?format=json"
+                        hx-include="#filter-form">
+                        JSON</a></li>
+                </ul>
+            </div>            
         </div>
         
         <div class="row flex-nowrap mt-2">

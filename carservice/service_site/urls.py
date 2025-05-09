@@ -7,6 +7,10 @@ urlpatterns = [
     path('customers/', views.customer_list, name='customers'),
     path('customer-details/', views.customer_details, name="customer-details"),
 
+    path('export/customers/', views.export_customers, name='export-customers'),
+    path('export/customers/xlsx/', views.export_customers, {'format': 'xlsx'}, name='export_customers_xlsx'),
+    path('export/customers/json/', views.export_customers, {'format': 'json'}, name='export_customers_json'),
+
     path('customer-search/', views.customer_search, name='customer-search'),
     path('customer-search-page/', views.get_customer_search, name='customer-search-page'),
     path('select-visit-customer/', views.select_visit_customer, name='select-visit-customer'),
