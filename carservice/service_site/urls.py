@@ -36,6 +36,8 @@ urlpatterns = [
     path('visit-detail/update-visit-car', views.update_visit_car, name='update-visit-car'),
     path('visit-detail/<int:visit_id>/', views.VisitDetailView.as_view(), name='visit-detail'),
 
+    path('export-visit-services/<int:visit_id>', views.export_visit_services, name='export-visit-services'),
+
     path('visit-service/<int:visit_service_id>/', views.VisitServiceView.as_view(), name='visit-service'),
     path('visit-services/<int:visit_id>/', views.visit_services, name='visit-services'),
 

@@ -10,7 +10,43 @@ from django.contrib import messages
 import uuid
 from .. import forms
 from ..views_utils import group_required
+from .. import resources
+from datetime import datetime
+from django.http import HttpResponse
 
+@login_required
+def export_visit_services(request, visit_id):
+    """
+    Export visit services data to various formats.
+    Supported formats: csv, json
+    """
+    format = request.GET.get('format', 'csv')
+    if request.htmx:
+        return HttpResponse(headers={'HX-Redirect': request.get_full_path()})
+    
+    visit_services = models.VisitService.objects.all().select_related(
+        'visit', 'service', 'visit__car', 
+        'visit__visit_status', 'visit__payment_status'
+    ).filter(visit__visit_id = visit_id)
+    
+    resource = resources.VisitServiceResource()
+    dataset = resource.export(visit_services)
+    
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f'visit_services_{timestamp}'
+    
+    if format == 'csv':
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+    elif format == 'json':
+        response = HttpResponse(dataset.json, content_type='application/json')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.json"'
+    else:
+        # Default to CSV if format not recognized
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+    
+    return response
 
 class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['service_site.view_customer']

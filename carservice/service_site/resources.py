@@ -1,7 +1,56 @@
 from import_export import resources, fields
 from . import models
 from import_export import resources, fields
+from import_export.fields import Field
 from import_export.widgets import ForeignKeyWidget
+
+class VisitServiceResource(resources.ModelResource):
+    visit_number = Field(
+        attribute='visit__visit_number',
+        column_name='Visit Number'
+    )
+    car = Field(
+        attribute='visit__car',
+        column_name='Car'
+    )
+    service_name = Field(
+        attribute='service__service_name',
+        column_name='Service'
+    )
+    service_price = Field(
+        attribute='service__price',
+        column_name='Price per Unit'
+    )
+    quantity = Field(
+        column_name='Quantity'
+    )
+    total_price = Field(
+        column_name='Total Price'
+    )
+    visit_date = Field(
+        attribute='visit__visit_date',
+        column_name='Visit Date'
+    )
+    status = Field(
+        attribute='visit__visit_status__status_name',
+        column_name='Visit Status'
+    )
+    payment_status = Field(
+        attribute='visit__payment_status__payment_name',
+        column_name='Payment Status'
+    )
+    
+    class Meta:
+        model = models.VisitService
+        fields = (
+            'visit_number', 'car', 'service_name', 'service_price',
+            'quantity', 'total_price', 'visit_date', 'status', 'payment_status'
+        )
+        export_order = fields
+    
+    def dehydrate_total_price(self, visit_service):
+        return visit_service.get_total_price()
+
 
 class CustomerResource(resources.ModelResource):
     """

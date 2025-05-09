@@ -25,6 +25,28 @@
                         id="visit-details-card">
                         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <h5>Visit details: {{ visit.visit_number }}{% if visit %}, станція: {{visit.employee.station.address}}{% endif %}</h5>
+                            {% if visit %}
+                                <!-- Add this dropdown to your visit services list page -->
+                                <div class="col-2 dropdown">
+                                    <button class="btn btn-primary dropdown-toggle mt-2 mb-2 w-100" type="button" id="exportServicesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Експортувати вибірку
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="exportServicesDropdown">
+                                        <li>
+                                            <a class="dropdown-item" hx-get="{% url 'export-visit-services' visit.pk %}?format=csv" 
+                                            hx-include="#filter-form">
+                                                CSV
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" hx-get="{% url 'export-visit-services' visit.pk %}?format=json"
+                                            hx-include="#filter-form">
+                                                JSON
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% endif %}
                             {% if visit.visit_status.status_name != "Completed"%}
                                 <template x-if='customer_editing_mode && editing_mode'>
                                     <a class="btn btn-sm btn-outline-light" href={% if visit.pk %}'{% url "visit-detail"  visit.pk%}'{% endif %}
@@ -75,9 +97,9 @@
             </div>
         </div>
     </div>
-    <section id="messages">
+    {% comment %} <section id="messages">
         {% include 'service_site/visits/_toast.html'%}
-    </section>
+    </section> {% endcomment %}
     <!-- Visit Service Search Modal -->
     <div class="modal fade" id="serviceSearchModal" tabindex="-1" aria-labelledby="serviceSearchModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
