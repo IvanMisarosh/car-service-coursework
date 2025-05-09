@@ -4,6 +4,58 @@ from import_export import resources, fields
 from import_export.fields import Field
 from import_export.widgets import ForeignKeyWidget
 
+class ProcurementOrderResource(resources.ModelResource):
+    order_number = Field(
+        attribute='order_number',
+        column_name='Order Number'
+    )
+    employee_name = Field(
+        column_name='Employee'
+    )
+    employee_position = Field(
+        attribute='employee__employee_position__position_name',
+        column_name='Position'
+    )
+    supplier_name = Field(
+        attribute='supplier__supplier_name',
+        column_name='Supplier'
+    )
+    supplier_contact = Field(
+        column_name='Supplier Contact'
+    )
+    status = Field(
+        attribute='procurement_status__status_name',
+        column_name='Status'
+    )
+    total_price = Field(
+        attribute='total_price',
+        column_name='Total Price'
+    )
+    order_date = Field(
+        attribute='order_date',
+        column_name='Order Date'
+    )
+    
+    class Meta:
+        model = models.ProcurementOrder
+        fields = (
+            'order_number', 'employee_name', 'employee_position', 
+            'supplier_name', 'supplier_contact', 'status',
+            'total_price', 'order_date'
+        )
+        export_order = fields
+
+    def dehydrate_employee_name(self, procurement_order):
+        return f"{procurement_order.employee.first_name} {procurement_order.employee.last_name}"
+    
+    def dehydrate_supplier_contact(self, procurement_order):
+        contacts = []
+        if procurement_order.supplier.email:
+            contacts.append(procurement_order.supplier.email)
+        if procurement_order.supplier.phone_number:
+            contacts.append(procurement_order.supplier.phone_number)
+        return ", ".join(contacts) if contacts else "N/A"
+
 class VisitServiceResource(resources.ModelResource):
     visit_number = Field(
         attribute='visit__visit_number',

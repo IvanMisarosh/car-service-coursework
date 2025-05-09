@@ -47,6 +47,9 @@ urlpatterns = [
     path('procurement/orders/add/', views.add_order, name='add-procurement-order'),
     path('procurement/orders/', views.procurement_orders, name='procurement-orders'),
     path('procurement/order/<int:order_id>/items/', views.procurement_order_items, name='procurement-order-items'),
+
+    # Your existing urls
+    path('export-procurement-orders/', views.export_procurement_orders, name='export-procurement-orders'),
     
     path('order-info/<int:pk>/', views.order_info, name='order-info'),
     path('order/<int:order_id>/update/', views.update_order_row, name='update-order'),

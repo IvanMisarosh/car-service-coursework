@@ -37,7 +37,26 @@
                 hx-swap="innerHTML">
                 Створити замовлення
             </button>
-        
+            <!-- Add this dropdown to your procurement orders page -->
+            <div class="col-2 dropdown">
+                <button class="btn btn-primary dropdown-toggle mt-2 mb-2 w-100" type="button" id="exportProcurementDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Експортувати вибірку
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="exportProcurementDropdown">
+                    <li>
+                        <a class="dropdown-item" hx-get="{% url 'export-procurement-orders' %}?format=csv" 
+                        hx-include="#filter-form, #order-search-bar">
+                            CSV
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" hx-get="{% url 'export-procurement-orders' %}?format=json"
+                        hx-include="#filter-form, #order-search-bar">
+                            JSON
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <div class="row mt-2">

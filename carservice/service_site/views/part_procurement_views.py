@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .. import models
 from .. import filters
 from .. import forms
+from .. import resources
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -47,6 +48,53 @@ def procurement_orders(request):
         return render(request, 'part_procurement/_procurement_order_list.html', context)
     
     return render(request, 'part_procurement/procurement_orders.html', context)
+
+
+@login_required
+def export_procurement_orders(request):
+    """
+    Export procurement orders data to various formats.
+    Supported formats: csv, json
+    """
+    format = request.GET.get('format', 'csv')
+    if request.htmx:
+        return HttpResponse(headers={'HX-Redirect': request.get_full_path()})
+    
+    search_query = request.GET.get('search', '')
+
+    queryset = models.ProcurementOrder.objects.select_related(
+        'employee', 'employee__employee_position', 'supplier', 'procurement_status'
+    ).order_by("-order_date")
+
+    if search_query:
+        queryset = queryset.filter(
+            Q(order_number__icontains=search_query) |
+            Q(employee__first_name__icontains=search_query) |
+            Q(employee__last_name__icontains=search_query) |
+            Q(supplier__supplier_name__icontains=search_query)
+        )
+
+    filter = filters.ProcurementOrderFilter(request.GET, queryset=queryset)
+    filtered_qs = filter.qs
+    
+    resource = resources.ProcurementOrderResource()
+    dataset = resource.export(filtered_qs)
+    
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f'procurement_orders_{timestamp}'
+    
+    if format == 'csv':
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+    elif format == 'json':
+        response = HttpResponse(dataset.json, content_type='application/json')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.json"'
+    else:
+        # Default to CSV if format not recognized
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+    
+    return response
 
 def add_order(request):
     if request.method == "GET":
