@@ -179,6 +179,15 @@ class ProcurementOrderInfoForm(forms.ModelForm):
             'procurement_status': 'Статус замовлення',
             'employee': 'Працівник, відповідальний за замовлення',
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+                # Правильний формат для HTML5 datetime-local
+        dt_fields = ["order_date"]
+        for field in dt_fields:
+            value = self.initial.get(field) or self.instance.__dict__.get(field)
+            if value:
+                self.initial[field] = timezone.localtime(value).strftime('%Y-%m-%d')
 
 class VisitForm(ModelForm):
     class Meta:

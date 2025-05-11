@@ -2,9 +2,9 @@
     x-data="{ 
         editMode: false,
         quantity: {{ unit.quantity|default:0 }},
-        price: {{ unit.price_per_unit|default_if_none:unit.part.get_price_per_unit|default:0 }},
+        price: {{ unit.price_per_unit|default_if_none:unit.part.get_price_per_unit|stringformat:".2f"|default:"0.00" }},
         originalQuantity: {{ unit.quantity|default:0 }},
-        originalPrice: {{ unit.price_per_unit|default_if_none:unit.part.get_price_per_unit|default:0 }},
+        originalPrice: {{ unit.price_per_unit|default_if_none:unit.part.get_price_per_unit|stringformat:".2f"|default:"0.00" }},
         cancelEdit() {
             this.quantity = this.originalQuantity;
             this.price = this.originalPrice;
@@ -63,7 +63,7 @@
         <div class="btn-group btn-group-sm" role="group">
             <button class="btn btn-outline-primary" 
                 @click="editMode ? cancelEdit() : editMode = true" 
-                x-text="editMode ? 'Cancel' : 'Edit'">
+                x-text="editMode ? 'Відмінити' : 'Редагувати'">
             </button>
 
             <button class="btn btn-outline-success" x-show="editMode"
@@ -71,12 +71,13 @@
                 hx-include="closest tr"
                 hx-target="closest tr"
                 hx-swap="outerHTML"
+                @htmx:after-request="htmx.ajax('GET', '{% url 'update-order' unit.procurement_order.pk %}', {target: '#row-{{ unit.procurement_order.pk }}', swap: 'outerHTML'})"
                 @click="
                     editMode = false;
                     originalQuantity = quantity;
                     originalPrice = price;
                 ">
-                Save
+                Зберегти
             </button>
 
             <button class="btn btn-outline-info"
