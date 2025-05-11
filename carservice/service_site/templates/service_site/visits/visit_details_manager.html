@@ -24,7 +24,7 @@
                                 customer_editing_mode: false}" 
                         id="visit-details-card">
                         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <h5>Visit details: {{ visit.visit_number }}{% if visit %}, станція: {{visit.employee.station.address}}{% endif %}</h5>
+                            <h5>Деталі візиту: {{ visit.visit_number }}{% if visit %}, станція: {{visit.employee.station.address}}{% endif %}</h5>
                             {% if visit %}
                                 <!-- Add this dropdown to your visit services list page -->
                                 <div class="col-2 dropdown">
@@ -54,7 +54,7 @@
                                                     editing_mode = !editing_mode" 
                                             x-show="visit_id">
                                         <i class="bi bi-pencil"></i> 
-                                        <span x-text="customer_editing_mode ? 'Cancel' : 'Edit'"></span>
+                                        <span x-text="customer_editing_mode ? 'Скасувати' : 'Редагувати'"></span>
                                     </a>
                                 </template>
                                 <template x-if='!customer_editing_mode'>
@@ -63,7 +63,7 @@
                                                 customer_editing_mode = false" 
                                         x-show="visit_id">
                                         <i class="bi bi-pencil"></i> 
-                                        <span x-text="editing_mode ? 'Cancel' : 'Edit'"></span>
+                                        <span x-text="editing_mode ? 'Скасувати' : 'Редагувати'"></span>
                                     </button>
                                 </template>
                             {% else %}
@@ -88,11 +88,11 @@
                     {% include 'service_site/visits/_visit_services.html' %}
                     {% if visit.visit_status.status_name != "Completed"%}
                         <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#serviceSearchModal">
-                            Add services to visit
+                            Додати послуги
                         </button>
                     {% endif %} 
                 {% else %}
-                    <p>Select/create a visit to see the services</p>
+                    <p>Виберіть/створіть візит щоб побачити послуги</p>
                 {% endif %}
             </div>
         </div>
@@ -105,7 +105,7 @@
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="serviceSearchModalLabel">Search for a services</h5>
+                    <h5 class="modal-title" id="serviceSearchModalLabel">Пошук послуг</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -128,7 +128,7 @@
                             hx-target="#visit-services" 
                             hx-vals='{"visit_id": "{{ visit.pk }}"}'
                         >
-                        Add services to visit
+                        Додати послуги до візиту
                     </button>
                 </div>
             </div>

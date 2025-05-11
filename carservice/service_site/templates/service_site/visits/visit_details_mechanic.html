@@ -19,7 +19,7 @@
             <div class="col-4 align-self-start g-2 mt-2 visit-details-container">
                 <div class="card px-0 mt-2 me-1 align-self-start rounded" id="visit-details-card">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h6>Visit details: {{ visit.visit_number }}{% if visit %}, станція: {{visit.employee.station.address}}{% endif %}</h6>
+                        <h6>Деталі візиту: {{ visit.visit_number }}{% if visit %}, станція: {{visit.employee.station.address}}{% endif %}</h6>
                     </div>
                     <div class="card-body">
                         <input type="hidden" name="station_id" id="station-id-hidden-input" value="{{ visit.employee.station.pk }}">
@@ -27,49 +27,39 @@
                             <!-- Visit State Card -->
                             <div class="card mb-2">
                                 <div class="card-header pb-0 {% if visit.visit_status.status_name == 'Completed' %}bg-success{% elif visit.visit_status.status_name == 'Cancelled' %}bg-danger{% else %}bg-warning{% endif %} text-white">
-                                    <h6>Visit State</h6>
+                                    <h6>Стан візиту</h6>
                                 </div>
                                 <div class="card-body py-1 px-2">
                                     <div class="row mb-2">
                                         <div class="col-md-6">
-                                            <strong>Visit Date:</strong><br> {{ visit.visit_date|date:"Y-m-d H:i" }}
+                                            <strong>Дата візиту:</strong><br> {{ visit.visit_date|date:"Y-m-d H:i" }}
                                         </div>
                                         <div class="col-md-6">
                                             {% if visit.visit_status.status_name == "Pending" %}
-                                                <strong>Status:</strong><br><span class="badge bg-warning text-dark">Pending</span>
+                                                <strong>Статус:</strong><br><span class="badge bg-warning text-dark">Pending</span>
                                             {% elif visit.visit_status.status_name == "In Progress" %}
-                                                <strong>Status:</strong><br><span class="badge bg-primary">In Progress</span>
+                                                <strong>Статус:</strong><br><span class="badge bg-primary">In Progress</span>
                                             {% elif visit.visit_status.status_name == "Completed" %}
-                                                <strong>Status:</strong><br><span class="badge bg-success">Completed</span>
+                                                <strong>Статус:</strong><br><span class="badge bg-success">Completed</span>
                                             {% elif visit.visit_status.status_name == "Cancelled" %}
-                                                <strong>Status:</strong><br><span class="badge bg-danger">Cancelled</span>
+                                                <strong>Статус:</strong><br><span class="badge bg-danger">Cancelled</span>
                                             {% endif %}
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <strong>Planned End Date:</strong><br> {{ visit.planned_end_date|date:"Y-m-d H:i"|default:"Not set" }}
+                                            <strong>Орієнтовна дата закінчення:</strong><br> {{ visit.planned_end_date|date:"Y-m-d H:i"|default:"Not set" }}
                                         </div>
                                         <div class="col-md-6">
-                                            <strong>Actual End Date:</strong><br> {{ visit.actual_end_date|date:"Y-m-d H:i"|default:"Not set"  }}
+                                            <strong>Фактична дата закінчення:</strong><br> {{ visit.actual_end_date|date:"Y-m-d H:i"|default:"Not set"  }}
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Visit Details Card -->
-
-                            <div class="card mb-2 rounded">
-                                <div class="card-header pb-0 bg-secondary text-white">
-                                    <h6>Visit Details</h6>
-                                </div>
-                                <div class="card-body py-1 px-2">
-                                    <div class="d-flex flex-wrap justify-content-between align-items-start">
-                                        <div>
-                                            <strong>Employee:</strong><br> {{ visit.employee }}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <strong>Працівник:</strong><br> {{ visit.employee }}
                                         </div>
-                                        <div id="details-container">
-                                            <strong>Details:</strong><br>
+                                        <div id="details-container" class="col-md-6">
+                                            <strong>Нотатки:</strong><br>
                                             <div class="text-truncate" id="visit-details">
                                                 {{ visit.details|default:"No details provided"|linebreaks }}
                                             </div>
@@ -82,7 +72,7 @@
                             <div class="mt-2 align-self-start rounded" id="visit-customer-details-readonly">
                                 <div class="card mb-2 rounded" id="customer-details">
                                     <div class="card-header pb-0 bg-primary d-flex justify-content-between align-items-center text-white">
-                                        <h6>Customer: {{visit_customer.first_name}} {{visit_customer.last_name}}</h6>
+                                        <h6>Клієнт: {{visit_customer.first_name}} {{visit_customer.last_name}}</h6>
                                     </div>
                                     <div class="card-body px-1 py-1">
                                         <h7>
@@ -101,7 +91,7 @@
                                     <div class="card rounded-4 overflow-hidden car-info-card">
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h6 class="mb-0">
-                                                Car details
+                                                Інформація про авто
                                             </h6>
                                         </div>
                                         <div class="row g-0">
@@ -110,34 +100,34 @@
                                                 <h6 class="fw-bold text-uppercase">{{ visit_car.car_model.car_brand.brand_name }} {{ visit_car.car_model.model_name }}</h6>
                                 
                                                 {% if visit_car.manufacture_year %}
-                                                    <p class="mb-1">📅 Year: {{ visit_car.manufacture_year }}</p>
+                                                    <p class="mb-1">📅 Рік: {{ visit_car.manufacture_year }}</p>
                                                 {% endif %}
                                         
                                                 {% if visit_car.mileage %}
-                                                    <p class="mb-1">🛣️ Mileage: {{ visit_car.mileage }} km</p>
+                                                    <p class="mb-1">🛣️ Пробіг: {{ visit_car.mileage }} км</p>
                                                 {% else %}
-                                                    <p class="mb-1">🛣️ Mileage: Unknown</p>
+                                                    <p class="mb-1">🛣️ Пробіг: не вказано</p>
                                                 {% endif %}
                                         
                                                 <p class="mb-1">🔐 VIN: {{ visit_car.vin }}</p>
-                                                <p class="mb-1">🎨 Color: {{ visit_car.color }}</p>
+                                                <p class="mb-1">🎨 Колір: {{ visit_car.color }}</p>
                                             </div>
                                         
                                             <div class="col-7 py-3 ps-3">
-                                                <h6 class="fw-bold text-uppercase">Model details</h6>
-                                                <p class="mb-1">🛠️ Engine:
+                                                <h6 class="fw-bold text-uppercase">Дані моделі</h6>
+                                                <p class="mb-1">🛠️ Двигун:
                                                     {{ visit_car.car_model.engine_type.engine_type_name|default:"Unknown" }}
                                                 </p>
-                                                <p class="mb-1">⚙️ Transmission:
+                                                <p class="mb-1">⚙️ Трансмісія:
                                                     {{ visit_car.car_model.transmission_type.transmission_type_name|default:"Unknown" }}
                                                 </p>
-                                                <p class="mb-1">🔧 Suspension type:
+                                                <p class="mb-1">🔧 Тип підвіски:
                                                     {{ visit_car.car_model.suspenison_type.suspenison_type_name|default:"Unknown" }}
                                                 </p>
-                                                <p class="mb-1">🚗 Body type:
+                                                <p class="mb-1">🚗 Тип кузова:
                                                     {{ visit_car.car_model.body_type.body_type_name|default:"Unknown" }}
                                                 </p>
-                                                <p class="mb-1">🚙 Drive type:
+                                                <p class="mb-1">🚙 Тип приводу:
                                                     {{ visit_car.car_model.drive_type.drive_type_name|default:"Unknown" }}
                                                 </p>
                                             </div>
@@ -157,7 +147,7 @@
             <div class="col-5 align-self-start ps-2">
                 <div class="card px-0 mt-2" id="required-parts-selection-container" x-data="{ staged_part_count: 0 }">
                     <dic class='card-header pb-1'>
-                        <h5 class='mb-1'>Selected visit service</h5>
+                        <h5 class='mb-1'>Вибрана послуга</h5>
                     </dic>
                     <div class="row card-body px-1 py-1">
                         <div class="col-6 border-end" id="required-parts-search">

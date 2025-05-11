@@ -1,28 +1,28 @@
 {% load group_filters %}
 <input type="hidden" name="visit_service_id" value="{{ visit_service.pk }}" id="visit_service_id">
 <div class="fw-bold">{{visit_service.service.service_name}}</div>
-<div>Category: {{visit_service.service.service_type.service_type_name}}</div>
+<div>Категорія: {{visit_service.service.service_type.service_type_name}}</div>
 
 <span>
-    Qty: {{visit_service.quantity}} x {{visit_service.service.price}} ₴,
+    К-сть: {{visit_service.quantity}} x {{visit_service.service.price}} ₴,
     {% if visit_service.provided_service %}
-        total (inclding parts): {{ visit_service.provided_service.get_total_price }} ₴
+        загальна ціна (включаючи запчастини): {{ visit_service.provided_service.get_total_price }} ₴
     {% else %}
-        total: {{ visit_service.get_total_price }} ₴
+        загальна ціна: {{ visit_service.get_total_price }} ₴
     {% endif %}
 </span>
 
 <div>
     {% if visit_service.provided_service %}
         <span class="badge bg-success rounded-pill">
-            Provided 
+            Надано:  
             {% if visit_service.provided_service.provided_date %}
-                on: {{visit_service.provided_service.provided_date|date:"F j, Y" }}
+                {{visit_service.provided_service.provided_date|date:"F j, Y" }}
             {% endif %}
         </span>
-        <span> by {{visit_service.provided_service.employee}}</span> 
+        <span> виконав {{visit_service.provided_service.employee}}</span> 
     {% else %}
-        <span class="badge bg-warning rounded-pill">Pending</span>
+        <span class="badge bg-warning rounded-pill">Очікується</span>
     {% endif %}
 </div>
 
@@ -31,7 +31,7 @@
         <button class="btn btn-sm btn-outline-primary me-2 mt-2" @click="show_used_parts = !show_used_parts; button_text = show_used_parts ? 'Hide' : 'Show'">
             <i class="bi bi-tools"></i> 
             <span x-text='button_text'></span>
-            Used parts
+            Використані запчастини
         </button>
         <div x-show="show_used_parts" class="bg-light p-2 rounded mt-2 w-100">
             <ul class="list-group">
@@ -42,10 +42,10 @@
                                 {{r_part.part_in_station.part.part_name}},
                             </span>
                             <span>  
-                                category: {{r_part.part_in_station.part.part_type.part_type_name}}
+                                Категорія: {{r_part.part_in_station.part.part_type.part_type_name}}
                             </span>
                         </div>
-                        <span>Qty: {{r_part.quantity}} x {{r_part.get_part_price}} ₴, total: {{ r_part.get_total_price }} ₴</span>
+                        <span>К-сть: {{r_part.quantity}} x {{r_part.get_part_price}} ₴, загальна: {{ r_part.get_total_price }} ₴</span>
                     </li>
                 {% endfor %}
             </ul>

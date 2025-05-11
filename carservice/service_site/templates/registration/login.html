@@ -2,22 +2,22 @@
 
 {% block content %}
 <div class="d-flex flex-column min-vh-100 justify-content-center align-items-center">
-    <h2 class="text-center">Login</h2>
+    <h2 class="text-center">Авторизація</h2>
 
     {% if form.errors %}
     <div class="alert alert-danger">
-        Your username and password didn't match. Please try again.
+        Ваш логін і пароль не співпадають. Спробуйте ще раз.
     </div>
     {% endif %}
 
     {% if next %}
         {% if user.is_authenticated %}
         <div class="alert alert-warning">
-            Your account doesn't have access to this page. Please log in with an account that has access.
+            Ваш аккаунт немає доступу до цієї сторінки. Авторизуйтись з аккаунтом який має доступ.
         </div>
         {% else %}
         <div class="alert alert-info">
-            Please log in to see this page.
+            Авторизуйтесь, щоб побачити цю сторінку.
         </div>
         {% endif %}
     {% endif %}
@@ -27,7 +27,7 @@
             {% csrf_token %}
 
             <div class="mb-0">
-                <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                <label for="{{ form.username.id_for_label }}" class="form-label">логін</label>
             </div>
 
             <div class="mb-2">
@@ -35,7 +35,7 @@
             </div>
 
             <div class="mb-0">
-                <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                <label for="{{ form.password.id_for_label }}" class="form-label">Пароль</label>
             </div>
 
             <div class="mb-2">
@@ -44,7 +44,7 @@
 
             <input type="hidden" name="next" value="{{ next }}">
 
-            <button type="submit" class="btn btn-primary w-100" value="login">Login</button>
+            <button type="submit" class="btn btn-primary w-100" value="login">Авторизуватись</button>
         </form>
     </div>
 

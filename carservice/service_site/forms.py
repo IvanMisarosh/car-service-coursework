@@ -2,6 +2,7 @@ from django.forms import ModelForm
 from . import models
 from django import forms
 from django.urls import reverse_lazy
+from django.utils import timezone
 
 class CarForm(forms.ModelForm):
     class Meta:
@@ -15,25 +16,26 @@ class CarForm(forms.ModelForm):
             'color': forms.Select(attrs={'class': 'form-control form-control-sm'}),
             'mileage': forms.NumberInput(attrs={'class': 'form-control form-control-sm'}),
         }
+        labels = {
+            'vin': 'VIN-код',
+            'manufacture_year': 'Рік випуску',
+            'car_model': 'Модель авто',
+            'color': 'Колір',
+            'mileage': 'Пробіг',
+        }
+        help_texts = {
+            'vin': 'Ідентифікаційний номер транспортного засобу',
+        }
 
     def __init__(self, *args, **kwargs):
-        # Get the customer_id from kwargs and remove it if exists
         customer_id = kwargs.pop('customer_id', None)
         super(CarForm, self).__init__(*args, **kwargs)
         
-        # If customer_id was provided, set initial value
         if customer_id:
             self.fields['customer'].initial = customer_id
-            
+
         self.fields['car_model'].required = True
-        
-        # Add help text
-        self.fields['vin'].help_text = "Vehicle Identification Number"
-        
-        # Customize car_model field to show brand and model
-        self.fields['car_model'].label = "Car Model"
         self.fields['car_model'].queryset = models.CarModel.objects.select_related('car_brand').all()
-        # self.fields['car_model'].label_from_instance = lambda obj: f"{obj.car_brand.brand_name} {obj.model_name}"
 
 class StationForm(forms.ModelForm):
     class Meta:
@@ -65,6 +67,21 @@ class PartForm(forms.ModelForm):
             'quantity_per_package': forms.NumberInput(attrs={'class': 'form-control form-control-sm'}),
             'price_per_package': forms.NumberInput(attrs={'class': 'form-control form-control-sm', 'step': '0.01'}),
         }
+        labels = {
+            'part_name': 'Назва запчастини',
+            'part_brand': 'Бренд',
+            'part_type': 'Тип запчастини',
+            'weight': 'Вага (кг)',
+            'dimensions': 'Розміри',
+            'description': 'Опис',
+            'quantity_per_package': 'Кількість в упаковці',
+            'price_per_package': 'Ціна за упаковку (₴)',
+        }
+        help_texts = {
+            'weight': 'Вкажіть вагу в кілограмах',
+            'dimensions': 'Наприклад: 10x20x5 см',
+            'quantity_per_package': 'Скільки одиниць у кожній упаковці',
+        }
 
 class CarModelForm(forms.ModelForm):
     class Meta:
@@ -81,14 +98,31 @@ class CarModelForm(forms.ModelForm):
                 'hx-trigger': 'keyup',
                 'hx-target': '#div_id_model_name',
                 'hx-swap': 'outerHTML'
-                },),
-            'dimensions': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Розміри'}),
+            }),
+            'dimensions': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Розміри (наприклад: довжина x ширина x висота)'
+            }),
             'car_brand': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
             'body_type': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
             'engine_type': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
             'transmission_type': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
             'drive_type': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
             'suspension_type': forms.Select(attrs={'class': 'form-select form-select-sm mt-1'}),
+        }
+        labels = {
+            'model_name': 'Назва моделі',
+            'car_brand': 'Бренд авто',
+            'body_type': 'Тип кузова',
+            'engine_type': 'Тип двигуна',
+            'transmission_type': 'Тип трансмісії',
+            'drive_type': 'Тип приводу',
+            'suspension_type': 'Тип підвіски',
+            'dimensions': 'Габарити',
+        }
+        help_texts = {
+            'model_name': 'Введіть назву моделі авто',
+            'dimensions': 'Наприклад: 4500 x 1800 x 1400 мм',
         }
 
         def clean_model_name(self):
@@ -106,6 +140,11 @@ class SupplierForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control form-control-sm'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
         }
+        labels = {
+            'supplier_name': 'Назва постачальника',
+            'email': 'Електронна пошта',
+            'phone_number': 'Номер телефону',
+        }
 
 class CustomerForm(forms.ModelForm):
     class Meta:
@@ -116,6 +155,12 @@ class CustomerForm(forms.ModelForm):
             'first_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+        }
+        labels = {
+            'email': 'Електронна пошта',
+            'first_name': "Ім'я",
+            'last_name': 'Прізвище',
+            'phone_number': 'Номер телефону',
         }
 
 class ProcurementOrderInfoForm(forms.ModelForm):
@@ -128,6 +173,12 @@ class ProcurementOrderInfoForm(forms.ModelForm):
             'procurement_status': forms.Select(attrs={'class': 'form-select form-select-sm'}),
             'employee': forms.Select(attrs={'class': 'form-select form-select-sm', 'id': 'employee-select'}),
         }
+        labels = {
+            'order_date': 'Дата замовлення',
+            'supplier': 'Постачальник',
+            'procurement_status': 'Статус замовлення',
+            'employee': 'Працівник, відповідальний за замовлення',
+        }
 
 class VisitForm(ModelForm):
     class Meta:
@@ -135,15 +186,15 @@ class VisitForm(ModelForm):
         fields = ['visit_date', 'visit_status', 'car', 'employee', 'payment_status',
                    'details', 'planned_end_date', 'actual_end_date', 'payment_date']
         labels = {
-            'visit_date': 'Visit Date',
-            'visit_status': 'Visit Status',
-            'car': 'Car',
-            'employee': 'Employee',
-            'payment_status': 'Payment Status',
+            'visit_date': 'Дата візиту',
+            'visit_status': 'Статус візиту',
+            'car': 'Авто',
+            'employee': 'Працівник',
+            'payment_status': 'Статус оплати',
             'details': 'Details',
-            'planned_end_date': 'Planned End Date',
-            'actual_end_date': 'Actual End Date',
-            'payment_date': 'Payment Date',
+            'planned_end_date': 'Орієнтовна дата закінчення',
+            'actual_end_date': 'Фактична дата закінчення',
+            'payment_date': 'Дата оплати',
         }
         widgets = {
             'visit_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control form-control-sm'}),
@@ -160,3 +211,10 @@ class VisitForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['employee'].queryset = models.Employee.objects.order_by('first_name', 'last_name')
+
+                # Правильний формат для HTML5 datetime-local
+        dt_fields = ['visit_date', 'planned_end_date', 'actual_end_date', 'payment_date']
+        for field in dt_fields:
+            value = self.initial.get(field) or self.instance.__dict__.get(field)
+            if value:
+                self.initial[field] = timezone.localtime(value).strftime('%Y-%m-%dT%H:%M')

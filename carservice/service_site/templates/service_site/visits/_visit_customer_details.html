@@ -9,7 +9,7 @@
                     hx-trigger="click"
                     hx-swap="innerHTML"
                     >
-                    Change customer
+                    Змінити клієнта
                 </button>
             </div>
             <div class="card-body">
@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        {{ visit_customer.first_name}}'s cars:
+        {{ visit_customer.first_name}}'s авто:
         <div class="list-group" id="customer-cars-list">
             {% for visit_car in visit_customer.cars.all %}
                 <div class="list-group-item p-0 mb-2 rounded">
@@ -44,7 +44,7 @@
                                 hx-vals='{"selected_car_id": "{{ visit_car.pk }}"}'
                                 @click="customer_editing_mode = false"
                             >
-                                Select car
+                                Вибрати авто
                             </button>
                             <i class="bi" :class="show_details ? 'bi-caret-up-fill' : 'bi-caret-down-fill'"></i>
                         </div>
@@ -55,12 +55,12 @@
                 </div>
             {% empty %}
                 <div class="alert alert-info">
-                    This customer has no registered cars.
+                    Цей клієнт не має авто.
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        Select customer 
+        Вибрати покупця
         {% include 'service_site/visits/_customer_search.html'%}
     {% endif %}     
 </div>

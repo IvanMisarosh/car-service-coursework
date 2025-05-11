@@ -1,11 +1,11 @@
 {% load group_filters %}
 <div class="card mt-2" id="visit-services">
     <div class="card-header mb-2 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Visit services</h5>
+        <h5 class="mb-0">Заплановані послуги</h5>
         {% if visit_price > 0 %} 
-            <span id="visit-price" class="badge bg-success">Total: {{ visit_price }} ₴</span>
+            <span id="visit-price" class="badge bg-success">Загальна: {{ visit_price }} ₴</span>
         {% else %}
-            <span id="visit-price" class="badge bg-danger">No services added yet</span>
+            <span id="visit-price" class="badge bg-danger">Немає запланованих послуг</span>
         {% endif %}
         
     </div>
@@ -26,7 +26,7 @@
             {% endfor %}
         {% else %}
             <div>
-                <span class="text-mutedfw-bold">No services added yet</span>
+                <span class="text-mutedfw-bold">Немає запланованих послуг</span>
             </div>
         {% endif %}
         

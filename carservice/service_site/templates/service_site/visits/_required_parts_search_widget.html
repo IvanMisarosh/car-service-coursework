@@ -2,24 +2,24 @@
     {% if visit_service %}
         {% include 'service_site/visits/_selected_visit_service.html' %}
     {% else %}
-        <p>Select a pending service to see the details</p>
+        <p>Виберіть невиконану послугу</p>
     {% endif %}
 </div>
 {% if visit_service %}
     <button class="btn btn-primary btn-sm mb-2" id="add-required-parts-button" type="button" 
             hx-post="{% url 'save-staged-parts' %}" 
-            {% comment %} hx-target="#visit-services"  {% endcomment %}
+            hx-target="#visit-services"
             hx-include="#visit_service_id"
             hx-target="#messages"
             x-show="staged_part_count > 0"
         >
-        Select part for service
+        Виконати послгу
     </button>
 {% endif %}
 <div class="pb-2" id="part-search-container">
     {% if visit_service %}
         {% include 'service_site/visits/_part_search.html' %}
     {% else %}
-        <p>Select a pending service to see the required parts</p>
+        <p>Виберіть невиконану послугу</p>
     {% endif %}
 </div>

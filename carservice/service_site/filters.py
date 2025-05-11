@@ -34,31 +34,43 @@ class ProcurementOrderFilter(django_filters.FilterSet):
 
 class CustomerFilter(django_filters.FilterSet):
     car_brand = django_filters.ModelMultipleChoiceFilter(
-        field_name="cars__car_model__car_brand",
-        queryset=CarBrand.objects.all(),
-        label="Бренд авто",
-        widget=forms.SelectMultiple(attrs={"class": "form-select select2"})
+    field_name="cars__car_model__car_brand",
+    queryset=CarBrand.objects.all(),
+    label="Бренд авто",
+    widget=forms.SelectMultiple(attrs={
+        "class": "form-select select2",
+        "data-placeholder": "Оберіть бренд(и) авто"
+    })
     )
 
     body_type = django_filters.ModelMultipleChoiceFilter(
         field_name="cars__car_model__body_type",
         queryset=BodyType.objects.all(),
         label="Тип кузову",
-        widget=forms.SelectMultiple(attrs={"class": "form-select select2"})
+        widget=forms.SelectMultiple(attrs={
+            "class": "form-select select2",
+            "data-placeholder": "Оберіть тип(и) кузову"
+        })
     )
 
     drive_type = django_filters.ModelChoiceFilter(
         field_name="cars__car_model__drive_type",
         queryset=DriveType.objects.all(),
         label="Тип приводу",
-        widget=forms.Select(attrs={"class": "form-select select2"})
+        widget=forms.Select(attrs={
+            "class": "form-select select2",
+            "data-placeholder": "Оберіть тип приводу"
+        })
     )
 
     engine_type = django_filters.ModelChoiceFilter(
         field_name="cars__car_model__engine_type",
         queryset=EngineType.objects.all(),
         label="Тип двигуна",
-        widget=forms.Select(attrs={"class": "form-select select2"})
+        widget=forms.Select(attrs={
+            "class": "form-select select2",
+            "data-placeholder": "Оберіть тип двигуна"
+        })
     )
 
     visit_date_from = django_filters.DateFilter(
@@ -83,76 +95,86 @@ class CustomerFilter(django_filters.FilterSet):
 
 class VisitFilter(django_filters.FilterSet):
     visit_date__gte = django_filters.DateFilter(
-        field_name='visit_date', lookup_expr='gte', label='Visit Date From',
+        field_name='visit_date', lookup_expr='gte', label='Дата візиту з',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control form-control-sm'})
     )
     visit_date__lte = django_filters.DateFilter(
-        field_name='visit_date', lookup_expr='lte', label='Visit Date To',
+        field_name='visit_date', lookup_expr='lte', label='Дата візиту до',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control form-control-sm'})
     )
     planned_end_date__gte = django_filters.DateFilter(
-        field_name='planned_end_date', lookup_expr='gte', label='Planned End From',
+        field_name='planned_end_date', lookup_expr='gte', label='Орієнтовна дата закінчення з',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control form-control-sm'})
     )
     planned_end_date__lte = django_filters.DateFilter(
-        field_name='planned_end_date', lookup_expr='lte', label='Planned End To',
+        field_name='planned_end_date', lookup_expr='lte', label='Орієнтовна дата закінчення до',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control form-control-sm'})
     )
     actual_end_date__gte = django_filters.DateFilter(
-        field_name='actual_end_date', lookup_expr='gte', label='Actual End From',
+        field_name='actual_end_date', lookup_expr='gte', label='Фактична дата закінчення з',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control form-control-sm'})
     )
     actual_end_date__lte = django_filters.DateFilter(
-        field_name='actual_end_date', lookup_expr='lte', label='Actual End To',
+        field_name='actual_end_date', lookup_expr='lte', label='Фактична дата закінчення до',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control form-control-sm'})
     )
     payment_date__gte = django_filters.DateFilter(
-        field_name='payment_date', lookup_expr='gte', label='Payment Date From',
+        field_name='payment_date', lookup_expr='gte', label='Дата оплати з',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control form-control-sm'})
     )
     payment_date__lte = django_filters.DateFilter(
-        field_name='payment_date', lookup_expr='lte', label='Payment Date To',
+        field_name='payment_date', lookup_expr='lte', label='Дата оплати до',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control form-control-sm'})
     )
 
     visit_status = django_filters.ModelChoiceFilter(
         queryset=Visit.visit_status.field.related_model.objects.all(),
-        label='Visit Status',
+        label='Статус візиту',
         widget=forms.Select(attrs={'class': 'form-select form-select-sm'})
     )
 
     customer = django_filters.ModelChoiceFilter(
         field_name='car__customer',
         queryset=Customer.objects.all(),
-        label='Customer',
-        widget=forms.Select(attrs={'class': 'form-select select2'})
+        label='Клієнт',
+        widget=forms.Select(attrs={
+            'class': 'form-select select2',
+            'data-placeholder': 'Оберіть клієнта'
+        }),
     )
 
     car_brand = django_filters.ModelMultipleChoiceFilter(
         field_name="car__car_model__car_brand",
         queryset=CarBrand.objects.all(),
-        label='Car Brand',
-        widget=forms.SelectMultiple(attrs={'class': 'form-select select2'})
+        label='Бренд авто',
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select select2',
+            'data-placeholder': 'Оберіть бренд(и)'
+        }),
     )
 
     employee = django_filters.ModelChoiceFilter(
-        queryset=Visit.employee.field.related_model.objects.all(),
-        label='Employee',
-        widget=forms.Select(attrs={'class': 'form-select select2'})
+        field_name='employee',
+        queryset=Visit._meta.get_field('employee').related_model.objects.all(),
+        label='Працівник',
+        widget=forms.Select(attrs={
+            'class': 'form-select select2',
+            'data-placeholder': 'Оберіть працівника'
+        }),
     )
 
     payment_status = django_filters.ModelChoiceFilter(
         queryset=Visit.payment_status.field.related_model.objects.all(),
-        label='Payment Status',
+        label='Статус оплати',
         widget=forms.Select(attrs={'class': 'form-select form-select-sm'})
     )
 
     price__gte = django_filters.NumberFilter(
-        field_name='price', lookup_expr='gte', label='Min Price',
+        field_name='price', lookup_expr='gte', label='Мінімальна ціна',
         widget=forms.NumberInput(attrs={'class': 'form-control form-control-sm'})
     )
     price__lte = django_filters.NumberFilter(
-        field_name='price', lookup_expr='lte', label='Max Price',
+        field_name='price', lookup_expr='lte', label='Максимальна ціна',
         widget=forms.NumberInput(attrs={'class': 'form-control form-control-sm'})
     )
 

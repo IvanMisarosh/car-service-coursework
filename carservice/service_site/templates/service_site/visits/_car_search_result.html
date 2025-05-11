@@ -10,7 +10,7 @@
             <h5 class="mb-1">{{car.car_model.car_brand.brand_name}} {{car.car_model.model_name}} <span class="badge bg-secondary rounded-pill">{{car.vin}}</span></h5>
             
             {% if car.manufacture_year%}
-                <small>{{car.manufacture_year}} year</small>
+                <small>{{car.manufacture_year}} рік</small>
             {% endif %}
         </div>
         <h8>{{car.customer.first_name}} {{car.customer.last_name}}, {{car.customer.phone_number}}</h8>

@@ -4,31 +4,40 @@
             <!-- Visit State Card -->
             <div class="card mb-2">
                 <div class="card-header pb-0 {% if visit.visit_status.status_name == 'Completed' %}bg-success{% elif visit.visit_status.status_name == 'Cancelled' %}bg-danger{% else %}bg-warning{% endif %} text-white">
-                    <h6>Visit State</h6>
+                    <h6>Стан візиту</h6>
                 </div>
                 <div class="card-body py-1 px-2">
                     <div class="row mb-2">
                         <div class="col-md-6">
-                            <strong>Visit Date:</strong><br> {{ visit.visit_date|date:"Y-m-d H:i" }}
+                            <strong>Дата візиту:</strong><br> {{ visit.visit_date|date:"Y-m-d H:i" }}
                         </div>
                         <div class="col-md-6">
                             {% if visit.visit_status.status_name == "Pending" %}
-                                <strong>Status:</strong><br><span class="badge bg-warning text-dark">Pending</span>
+                                <strong>Статус:</strong><br><span class="badge bg-warning text-dark">Pending</span>
                             {% elif visit.visit_status.status_name == "In Progress" %}
-                                <strong>Status:</strong><br><span class="badge bg-primary">In Progress</span>
+                                <strong>Статус:</strong><br><span class="badge bg-primary">In Progress</span>
                             {% elif visit.visit_status.status_name == "Completed" %}
-                                <strong>Status:</strong><br><span class="badge bg-success">Completed</span>
+                                <strong>Статус:</strong><br><span class="badge bg-success">Completed</span>
                             {% elif visit.visit_status.status_name == "Cancelled" %}
-                                <strong>Status:</strong><br><span class="badge bg-danger">Cancelled</span>
+                                <strong>Статус:</strong><br><span class="badge bg-danger">Cancelled</span>
                             {% endif %}
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <strong>Planned End Date:</strong><br> {{ visit.planned_end_date|date:"Y-m-d H:i"|default:"Not set" }}
+                            <strong>Орієнтовна дата закінчення:</strong><br> {{ visit.planned_end_date|date:"Y-m-d H:i"|default:"Не вказано" }}
                         </div>
                         <div class="col-md-6">
-                            <strong>Actual End Date:</strong><br> {{ visit.actual_end_date|date:"Y-m-d H:i"|default:"Not set"  }}
+                            <strong>Фактична дата закінчення:</strong><br> {{ visit.actual_end_date|date:"Y-m-d H:i"|default:"Не вказано"  }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Працівник:</strong><br> {{ visit.employee }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Нотатки:</strong><br> 
+                            {{ visit.details|default:"Нотаток немає"|linebreaks }}
                         </div>
                     </div>
                 </div>
@@ -37,42 +46,24 @@
             <!-- Payment Details Card -->
             <div class="card mb-2">
                 <div class="card-header pb-0 {% if visit.payment_status.payment_name == 'Paid' %}bg-success{% elif visit.payment_status.payment_name == 'Pending' %}bg-warning{% else %}bg-danger{% endif %} text-white">
-                    <h6>Payment Details</h6>
+                    <h6>Оплата</h6>
                 </div>
                 <div class="card-body py-1 px-2">
-                    <div class="row mb-2">
-                        <div class="col-md-6">
-                            <strong>Payment Date:</strong><br> {{ visit.payment_date|date:"Y-m-d H:i"|default:"Not set"  }}
-                        </div>
-                        <div class="col-md-6">
-                            {% if visit.payment_status.payment_name == "Pending" %}
-                                <strong>Payment Status:</strong><br> <span class="badge bg-warning text-dark">Pending</span>
-                            {% elif visit.payment_status.payment_name == "Paid" %}
-                                <strong>Payment Status:</strong><br> <span class="badge bg-success">Paid</span>
-                            {% elif visit.payment_status.payment_name == "Refunded" %}
-                                <strong>Payment Status:</strong><br> <span class="badge bg-info text-dark">Refunded</span>
-                            {% elif visit.payment_status.payment_name == "Cancelled" %}
-                                <strong>Payment Status:</strong><br> <span class="badge bg-danger">Cancelled</span>
-                            {% else %}
-                                <strong>Payment Status:</strong><br> <span class="badge bg-secondary">Not set</span>
-                            {% endif %}
-                        </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>Дата оплати:</strong><br> {{ visit.payment_date|date:"Y-m-d H:i"|default:"Не вказано"  }}
                     </div>
-                </div>
-            </div>
-
-            <!-- Visit Details Card -->
-            <div class="card mb-2">
-                <div class="card-header pb-0 bg-secondary text-white">
-                    <h6>Visit Details</h6>
-                </div>
-                <div class="card-body py-1 px-2">
-                    <div class="mb-2">
-                        <strong>Employee:</strong><br> {{ visit.employee }}
-                    </div>
-                    <div class="mb-2">
-                        <strong>Details:</strong><br> 
-                        {{ visit.details|default:"No details provided"|linebreaks }}
+                    <div class="col-md-6">
+                        {% if visit.payment_status.payment_name == "Pending" %}
+                            <strong>Статус оплати:</strong><br> <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif visit.payment_status.payment_name == "Paid" %}
+                            <strong>Статус оплати:</strong><br> <span class="badge bg-success">Paid</span>
+                        {% elif visit.payment_status.payment_name == "Refunded" %}
+                            <strong>Статус оплати:</strong><br> <span class="badge bg-info text-dark">Refunded</span>
+                        {% elif visit.payment_status.payment_name == "Cancelled" %}
+                            <strong>Статус оплати:</strong><br> <span class="badge bg-danger">Cancelled</span>
+                        {% else %}
+                            <strong>Статус оплати:</strong><br> <span class="badge bg-secondary">Не вказано</span>
+                        {% endif %}
                     </div>
                 </div>
             </div>

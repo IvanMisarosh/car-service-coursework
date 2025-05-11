@@ -21,15 +21,15 @@
         </div>
         <div>
             {% if part_in_station.part.part_brand %}
-                <span class='badge bg-secondary rounded-pill'>Brand:</span> {{ part_in_station.part.part_brand.brand_name }}
+                <span class='badge bg-secondary rounded-pill'>Бренд:</span> {{ part_in_station.part.part_brand.brand_name }}
             {% endif %}
             {% if part_in_station.part.part_type %}
-                <span class='badge bg-secondary rounded-pill'>Type:</span> {{ part_in_station.part.part_type.part_type_name }}
+                <span class='badge bg-secondary rounded-pill'>Тип:</span> {{ part_in_station.part.part_type.part_type_name }}
             {% endif %}
             <br>
-            Quantity in Station: {{ part_in_station.quantity }} packages
+            Кількість на станції: {{ part_in_station.quantity }} пакунків
             <br>
-            Units per Package: {{ part_in_station.part.quantity_per_package }}
+            Одиниць в пакунку: {{ part_in_station.part.quantity_per_package }}
         </div>
     </div> 
 {% endfor %}
