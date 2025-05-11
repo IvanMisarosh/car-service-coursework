@@ -19,14 +19,14 @@
     <table class="table table-striped table-hover">
       <thead class="table-dark">
         <tr>
-          <th>Order #</th>
-          <th>Employee</th>
-          <th>Supplier</th>
-          <th>Items</th>
-          <th>Total</th>
-          <th>Date</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>Замовлення #</th>
+          <th>Працівник</th>
+          <th>Постачальник</th>
+          <th>Елементи</th>
+          <th>Загальна ціна</th>
+          <th>Дата</th>
+          <th>Статус</th>
+          <th>Дії</th>
         </tr>
       </thead>
       <tbody id="order-table-body">
@@ -34,7 +34,7 @@
           {% include 'part_procurement/_order_row_expandable.html'%}
         {% empty %}
         <tr>
-          <td colspan="8" class="text-center py-4">No procurement orders found.</td>
+          <td colspan="8" class="text-center py-4">Не знайдено замовлень.</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -50,11 +50,11 @@
             hx-target="#order-list"
             hx-include="#filter-form"
             class="btn btn-primary">
-      <i class="bi bi-chevron-left"></i> Previous
+      <i class="bi bi-chevron-left"></i> 
     </button>
     {% else %}
-    <button class="btn btn-primary" disabled>
-      <i class="bi bi-chevron-left"></i> Previous
+    <button class="btn btn-primary" disabled>Попередня
+      <i class="bi bi-chevron-left"></i> Попередня
     </button>
     {% endif %}
 
@@ -65,17 +65,17 @@
             hx-target="#order-list"
             hx-include="#filter-form"
             class="btn btn-primary">
-      Next <i class="bi bi-chevron-right"></i>
+      Наступна <i class="bi bi-chevron-right"></i>
     </button>
     {% else %}
     <button class="btn btn-primary" disabled>
-      Next <i class="bi bi-chevron-right"></i>
+      Наступна <i class="bi bi-chevron-right"></i>
     </button>
     {% endif %}
   </div>
 
   <div>
-    <label for="items-per-page" class="me-2">Items per page:</label>
+    <label for="items-per-page" class="me-2">Записів на сторінку:</label>
     <select id="items-per-page" name="items_per_page"
             hx-get="{% url 'procurement-orders' %}"
             hx-target="#order-list"

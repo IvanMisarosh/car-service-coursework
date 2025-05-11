@@ -1,0 +1,30 @@
+<div class="card">
+  <div class="card-header">
+    <h5>Додати нового клієнта</h5>
+  </div>
+  <div class="card-body">
+    <form 
+      hx-post="{% url 'add-customer-form' %}" 
+      hx-target="tbody"
+      hx-swap="afterbegin"
+    >
+      {% csrf_token %}
+      <div class='row'>
+        <div class="col-3 mb-2">
+          {{ form.email.label_tag }} {{ form.email }}
+        </div>
+        <div class="col-3 mb-2">
+          {{ form.first_name.label_tag }} {{ form.first_name }}
+        </div>
+        <div class="col-3 mb-2">
+          {{ form.last_name.label_tag }} {{ form.last_name }}
+        </div>
+        <div class="col-3 mb-2">
+          {{ form.phone_number.label_tag }} {{ form.phone_number }}
+        </div>
+      </div>  
+      <button type="submit" class="btn btn-sm btn-primary">Зберегти</button>
+      <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('add-customer-form-container').innerHTML = '';">Скасувати</button>
+    </form>
+  </div>
+</div>

@@ -1,49 +1,64 @@
 <div class="bg-info p-2 mt-2 mb-2 rounded border shadow" id="selected-customer-cars">
-    <h3>{% if customer %} {{ customer.first_name }}'s {% endif%} Cars</h3>
+    <h3>{% if customer %} {{ customer.first_name }}'s {% endif%} авто</h3>
     {% if customer_cars %}
         <div class="list-group" id="customer-cars">
             {% for car in customer_cars%}
-                <a href="" class="list-group-item list-group-item-action flex-column align-items-start">
+                <a class="list-group-item list-group-item-action flex-column align-items-start"
+                    hx-get="{% url 'add-car-form' %}?customer_id={{ customer.customer_id }}&car_id={{ car.pk }}"
+                           hx-target="#add-car-form-container"
+                           hx-swap="innerHTML">
                 <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">{{car.car_model.car_brand.brand_name}} {{car.car_model.model_name}}</h5>
                     {% if car.manufacture_year%}
-                        <small>{{car.manufacture_year}} year</small>
+                        <small>{{car.manufacture_year}} рік</small>
                     {% endif %}
                 </div>
                 {% if car.mileage%}
-                    <small>{{car.mileage}} km</small>
+                    <small>{{car.mileage}} км</small>
                 {% else %}
-                    <small>Unknown mileage</small>
+                    <small>Пробіг не вказаний</small>
                 {% endif %}
                 </a>
             {% endfor %}
         </div>
     {% else %}
-        Customer is not selected
+        Клієнта не вибрано
     {% endif %}
 
 </div>
 
 <div class="bg-warning p-2 mb-2 rounded border shadow" id="selected-customer-visits">
-    <h3>{% if customer %} {{ customer.first_name }}'s {% endif%} Visits</h3>
+    <h3>{% if customer %} {{ customer.first_name }}'s {% endif%} візити</h3>
     {% if customer_visits %}
         <div class="list-group" id="customer-visits">
-            {% for visit in customer_visits%}
+            {% for visit in customer_visits %}
                 <a href="{% url 'visit-detail' visit.pk %}" method="GET" class="list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">{{visit.visit_number}}, {{visit.visit_date|date:"F j, Y" }}</h5>
-                    <small>{{visit.visit_status.status_name}}</small>
-                </div>
-                <p class="mb-1">{{visit.visit_service_count}} services, totaling ₴{{visit.price}}</p>
-                {% if visit.actual_end_date %}
-                    <small>Completed: {{visit.actual_end_date|date:"F j, Y" }}</small>
-                {% elif visit.planned_end_date %}
-                    <small>Planned end date: {{visit.planned_end_date|date:"F j, Y" }}</small>
-                {% endif %} 
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">
+                            {{ visit.visit_number }}, {{ visit.visit_date|date:"F j, Y" }}
+                        </h5>
+                        <small>
+                            {% if visit.visit_status.status_name == 'Completed' %}
+                                <span class="badge bg-success">{{ visit.visit_status.status_name }}</span>
+                            {% endif %} 
+                        </small>
+                    </div>
+                    <p class="mb-1">
+                        {{ visit.visit_service_count }} послуг
+                        <span class="badge bg-success">₴{{ visit.price }}</span>
+                    </p>
+                    {% if visit.actual_end_date %}
+                        <small>Завершений: {{ visit.actual_end_date|date:"F j, Y" }}</small>
+                    {% elif visit.planned_end_date %}
+                        <small>
+                            Орієнтовна дата завершення:
+                            <span class="badge bg-primary">{{ visit.planned_end_date|date:"F j, Y" }}</span>
+                        </small>
+                    {% endif %} 
                 </a>
             {% endfor %}
         </div>
     {% else %}
-        Customer is not selected
+        Клієнт не вибраний
     {% endif %}
 </div>

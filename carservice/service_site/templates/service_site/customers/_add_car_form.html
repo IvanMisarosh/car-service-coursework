@@ -1,0 +1,62 @@
+<div class="card">
+  <div class="card-header">
+    <h5>{% if form.instance.pk %}Редагувати автомобіль{% else %}Додати новий автомобіль для{% endif %} {{customer}}</h5>
+  </div>
+  <div class="card-body">
+    <form 
+      hx-post="{% url 'add-car-form' %}" 
+      hx-target="#add-car-form-container"
+      hx-swap="innerHTML"
+    >
+      {% csrf_token %}
+      {% if customer %}
+        <input type="hidden" name="customer_id" value="{{ customer.pk }}">
+      {% endif %}
+      {% if form.instance.pk %}
+        <input type="hidden" name="car_id" value="{{ form.instance.pk }}">
+      {% endif %}
+      <div class='row'>
+        <div class="col-3 mb-2">
+          {{ form.vin.label_tag }} {{ form.vin }}
+          {% if form.vin.errors %}
+            <div class="text-danger">{{ form.vin.errors }}</div>
+          {% endif %}
+          {% if form.vin.help_text %}
+            <small class="form-text text-muted">{{ form.vin.help_text }}</small>
+          {% endif %}
+        </div>
+        <div class="col-2 mb-2">
+          {{ form.manufacture_year.label_tag }} {{ form.manufacture_year }}
+          {% if form.manufacture_year.errors %}
+            <div class="text-danger">{{ form.manufacture_year.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="col-3 mb-2">
+          {{ form.car_model.label_tag }} {{ form.car_model }}
+          {% if form.car_model.errors %}
+            <div class="text-danger">{{ form.car_model.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="col-2 mb-2">
+          {{ form.color.label_tag }} {{ form.color }}
+          {% if form.color.errors %}
+            <div class="text-danger">{{ form.color.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="col-2 mb-2">
+          {{ form.mileage.label_tag }} {{ form.mileage }}
+          {% if form.mileage.errors %}
+            <div class="text-danger">{{ form.mileage.errors }}</div>
+          {% endif %}
+        </div>
+        
+      </div>
+      {{ form.customer }}
+      
+      <div class="mt-3">
+        <button type="submit" class="btn btn-sm btn-primary">Зберегти</button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('add-car-form-container').innerHTML = '';">Скасувати</button>
+      </div>
+    </form>
+  </div>
+</div>

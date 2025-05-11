@@ -6,6 +6,10 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('customers/', views.customer_list, name='customers'),
     path('customer-details/', views.customer_details, name="customer-details"),
+    path('customers/edit/<int:pk>/', views.get_customer_edit_row, name='edit-customer-row'),
+    path('customers/row/<int:pk>/', views.get_customer_row, name='get-customer-row'),
+    path('customers/add/', views.CustomerAddView.as_view(), name='add-customer-form'),
+    path('cars/add/', views.CarAddView.as_view(), name='add-car-form'),
 
     path('export/customers/', views.export_customers, name='export-customers'),
     path('export/customers/xlsx/', views.export_customers, {'format': 'xlsx'}, name='export_customers_xlsx'),

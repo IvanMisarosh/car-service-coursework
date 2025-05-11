@@ -1,6 +1,6 @@
 import django_filters
 from django import forms
-from .models import Customer, Visit, CarBrand, ProcurementOrder, Supplier, ProcurementStatus
+from .models import Customer, Visit, CarBrand, ProcurementOrder, Supplier, ProcurementStatus, BodyType, DriveType, EngineType
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit
 
@@ -25,41 +25,60 @@ class ProcurementOrderFilter(django_filters.FilterSet):
         widget=forms.Select(attrs={'class': 'form-select form-select-sm'})
     )
 
-    supplier = django_filters.ModelChoiceFilter(
+    supplier = django_filters.ModelMultipleChoiceFilter(
         field_name='supplier__supplier_name',
         queryset=Supplier.objects.all(),
         label='Постачальник',
-        widget=forms.Select(attrs={'class': 'form-select select2'})
+        widget=forms.SelectMultiple(attrs={'class': 'form-select select2'})
     )
 
 class CustomerFilter(django_filters.FilterSet):
-    first_name = django_filters.CharFilter(
-        lookup_expr="startswith",
-        label="First Name",
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "First Name"})
-    )
-    
-    last_name = django_filters.CharFilter(
-        lookup_expr="icontains",
-        label="Last Name",
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Last Name"})
+    car_brand = django_filters.ModelMultipleChoiceFilter(
+        field_name="cars__car_model__car_brand",
+        queryset=CarBrand.objects.all(),
+        label="Бренд авто",
+        widget=forms.SelectMultiple(attrs={"class": "form-select select2"})
     )
 
-    email = django_filters.CharFilter(
-        lookup_expr="startswith",
-        label="Email",
-        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email"})
+    body_type = django_filters.ModelMultipleChoiceFilter(
+        field_name="cars__car_model__body_type",
+        queryset=BodyType.objects.all(),
+        label="Тип кузову",
+        widget=forms.SelectMultiple(attrs={"class": "form-select select2"})
     )
 
-    phone_number = django_filters.CharFilter(
-        lookup_expr="icontains",
-        label="Phone Number",
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Phone Number",})
+    drive_type = django_filters.ModelChoiceFilter(
+        field_name="cars__car_model__drive_type",
+        queryset=DriveType.objects.all(),
+        label="Тип приводу",
+        widget=forms.Select(attrs={"class": "form-select select2"})
+    )
+
+    engine_type = django_filters.ModelChoiceFilter(
+        field_name="cars__car_model__engine_type",
+        queryset=EngineType.objects.all(),
+        label="Тип двигуна",
+        widget=forms.Select(attrs={"class": "form-select select2"})
+    )
+
+    visit_date_from = django_filters.DateFilter(
+        field_name="cars__visits__visit_date",
+        lookup_expr="gte",
+        label="Візит з",
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"})
+    )
+
+    visit_date_to = django_filters.DateFilter(
+        field_name="cars__visits__visit_date",
+        lookup_expr="lte",
+        label="Візит до",
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"})
     )
 
     class Meta:
         model = Customer
-        fields = ["first_name", "last_name", "email", "phone_number"]
+        fields = []
+
 
 
 class VisitFilter(django_filters.FilterSet):
@@ -109,11 +128,11 @@ class VisitFilter(django_filters.FilterSet):
         widget=forms.Select(attrs={'class': 'form-select select2'})
     )
 
-    car_brand = django_filters.ModelChoiceFilter(
+    car_brand = django_filters.ModelMultipleChoiceFilter(
         field_name="car__car_model__car_brand",
         queryset=CarBrand.objects.all(),
         label='Car Brand',
-        widget=forms.Select(attrs={'class': 'form-select select2'})
+        widget=forms.SelectMultiple(attrs={'class': 'form-select select2'})
     )
 
     employee = django_filters.ModelChoiceFilter(

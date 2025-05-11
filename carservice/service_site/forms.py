@@ -3,6 +3,38 @@ from . import models
 from django import forms
 from django.urls import reverse_lazy
 
+class CarForm(forms.ModelForm):
+    class Meta:
+        model = models.Car
+        fields = ['vin', 'manufacture_year', 'car_model', 'customer', 'color', "mileage"]
+        widgets = {
+            'vin': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+            'manufacture_year': forms.NumberInput(attrs={'class': 'form-control form-control-sm'}),
+            'car_model': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'customer': forms.HiddenInput(),
+            'color': forms.Select(attrs={'class': 'form-control form-control-sm'}),
+            'mileage': forms.NumberInput(attrs={'class': 'form-control form-control-sm'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        # Get the customer_id from kwargs and remove it if exists
+        customer_id = kwargs.pop('customer_id', None)
+        super(CarForm, self).__init__(*args, **kwargs)
+        
+        # If customer_id was provided, set initial value
+        if customer_id:
+            self.fields['customer'].initial = customer_id
+            
+        self.fields['car_model'].required = True
+        
+        # Add help text
+        self.fields['vin'].help_text = "Vehicle Identification Number"
+        
+        # Customize car_model field to show brand and model
+        self.fields['car_model'].label = "Car Model"
+        self.fields['car_model'].queryset = models.CarModel.objects.select_related('car_brand').all()
+        # self.fields['car_model'].label_from_instance = lambda obj: f"{obj.car_brand.brand_name} {obj.model_name}"
+
 class StationForm(forms.ModelForm):
     class Meta:
         model = models.Station
@@ -72,6 +104,17 @@ class SupplierForm(forms.ModelForm):
         widgets = {
             'supplier_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'email': forms.EmailInput(attrs={'class': 'form-control form-control-sm'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+        }
+
+class CustomerForm(forms.ModelForm):
+    class Meta:
+        model = models.Customer
+        fields = ['email', 'first_name', 'last_name', 'phone_number']
+        widgets = {
+            'email': forms.EmailInput(attrs={'class': 'form-control form-control-sm'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
         }
 

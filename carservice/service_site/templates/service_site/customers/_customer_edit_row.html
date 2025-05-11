@@ -1,0 +1,40 @@
+<tr>
+    <td class="py-1 px-1">
+        <input type="email" class="form-control form-control-sm" value="{{ customer.email|default:'' }}" id="email_{{ customer.customer_id }}">
+    </td>
+    <td>
+        <input type="text" class="form-control form-control-sm" value="{{ customer.first_name }}" id="first_name_{{ customer.customer_id }}">
+    </td>
+    <td>
+        <input type="text" class="form-control form-control-sm" value="{{ customer.last_name }}" id="last_name_{{ customer.customer_id }}">
+    </td>
+    <td>
+        <input type="text" class="form-control form-control-sm" value="{{ customer.phone_number|default:'' }}" id="phone_number_{{ customer.customer_id }}">
+    </td>
+    <td id="last-visit-column">
+        <a href="{% url 'visit-detail' customer.last_visit.visit_id %}" id="last-visit-link">{{ customer.last_visit.visit_date|date:"F j, Y" }}</a>
+    </td>
+    <td>
+        <button 
+            class="btn btn-sm btn-success me-1"
+            hx-post="{% url 'edit-customer-row' customer.customer_id %}"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            hx-vals='js:{
+                "email": document.getElementById("email_{{ customer.customer_id }}").value,
+                "first_name": document.getElementById("first_name_{{ customer.customer_id }}").value,
+                "last_name": document.getElementById("last_name_{{ customer.customer_id }}").value,
+                "phone_number": document.getElementById("phone_number_{{ customer.customer_id }}").value
+            }'
+            hx-target="closest tr"
+            hx-swap="outerHTML">
+            <i class="bi bi-check-lg"></i> Зберегти
+        </button>
+
+        <button class="btn btn-sm btn-secondary"
+                hx-get="{% url 'get-customer-row' customer.customer_id %}"
+                hx-target="closest tr"
+                hx-swap="outerHTML">
+            Скасувати
+        </button>
+    </td>
+</tr>
