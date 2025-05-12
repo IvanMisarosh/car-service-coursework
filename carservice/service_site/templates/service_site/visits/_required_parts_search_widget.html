@@ -5,7 +5,7 @@
         <p>Виберіть невиконану послугу</p>
     {% endif %}
 </div>
-{% if visit_service %}
+{% comment %} {% if visit_service %} {% endcomment %}
     <button class="btn btn-primary btn-sm mb-2" id="add-required-parts-button" type="button" 
             hx-post="{% url 'save-staged-parts' %}" 
             hx-target="#visit-services"
@@ -15,7 +15,7 @@
         >
         Виконати послгу
     </button>
-{% endif %}
+{% comment %} {% endif %} {% endcomment %}
 <div class="pb-2" id="part-search-container">
     {% if visit_service %}
         {% include 'service_site/visits/_part_search.html' %}

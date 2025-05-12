@@ -10,6 +10,7 @@
 
 {% block js_files %}
     <script src="{% static 'service_site/js/modals.js' %}"></script>
+    <script src="{% static 'service_site/js/toast.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -97,9 +98,14 @@
             </div>
         </div>
     </div>
-    {% comment %} <section id="messages">
-        {% include 'service_site/visits/_toast.html'%}
-    </section> {% endcomment %}
+    <div data-toast-container class="toast-container position-fixed top-0 end-0 p-3" id="toasts">
+        <div data-toast-template class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div data-toast-body class="toast-body"></div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
     <!-- Visit Service Search Modal -->
     <div class="modal fade" id="serviceSearchModal" tabindex="-1" aria-labelledby="serviceSearchModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">

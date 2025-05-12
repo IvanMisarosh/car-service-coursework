@@ -278,10 +278,10 @@ def save_staged_parts(request):
     visit_service = models.VisitService.objects.get(pk=v_service_id)
     employee = request.user.employee
     error = False
-
-    if len(staged_parts) == 0:
-        messages.error(request, "No parts staged.")
-        error = True
+    messages.error(request, "No parts staged.")
+    # if len(staged_parts) == 0:
+    #     messages.error(request, "No parts staged.")
+    #     error = True
         
     if models.ProvidedService.objects.filter(visit_service=visit_service).exists():
         
@@ -289,9 +289,11 @@ def save_staged_parts(request):
         error = True
 
     if error:
-        # TODO: figure out why hx-target-error doesn't work when status is 400
-        response = render(request, "service_site/visits/_toast.html", status=200)
+        messages.error(request, "This service has already been provided.")
+        response = HttpResponse("")
+        response['HX-Refresh'] = 'true'
         return response
+        
 
     provided_service = models.ProvidedService.objects.create(
         visit_service=visit_service,

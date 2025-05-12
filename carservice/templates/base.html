@@ -29,7 +29,8 @@
         <title>{% block title %}{% endblock %}</title>
         {% comment %} <link rel="stylesheet" href="{% static 'app.css' %}"> {% endcomment %}
         {% block css_files %}{% endblock %}
-        {% block js_files %}{% endblock %}
+        {% block js_files %}
+        {% endblock %}
 
     </head>
 
@@ -37,8 +38,6 @@
         >
         {% block content %}
         {% endblock %}
-        {% comment %} {% include '_toasts.html'%} {% endcomment %}
-        {% comment %} <script src="{% static 'service_site/js/toast.js' %}" defer></script> {% endcomment %}
     </body>
 
     <script>

@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from django.shortcuts import get_object_or_404
+from django.contrib import messages
 
 
 class SuppliersView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -55,7 +56,6 @@ def get_supplier_edit_row(request, pk):
 
         supplier.items_supplied = items_supplied
         supplier.last_order_date = last_order_date
-
         context = {
             'supplier': supplier,
         }
@@ -93,7 +93,6 @@ def get_supplier_row(request, pk):
         'supplier': supplier,
     }
     return render_htmx(request, None, "supplier/_supplier_list_row.html", context)
-
 
 
 @method_decorator(csrf_exempt, name='dispatch')

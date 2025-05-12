@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from ..filters import VisitFilter
 from django.db.models import Q
 from ..views_utils import render_htmx
+from django.contrib import messages
 
 
 class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
