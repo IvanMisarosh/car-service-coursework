@@ -38,7 +38,7 @@
             <input type="number" step="0.01" class="form-control form-control-sm" x-model="price" name="price">
         </template>
         <template x-if="!editMode">
-            <span x-text="price.toFixed(2) + ' ₴'"></span>
+            <span x-text="price + ' ₴'"></span>
         </template>
     </td>
 

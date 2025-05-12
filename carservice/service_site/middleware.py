@@ -2,30 +2,28 @@ from django.contrib.messages import get_messages
 from django.http import HttpRequest, HttpResponse
 from django.template.loader import render_to_string
 from django.utils.deprecation import MiddlewareMixin
+import json
+from django.contrib import messages
 
 
 class HtmxMessageMiddleware(MiddlewareMixin):
     def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
-        # if "HX-Request" not in request.headers:
-        #     return response
+        hx_trigger = response.headers.get('HX-Trigger')
+        if hx_trigger is None:
+            hx_trigger = {}
+        elif hx_trigger.startswith("{"):
+            hx_trigger = json.loads(hx_trigger)
+        else:
+            hx_trigger = {hx_trigger: True}
 
-        # if 300 <= response.status_code < 400:
-        #     return response
-
-        # if "HX-Redirect" in response.headers:
-        #     return response
-
-        # if "text/html" not in response.get("Content-Type", ""):
-        #     return response
-
-        # messages = get_messages(request)
-        # rendered_messages = render_to_string(
-        #     "_toasts.html",
-        #     {"messages": messages},
-        #     request=request
-        # ).strip()
-
-        # if rendered_messages:
-        #     response.content += rendered_messages.encode("utf-8")
+        hx_trigger['messages'] =  [
+                {
+                    'message': message.message,
+                    'tags': message.tags
+                }
+                for message in messages.get_messages(request)
+            ]
+        
+        response.headers["HX-Trigger"] = json.dumps(hx_trigger)
 
         return response

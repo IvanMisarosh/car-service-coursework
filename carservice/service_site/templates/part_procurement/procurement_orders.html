@@ -12,7 +12,7 @@
 
 {% block js_files %}
     <script src="{% static 'service_site/js/procurement_orders.js' %}" defer></script>
-    {% comment %} <script src="{% static 'service_site/js/toast.js' %}" defer></script> {% endcomment %}
+    <script src="{% static 'service_site/js/toast.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -93,6 +93,14 @@
                 </div>
                 <div id="order-list">
                     {% include 'part_procurement/_procurement_order_list.html' %}
+                </div>
+            </div>
+        </div>
+        <div data-toast-container class="toast-container position-fixed top-0 end-0 p-3" id="toasts">
+            <div data-toast-template class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div data-toast-body class="toast-body"></div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
             </div>
         </div>

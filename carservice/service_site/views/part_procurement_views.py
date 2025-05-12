@@ -202,7 +202,17 @@ def add_placement(request, unit_id):
         available_quantity = unit.quantity - placed_count
 
         if quantity <= 0 or quantity > available_quantity:
-            return HttpResponse("Неправильна кількість", status=400)
+            messages.error(request,  f"Кількість для розміщення має бути в діапазоні від 1 до {available_quantity}")
+            unit.refresh_from_db()
+            placed_count = unit.get_placed_count()
+
+            # Render only this updated row
+            rendered_row = render_to_string("part_procurement/_unit_row.html", {
+                "unit": unit,
+                "placed_count": placed_count
+            }, request=request)
+
+            return HttpResponse(rendered_row)
 
         station = get_object_or_404(models.Station, station_id=station_id)
 
