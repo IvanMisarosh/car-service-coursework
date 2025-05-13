@@ -9,14 +9,17 @@
     <td>{{ part.quantity_per_package }}</td>
     <td>{{ part.price_per_package }}</td>
     <td>{{ part.get_price_per_unit }}</td>
-    <td>
+    <td class="d-flex gap-1">
         <button class="btn btn-sm btn-primary"
-                hx-get="{% url 'edit-part-form' part.part_id %}"
+                hx-get="{% url 'edit-part-form' part.pk %}"
                 hx-target="closest tr"
                 hx-swap="outerHTML">
-            <i class="bi bi-pencil-fill"></i> Редагувати
+            <i class="bi bi-pencil-fill"></i>
         </button>
-        <button type="button" class="btn btn-danger btn-sm">
+        <button type="button" class="btn btn-danger btn-sm"
+                hx-delete="{% url 'delete-part' part.pk %}"
+                hx-target="closest tr"
+                hx-swap="outerHTML">
             <i class="bi bi-trash"></i>
         </button>
     </td>

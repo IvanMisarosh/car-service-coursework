@@ -1,4 +1,9 @@
-<div class="container mt-2">
+<div class="container mt-2" id="model-cards-list"
+    hx-get="{% url 'car-models' %}"
+    hx-trigger="update-model-list from:body"
+    hx-target="#model-cards-list"
+    hx-swap="outerHTML"
+    >
     <div class="row" id="car-models-container">
         {% for car_model in car_models %}
             {% include 'car_model/_car_model_card.html'%}

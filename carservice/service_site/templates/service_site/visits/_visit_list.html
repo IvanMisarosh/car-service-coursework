@@ -31,7 +31,11 @@
                 <td>
                     <a href="{% url 'visit-detail' visit.visit_id %}">{{ visit.visit_number }}</a>
                     {% if not request.user|has_group:"mechanic" %}
-                        <button type="button" class="ms-5 btn btn-danger btn-sm">
+                        <button type="button" 
+                            class="btn btn-danger btn-sm ms-5" 
+                            hx-delete="{% url 'delete-visit' visit.pk %}"
+                            hx-target="#table-container"
+                            hx-swap="outerHTML">
                             <i class="bi bi-trash"></i>
                         </button>
                     {% endif %}
@@ -93,41 +97,43 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <div class="d-flex justify-content-center align-items-center mb-3 mt-1">
+        <div class="d-flex justify-content-center align-items-center flex-grow-1">
+            {% if visits.has_previous %}
+            <button hx-get="{% url 'visits' %}?page={{ visits.previous_page_number }}&items_per_page={{ visits.paginator.per_page }}" 
+                    hx-target="#visit-list"
+                    hx-include="#visit-filter-form"
+                    hx-vals='js:{"search": document.getElementById("visit-search-bar").value}'
+                    class="btn btn-primary">Попередня</button>
+            {% endif %}
+
+            <span class="mx-3">Сторінка {{ visits.number }} з {{ visits.paginator.num_pages }}</span>
+
+            {% if visits.has_next %}
+            <button hx-get="{% url 'visits' %}?page={{ visits.next_page_number }}&items_per_page={{ visits.paginator.per_page }}" 
+                    hx-target="#visit-list"
+                    hx-push-url="true"
+                    hx-include="#visit-filter-form"
+                    hx-vals='js:{"search": document.getElementById("visit-search-bar").value}'
+                    class="btn btn-primary">Наступна</button>
+            {% endif %}
+        </div>
+
+        <div class="d-flex align-items-center">
+            <label for="items-per-page" class="mb-0 me-2" id='items-lable'>Записів на сторінку: </label>
+            <select id="items-per-page" name="items_per_page" 
+                    hx-get="{% url 'visits' %}" 
+                    hx-target="#visit-list" 
+                    hx-push-url="true"
+                    class="form-select">
+                <option value="10" {% if visits.paginator.per_page == 10 %}selected{% endif %}>10</option>
+                <option value="25" {% if visits.paginator.per_page == 25 %}selected{% endif %}>25</option>
+                <option value="50" {% if visits.paginator.per_page == 50 %}selected{% endif %}>50</option>
+            </select>
+        </div>
+    </div>
 </div>
 
-<div class="d-flex justify-content-center align-items-center mb-3 mt-1">
-    <div class="d-flex justify-content-center align-items-center flex-grow-1">
-        {% if visits.has_previous %}
-        <button hx-get="{% url 'visits' %}?page={{ visits.previous_page_number }}&items_per_page={{ visits.paginator.per_page }}" 
-                hx-target="#visit-list"
-                hx-include="#visit-filter-form"
-                hx-vals='js:{"search": document.getElementById("visit-search-bar").value}'
-                class="btn btn-primary">Попередня</button>
-        {% endif %}
 
-        <span class="mx-3">Сторінка {{ visits.number }} з {{ visits.paginator.num_pages }}</span>
-
-        {% if visits.has_next %}
-        <button hx-get="{% url 'visits' %}?page={{ visits.next_page_number }}&items_per_page={{ visits.paginator.per_page }}" 
-                hx-target="#visit-list"
-                hx-push-url="true"
-                hx-include="#visit-filter-form"
-                hx-vals='js:{"search": document.getElementById("visit-search-bar").value}'
-                class="btn btn-primary">Наступна</button>
-        {% endif %}
-    </div>
-
-    <div class="d-flex align-items-center">
-        <label for="items-per-page" class="mb-0 me-2" id='items-lable'>Записів на сторінку: </label>
-        <select id="items-per-page" name="items_per_page" 
-                hx-get="{% url 'visits' %}" 
-                hx-target="#visit-list" 
-                hx-push-url="true"
-                class="form-select">
-            <option value="10" {% if visits.paginator.per_page == 10 %}selected{% endif %}>10</option>
-            <option value="25" {% if visits.paginator.per_page == 25 %}selected{% endif %}>25</option>
-            <option value="50" {% if visits.paginator.per_page == 50 %}selected{% endif %}>50</option>
-        </select>
-    </div>
-</div>
 

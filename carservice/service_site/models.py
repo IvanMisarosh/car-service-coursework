@@ -106,6 +106,7 @@ class Customer(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     
+    # TODO: move methods that do queries to views\busines logic
     def get_cars(self):
         cars = Car.objects.filter(customer=self.customer_id)
         return cars
@@ -115,7 +116,7 @@ class Customer(models.Model):
         return len(cars)
     
     def get_visits(self):
-        return Visit.objects.filter(car__customer=self).order_by('-visit_date')
+        return Visit.objects.filter(car__customer=self).select_related("car").order_by('-visit_date')
     
     def last_visit(self):
         """Returns the most recent visit for this customer."""
@@ -137,9 +138,9 @@ class Color(models.Model):
 
 class Car(models.Model):
     car_id = models.AutoField(primary_key=True, db_column='CarID')
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, db_column='CustomerID', related_name='cars')
-    car_model = models.ForeignKey(CarModel, on_delete=models.CASCADE, db_column='CarModelID')
-    color = models.ForeignKey(Color, on_delete=models.CASCADE, db_column='ColorID')
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT, db_column='CustomerID', related_name='cars')
+    car_model = models.ForeignKey(CarModel, on_delete=models.PROTECT, db_column='CarModelID')
+    color = models.ForeignKey(Color, on_delete=models.PROTECT, db_column='ColorID')
     manufacture_year = models.IntegerField(null=True, blank=True, db_column='ManufactureYear')
     note = models.CharField(max_length=255, null=True, blank=True, db_column='Note')
     vin = models.CharField(max_length=17, unique=True, db_column='VIN')
@@ -205,8 +206,8 @@ class Station(models.Model):
 
 class PartInStation(models.Model):
     part_in_station_id = models.AutoField(primary_key=True, db_column='PartInStationID')
-    station = models.ForeignKey(Station, on_delete=models.CASCADE, db_column='StationID')
-    part = models.ForeignKey(Part, on_delete=models.CASCADE, db_column='PartID')
+    station = models.ForeignKey(Station, on_delete=models.PROTECT, db_column='StationID')
+    part = models.ForeignKey(Part, on_delete=models.PROTECT, db_column='PartID')
     quantity = models.IntegerField(db_column='Quantity')
     
     class Meta:
@@ -229,7 +230,7 @@ class EmployeePosition(models.Model):
 class Employee(models.Model):
     employee_id = models.AutoField(primary_key=True, db_column='EmployeeID')
     employee_position = models.ForeignKey(EmployeePosition, null=True, on_delete=models.SET_NULL, db_column='EmployeePositionID')
-    station = models.ForeignKey(Station, on_delete=models.CASCADE, db_column='StationID')
+    station = models.ForeignKey(Station, on_delete=models.PROTECT, db_column='StationID')
     first_name = models.CharField(max_length=50, db_column='FirstName')
     last_name = models.CharField(max_length=50, db_column='LastName')
     email = models.CharField(max_length=100, null=True, blank=True, db_column='Email')
@@ -288,9 +289,9 @@ class PaymentStatus(models.Model):
 
 class Visit(models.Model):
     visit_id = models.AutoField(primary_key=True, db_column='VisitID')
-    visit_status = models.ForeignKey(VisitStatus, on_delete=models.CASCADE, db_column='VisitStatusID')
-    car = models.ForeignKey(Car, on_delete=models.CASCADE, db_column='CarID', related_name='visits')
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, db_column='EmployeeID')
+    visit_status = models.ForeignKey(VisitStatus, on_delete=models.PROTECT, db_column='VisitStatusID')
+    car = models.ForeignKey(Car, on_delete=models.PROTECT, db_column='CarID', related_name='visits')
+    employee = models.ForeignKey(Employee, on_delete=models.PROTECT, db_column='EmployeeID')
     payment_status = models.ForeignKey(PaymentStatus, null=True, blank=True, on_delete=models.SET_NULL, db_column='PaymentStatusID')
     visit_date = models.DateTimeField(default=timezone.now, db_column='VisitDate')
     planned_end_date = models.DateTimeField(null=True, blank=True, db_column='PlannedEndDate')
@@ -322,8 +323,8 @@ class Visit(models.Model):
 
 class VisitService(models.Model):
     visit_service_id = models.AutoField(primary_key=True, db_column='VisitServiceID')
-    visit = models.ForeignKey(Visit, on_delete=models.CASCADE, db_column='VisitID', related_name='visit_services')
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, db_column='ServiceID')
+    visit = models.ForeignKey(Visit, on_delete=models.PROTECT, db_column='VisitID', related_name='visit_services')
+    service = models.ForeignKey(Service, on_delete=models.PROTECT, db_column='ServiceID')
     quantity = models.IntegerField(db_column='Quantity')
     
     class Meta:
@@ -339,7 +340,7 @@ class VisitService(models.Model):
 class ProvidedService(models.Model):
     provided_service_id = models.AutoField(primary_key=True, db_column='ProvidedServiceID')
     employee = models.ForeignKey(Employee, null=True, on_delete=models.SET_NULL, db_column='EmployeeID')
-    visit_service = models.OneToOneField(VisitService, on_delete=models.CASCADE, db_column='VisitServiceID', related_name='provided_service')
+    visit_service = models.OneToOneField(VisitService, on_delete=models.PROTECT, db_column='VisitServiceID', related_name='provided_service')
     provided_date = models.DateTimeField(null=True, blank=True, db_column='ProvidedDate')
     
     class Meta:
@@ -358,8 +359,8 @@ class ProvidedService(models.Model):
 
 class RequiredPart(models.Model):
     required_part_id = models.AutoField(primary_key=True, db_column='RequiredPartID')
-    part_in_station = models.ForeignKey(PartInStation, on_delete=models.CASCADE, db_column='PartInStationID')
-    provided_service = models.ForeignKey(ProvidedService, on_delete=models.CASCADE, db_column='ProvidedServiceID', related_name='required_parts')
+    part_in_station = models.ForeignKey(PartInStation, on_delete=models.PROTECT, db_column='PartInStationID')
+    provided_service = models.ForeignKey(ProvidedService, on_delete=models.PROTECT, db_column='ProvidedServiceID', related_name='required_parts')
     quantity = models.IntegerField(db_column='Quantity')
     
     class Meta:
@@ -400,8 +401,8 @@ class ProcurementStatus(models.Model):
 
 class ProcurementOrder(models.Model):
     procurement_order_id = models.AutoField(primary_key=True, db_column='ProcurementOrderID')
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, db_column='EmployeeID')
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, db_column='SupplierID')
+    employee = models.ForeignKey(Employee, on_delete=models.PROTECT, db_column='EmployeeID')
+    supplier = models.ForeignKey(Supplier, on_delete=models.PROTECT, db_column='SupplierID')
     procurement_status = models.ForeignKey(ProcurementStatus, null=True, on_delete=models.SET_NULL, db_column='ProcurementStatusID')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, db_column='TotalPrice')
     order_date = models.DateTimeField(null=True, db_column='OrderDate')
@@ -409,7 +410,7 @@ class ProcurementOrder(models.Model):
     
     class Meta:
         db_table = 'ProcurementOrder'   
-    
+
     def __str__(self):
         return f"Order {self.order_number}"
     
@@ -424,10 +425,10 @@ class ProcurementOrder(models.Model):
 
 class ProcurementUnit(models.Model):
     procurement_unit_id = models.AutoField(primary_key=True, db_column='ProcurementUnitID')
-    part = models.ForeignKey(Part, on_delete=models.CASCADE, db_column='PartID')
+    part = models.ForeignKey(Part, on_delete=models.PROTECT, db_column='PartID')
     quantity = models.IntegerField(db_column='Quantity')
     price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, db_column='PricePerUnit')
-    procurement_order = models.ForeignKey(ProcurementOrder, on_delete=models.CASCADE, db_column='ProcurementOrderID', related_name='units')
+    procurement_order = models.ForeignKey(ProcurementOrder, on_delete=models.PROTECT, db_column='ProcurementOrderID', related_name='units')
     
     class Meta:
         db_table = 'ProcurementUnit'  
@@ -447,8 +448,8 @@ class ProcurementUnit(models.Model):
 
 class StoragePlacement(models.Model):
     storage_placement_id = models.AutoField(primary_key=True, db_column='StoragePlacementID')
-    procurement_unit = models.ForeignKey(ProcurementUnit, on_delete=models.CASCADE, db_column='ProcurementUnitID', related_name='placements')
-    part_in_station = models.ForeignKey(PartInStation, on_delete=models.CASCADE, db_column='PartInStationID')
+    procurement_unit = models.ForeignKey(ProcurementUnit, on_delete=models.PROTECT, db_column='ProcurementUnitID', related_name='placements')
+    part_in_station = models.ForeignKey(PartInStation, on_delete=models.PROTECT, db_column='PartInStationID')
     quantity = models.IntegerField(db_column='Quantity')
     placement_date = models.DateTimeField(db_column='PlacementDate')
     

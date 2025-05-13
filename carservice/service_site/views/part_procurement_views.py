@@ -12,6 +12,7 @@ from django.contrib import messages
 from datetime import datetime
 from django.template.loader import render_to_string
 import json
+from django.db.models import ProtectedError
 
 @login_required
 def procurement_orders(request):
@@ -99,8 +100,6 @@ def export_procurement_orders(request):
 def add_order(request):
     if request.method == "GET":
         form = forms.ProcurementOrderInfoForm()
-        # messages.add_message(request, *(messages.SUCCESS, "Congratulations! You did it."))
-        # messages.error(request, 'words')
         return render(request, 'part_procurement/_add_order_form.html', {'form': form})
     if request.method == 'POST':
         form = forms.ProcurementOrderInfoForm(request.POST)
@@ -109,11 +108,21 @@ def add_order(request):
             form.instance.order_number = models.ProcurementOrder.generate_order_number()
             form.instance.total_price = 0
             order = form.save()
-            # messages.error(request, 'words')
+            messages.success(request, f'Замовлення №{order.order_number} успішно додано')
             return render(request, "part_procurement/_order_row_expandable.html", {"order": order})
-    # messages.error(request, 'words')
     return render(request, 'part_procurement/_add_order_form.html', {'form': form}, status=400)
-    
+
+def delete_procurement_order(request, order_id):
+    procurement_order = get_object_or_404(models.ProcurementOrder, pk=order_id)
+    try:
+        order_number = procurement_order.order_number
+        procurement_order.delete()
+        messages.success(request, f"Замовлення {order_number} успішно видалено")
+        return procurement_orders(request)
+    except ProtectedError:
+        messages.error(request, f"Неможливо видалити замовлення '{order_number}', оскільки воно має позиції.")
+        return update_order_row(request, order_id)
+
 def order_info(request, pk):
     order = get_object_or_404(models.ProcurementOrder, pk=pk)
     return render(request, 'part_procurement/_order_info_fields.html', {'order': order})
@@ -164,6 +173,17 @@ def add_order_unit(request, order_id):
         # messages.error(request, "Quantity must be greater than 0.")
         return render(request, 'part_procurement/_unit_row_with_placement.html', 
                       {'unit': order_unit, "placed_count": order_unit.get_placed_count})
+    
+def delete_procurement_unit(request, unit_id):
+    procurement_unit = get_object_or_404(models.ProcurementUnit, pk=unit_id)
+    try:
+        procurement_unit.delete()
+        messages.success(request, f"Одиницю закупівлі успішно видалено")
+        return HttpResponse("", status=200)
+    except ProtectedError:
+        placed_count = procurement_unit.get_placed_count()
+        messages.error(request, f"Неможливо видалити, оскільки {placed_count} одиниці вже розміщені.")
+        return render(request, 'part_procurement/_unit_row.html', {'unit': procurement_unit, "placed_count": placed_count})
 
 def edit_unit(request, unit_id):
     unit = get_object_or_404(models.ProcurementUnit, pk=unit_id)
@@ -246,10 +266,21 @@ def add_placement(request, unit_id):
     
 def remove_placement(request, placement_id):
     placement = get_object_or_404(models.StoragePlacement, pk=placement_id)
-    unit_id=placement.procurement_unit.pk
+    unit_id = placement.procurement_unit.pk
     placement.delete()
-    return redirect("update-unit", unit_id)
 
+    # Load the updated HTML fragment
+    unit = get_object_or_404(
+        models.ProcurementUnit.objects.prefetch_related('placements__part_in_station__station'),
+        pk=unit_id
+    )
+    rendered = render_to_string('part_procurement/_unit_placements.html', {'unit': unit}, request=request)
+
+    # Return response with HX-Trigger
+    response = HttpResponse(rendered)
+    response['HX-Trigger'] = 'placementRemoved'
+    messages.success(request, "Розміщення успішно видалене")
+    return response
 
 def update_row(request, unit_id):
     unit = get_object_or_404(models.ProcurementUnit, procurement_unit_id=unit_id)

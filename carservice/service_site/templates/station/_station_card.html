@@ -7,13 +7,16 @@
             </h5>
             <div>
                 <button class="btn btn-sm btn-light" 
-                    hx-get="{% url 'edit-station' station.station_id %}" 
-                    hx-target="#station-{{ station.station_id }}"
+                    hx-get="{% url 'edit-station' station.pk %}" 
+                    hx-target="#station-{{ station.pk }}"
                     hx-swap="outerHTML"
                     title="Редагувати">
                     <i class="bi bi-pencil-fill"></i>
-                </button>
-                    <button type="button" class="btn btn-danger btn-sm">
+                <button 
+                    hx-delete="{% url 'station-delete' station.pk %}" 
+                    hx-target="#station-{{ station.pk }}" 
+                    hx-swap="outerHTML" 
+                    class="btn btn-danger btn-sm">
                     <i class="bi bi-trash"></i>
                 </button>
             </div>

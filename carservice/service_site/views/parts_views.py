@@ -13,6 +13,7 @@ import uuid
 from datetime import datetime
 from django.core.paginator import Paginator
 import json
+from django.db.models import ProtectedError
 
 
 
@@ -85,6 +86,18 @@ class PartFormView(LoginRequiredMixin, PermissionRequiredMixin, View):
         print(form.errors)
 
         return HttpResponseBadRequest("")
+    
+def delete_part(request, part_id):
+    part = get_object_or_404(models.Part, pk=part_id)
+    try:
+        part_name = part.part_name
+        part.delete()
+        messages.success(request, f"Запчастину '{part_name}' успішно видалено.")
+        return HttpResponse("", status=200)
+    except ProtectedError:
+        messages.error(request, f"Неможливо видалити запчастину '{part.part_name}', оскільки вона використовується у послугах.")
+        context = {'part': part}
+        return render(request, "part/_part_list_row.html", context)
 
 
 class PartEditView(LoginRequiredMixin, PermissionRequiredMixin, View):

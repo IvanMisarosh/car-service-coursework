@@ -10,6 +10,7 @@ from django.http import HttpResponseBadRequest, HttpResponse
 import json
 from crispy_forms.templatetags.crispy_forms_filters import as_crispy_field
 from django.contrib import messages
+from django.db.models import ProtectedError
 
 class CarModelsView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = []
@@ -39,7 +40,7 @@ class CarModelsView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'transmission_type',
             'drive_type',
             'suspension_type'
-        ).filter(query).order_by('model_name')
+        ).filter(query).order_by('-model_name')
 
         paginator = Paginator(car_models, items_per_page)
         page_obj = paginator.get_page(page_number)
@@ -56,6 +57,19 @@ class CarModelsView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         return render_htmx(request, "car_model/car_models.html", "car_model/_car_model_list.html", context)
     
+    def delete(self, request, car_model_id):
+        car_model = get_object_or_404(models.CarModel, pk=car_model_id)
+        try:
+            name = car_model.model_name
+            car_model.delete()
+            messages.success(request, f"Модель авто '{name}' успішно видалено.")
+        except ProtectedError:
+            messages.error(request, f"Неможливо видалити модель '{car_model.model_name}', оскільки вона використовується в інших записах.")
+        except Exception:
+            messages.error(request, f"Сталася невідома помилка при видаленні моделі.")
+        finally:
+            return self.get(request)
+    
 def add_car_model(request):
     if request.method == "GET":
         context = {
@@ -66,7 +80,11 @@ def add_car_model(request):
         form = forms.CarModelForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('car-models')
+            messages.success(request, f"Модель {form.instance.model_name} була успішно додана")
+            response = HttpResponse("")
+            response['HX-Trigger'] = 'update-model-list'
+
+            return response
     
 def check_model_name(request):
     form = forms.CarModelForm(request.GET)
@@ -83,7 +101,9 @@ def edit_car_model(request, pk):
         form = forms.CarModelForm(request.POST, instance=car_model)
         if form.is_valid():
             form.save()
+            messages.success(request, f"Модель {form.instance.model_name} була успішно змінена")
             return render(request, 'car_model/_car_model_card.html', {'car_model': car_model})
     elif request.method == "GET":
         form = forms.CarModelForm(instance=car_model)
         return render(request, 'car_model/_car_model_form.html', {'form': form, 'car_model': car_model})
+    

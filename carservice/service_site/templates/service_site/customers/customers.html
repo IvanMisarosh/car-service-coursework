@@ -88,7 +88,7 @@
         <div id="add-car-form-container" class="mb-3"></div>
         
         <div class="row flex-nowrap mt-2">
-            <div class="col-2 bg-info rounded shadow align-self-start" id="customer-list-filters">
+            <div class="col-2 rounded shadow align-self-start" id="customer-list-filters">
                 <form class='mt-2' id="filter-form">
                     {% crispy form %}
                     <button hx-get="{% url 'customers' %}"

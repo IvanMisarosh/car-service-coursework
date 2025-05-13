@@ -1,33 +1,14 @@
-<div class="bg-info p-2 mt-2 mb-2 rounded border shadow" id="selected-customer-cars">
+<div class="p-2 mt-2 mb-2 rounded border shadow" id="selected-customer-cars"
+    >
     <h3>{% if customer %} {{ customer.first_name }}'s {% endif%} авто</h3>
     {% if customer_cars %}
-        <div class="list-group" id="customer-cars">
-            {% for car in customer_cars%}
-                <a class="list-group-item list-group-item-action flex-column align-items-start"
-                    hx-get="{% url 'add-car-form' %}?customer_id={{ customer.customer_id }}&car_id={{ car.pk }}"
-                           hx-target="#add-car-form-container"
-                           hx-swap="innerHTML">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">{{car.car_model.car_brand.brand_name}} {{car.car_model.model_name}}</h5>
-                    {% if car.manufacture_year%}
-                        <small>{{car.manufacture_year}} рік</small>
-                    {% endif %}
-                </div>
-                {% if car.mileage%}
-                    <small>{{car.mileage}} км</small>
-                {% else %}
-                    <small>Пробіг не вказаний</small>
-                {% endif %}
-                </a>
-            {% endfor %}
-        </div>
+        {% include 'service_site/customers/_selected_customer_car_list.html' %}
     {% else %}
-        Клієнта не вибрано
+        Клієнта не вибрано або він немає авто
     {% endif %}
-
 </div>
 
-<div class="bg-warning p-2 mb-2 rounded border shadow" id="selected-customer-visits">
+<div class="p-2 mb-2 rounded border shadow" id="selected-customer-visits">
     <h3>{% if customer %} {{ customer.first_name }}'s {% endif%} візити</h3>
     {% if customer_visits %}
         <div class="list-group" id="customer-visits">
@@ -44,9 +25,11 @@
                         </small>
                     </div>
                     <p class="mb-1">
-                        {{ visit.visit_service_count }} послуг
-                        <span class="badge bg-success">₴{{ visit.price }}</span>
+                        послуг: {{ visit.visit_service_count }} 
+                        вартість: <span class="badge bg-success">₴{{ visit.price }}</span><br>
+                        авто: <span class="badge bg-secondary">{{ visit.car.vin }}</span>
                     </p>
+
                     {% if visit.actual_end_date %}
                         <small>Завершений: {{ visit.actual_end_date|date:"F j, Y" }}</small>
                     {% elif visit.planned_end_date %}

@@ -87,34 +87,21 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
         if not visit_id:
             visit_id = request.POST.get('visit_id', None)
         
-        # is_valid = True
         if visit_id:
             visit = models.Visit.objects.get(pk=visit_id)
             form = forms.VisitForm(request.POST, instance=visit)
-            # form_visit_status = models.VisitStatus.objects.get(pk=request.POST.get('visit_status'))
-            # if  form_visit_status.status_name == "Completed":
-            #     print("Checking if all services are completed...")
-            #     if visit.visit_services.exists():
-            #         if visit.visit_services.filter(provided_service__isnull=True).exists():
-            #             is_valid = False
-            #     else:
-            #         is_valid = False
-            #     print("All services completed:", is_valid)
         else:
             form = forms.VisitForm(request.POST)
             form.instance.visit_number = models.Visit.generate_visit_number()
 
         if form.is_valid():
             visit = form.save()
-            messages.success(request, "Visit details saved successfully.")
+            messages.success(request, f"Візит №{visit.visit_number} був успішно збережений.")
             return redirect('visit-detail', visit_id=visit.pk)
+            # return self.get(request, visit_id=visit.pk)
         else:
             car = getattr(form.instance, 'car', None)
             visit_services = getattr(form.instance, 'visit_services', None)
-            # if not is_valid:
-            #     messages.error(request, "Всі послуги мають бути завершеними перед зміною статуса на 'Completed'.")
-            # messages.error(request, "Error saving visit details. Please check the form.")
-            
             context = {
                 "visit_form": form,
                 "visit_car": form.instance.car if car else None,
@@ -151,11 +138,10 @@ class VisitServiceView(View):
         if qty > 0:
             visit_service.quantity = qty
             visit_service.save()
-            messages.success(request, "Visit service updated successfully.")
+            messages.success(request, f"Послуга була успішно збережена.")
         else:
-            messages.error(request, "Quantity must be greater than 0.")
-
-        return redirect('visit-services', visit_id=visit_service.visit.pk)
+            messages.error(request, "Кількість має бути вищою за 0.")
+        return visit_services(request, visit_service.visit.pk)
 
     def delete(self, request, visit_service_id):
         visit_service = get_object_or_404(models.VisitService, pk=visit_service_id)

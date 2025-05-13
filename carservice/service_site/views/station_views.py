@@ -11,6 +11,7 @@ from crispy_forms.templatetags.crispy_forms_filters import as_crispy_field
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib import messages
+from django.db.models import ProtectedError, Max
 
 def calculate_station_stats(station):
     """Helper function to calculate station statistics"""
@@ -83,6 +84,17 @@ class StationsView(LoginRequiredMixin, PermissionRequiredMixin, View):
         
         return render_htmx(request, "station/stations.html", "station/_station_list.html", context)
     
+def delete_station(request, station_id):
+    station = get_object_or_404(models.Station, pk=station_id)
+    try:
+        station_address = station.address
+        station.delete()
+        messages.success(request, f"Станцію за адресою {station_address} успішно видалено.")
+        return HttpResponse("", status=200)
+    except ProtectedError:
+        messages.error(request, f"Неможливо видалити станцію '{station.address}', оскільки вона має працівників та\або запчастини на складі склад.")
+        return view_station(request, station_id)
+    
 def add_station(request):
     if request.method == "GET":
         context = {
@@ -107,14 +119,18 @@ def view_station(request, pk):
     employees = models.Employee.objects.filter(station=station).select_related('employee_position')
     parts_in_station = models.PartInStation.objects.filter(station=station).select_related('part', 'part__part_brand', 'part__part_type')
     
-    active_tab = request.GET.get('tab', 'employees')
+    active_tab = request.GET.get('tab', 'summary')
+    stats = calculate_station_stats(station)
+    station.unique_customers = stats["unique_customers"]
+    station.completed_services = stats["completed_services"]
+    station.avg_visit_price = stats["avg_visit_price"]
+    station.employee_count = employees.count()
     
     context = {
         "station": station,
         "employees": employees,
         "parts_in_station": parts_in_station,
         "active_tab": active_tab,
-        "employee_count": employees.count()
     }
     return render(request, "station/_station_card.html", context)
 

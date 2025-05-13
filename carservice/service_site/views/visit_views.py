@@ -1,4 +1,3 @@
-from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from .. import models
 from django.views.generic import View 
@@ -7,6 +6,9 @@ from ..filters import VisitFilter
 from django.db.models import Q
 from ..views_utils import render_htmx
 from django.contrib import messages
+from django.db.models import ProtectedError
+from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
 
 
 class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -51,3 +53,19 @@ class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
 
         return render_htmx(request, "service_site/visits/visits.html", "service_site/visits/_visit_list.html", context)
+    
+    def delete(self, request, visit_id):
+        visit = get_object_or_404(models.Visit, pk=visit_id)
+        try:
+            visit_number = visit.visit_number
+            visit.delete()
+            messages.success(request, f"Візит №{visit_number} успішно видалено.")
+        except ProtectedError:
+            messages.error(
+                request,
+                f"Неможливо видалити візит №{visit.visit_number}, оскільки він має послуги."
+            )
+        except Exception:
+            messages.error(request, "Сталася невідома помилка під час видалення візиту.")
+        finally:
+            return self.get(request)

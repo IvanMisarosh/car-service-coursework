@@ -16,6 +16,7 @@ from django.views.generic import View
 from django.template.loader import render_to_string
 import json
 from django.contrib import messages
+from django.db.models.deletion import ProtectedError
 
 @login_required
 def export_customers(request):
@@ -60,7 +61,6 @@ def export_customers(request):
         response = HttpResponse(dataset.json, content_type='application/json')
         response['Content-Disposition'] = f'attachment; filename="{filename}.json"'
     else:
-        # Default to CSV if format not recognized
         response = HttpResponse(dataset.csv, content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
     
@@ -204,6 +204,21 @@ def get_customer_row(request, pk):
     }
     return render_htmx(request, None, "service_site/customers/_customer_list_row.html", context)
 
+def delete_customer(request, customer_id):
+    customer = get_object_or_404(models.Customer, pk=customer_id)
+    try:
+        customer_name = f"{customer.first_name} {customer.last_name}"
+        customer.delete()
+        messages.success(request, f"Клієнта {customer_name} успішно видалено")
+        return HttpResponse("", status=200)
+    except ProtectedError:
+        messages.error(request, f"Неможливо видалити клієнта '{customer_name}', його авто мають записи про обслуговування.")
+        context = {'customer': customer}
+        return render(request, "customer/_customer_list_row.html", context)
+    except Exception:
+        messages.error(request, f"Сталася помилка при видаленні клієнта. Спробуйте пізніше.")
+        context = {'customer': customer}
+        return render(request, "service_site/customers/_customer_list_row.html", context)
 
 class CustomerAddView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['service_site.change_customer', 'service_site.add_customer']
@@ -221,7 +236,22 @@ class CustomerAddView(LoginRequiredMixin, PermissionRequiredMixin, View):
             # Render the new row for the customer table
             return render_htmx(request, None, "service_site/customers/_customer_list_row.html", {"customer": customer})
         return render_htmx(request, None, "service_site/customers/_add_customer_form.html", {"form": form})
-    
+
+def delete_car(request, car_id):
+    car = get_object_or_404(models.Car, pk=car_id)
+    try:
+        vin = car.vin
+        car.delete()
+        messages.success(request, f"Автомобіль з VIN {vin} успішно видалено")
+        return HttpResponse("", status=200)
+    except ProtectedError:
+        messages.error(request, f"Неможливо видалити авто '{car.vin}', оскільки є пов’язані записи.")
+        context = {
+            'car': car,
+        }
+        return render(request, "car/_car_list_row.html", context)
+    except Exception:
+        return HttpResponse("Помилка під час видалення", status=500)    
 
 class CarAddView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['service_site.change_car', 'service_site.add_car']
@@ -258,37 +288,40 @@ class CarAddView(LoginRequiredMixin, PermissionRequiredMixin, View):
             form = forms.CarForm(request.POST)
         
         if form.is_valid():
-            car = form.save()
-            customer = car.customer
-            
-            # Fetch updated data for selected_customer_details
-            customer_cars = models.Car.objects.filter(customer=customer)
-            customer_visits = models.Visit.objects.filter(car__customer=customer).order_by('-visit_date')
-            
-            context = {
-                "customer": customer,
-                "customer_cars": customer_cars,
-                "customer_visits": customer_visits
-            }
-            print(context)
-            
-            # Return both success message and updated customer details
-            success_message = f'<div class="alert alert-success">Автомобіль {car} успішно збережено. ' \
-                            f'<button type="button" class="btn-close float-end" ' \
-                            f'onclick="document.getElementById(\'add-car-form-container\').innerHTML = \'\';"></button></div>'
-            
-            customer_details_html = render_to_string('service_site/customers/_selected_customer_details.html', context)
-            
-            response = HttpResponse()
-            response['HX-Trigger'] = json.dumps({
-                'showMessage': success_message,
-                'updateCustomerDetails': customer_details_html
-            })
+            car = form.save()   
+            response = HttpResponse("")
+            if car_id:
+                response['HX-Trigger'] = f'update-car-{car.pk}'
+            else:
+                response['HX-Trigger'] = 'update-selected-customer-car-list'
+            message = f'Авто {car.vin} успішно додано' if not car_id else f"Дані про авто {car.vin} успішно оновлені"
+            messages.success(request, message)
             return response
         
         # If form is invalid, return the form with errors
+        messages.error(request, "Додавання/збереження не вдалось, виправіть помилки на формі")
         context = {
             "form": form,
             "customer": models.Customer.objects.get(pk=customer_id) if customer_id else None
         }
         return render_htmx(request, None, "service_site/customers/_add_car_form.html", context)
+    
+def selected_customer_car_list_row(request, car_id):
+    car = get_object_or_404(models.Car.objects.select_related(
+        'customer', 'car_model__car_brand', 'car_model__body_type',
+        'car_model__drive_type', 'car_model__suspension_type',
+        'car_model__transmission_type', 'car_model__engine_type',
+        'color'
+    ), pk=car_id)
+    
+    return render(request, "service_site/customers/_selected_customer_car_list_row.html", {"car": car})
+
+def selected_customer_car_list(request, customer_id):
+    cars = models.Car.objects.select_related(
+        'customer', 'car_model__car_brand', 'car_model__body_type',
+        'car_model__drive_type', 'car_model__suspension_type',
+        'car_model__transmission_type', 'car_model__engine_type',
+        'color'
+    ).filter(customer__customer_id = customer_id)
+    
+    return render(request, "service_site/customers/_selected_customer_car_list.html", {"customer_cars": cars, "customer": cars[0].customer})

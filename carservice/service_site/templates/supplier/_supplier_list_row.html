@@ -11,13 +11,17 @@
     <td> {{ supplier.items_supplied|default:"0" }}</td>
     <td>{{ supplier.last_order_date|default:"Never" }}</td>
     <td>
-        <button class="btn btn-sm btn-primary" 
+        <button class="btn btn-sm btn-primary"
                 hx-get="{% url 'edit-supplier-row' supplier.pk %}"
                 hx-target="closest tr"
                 hx-swap="outerHTML">
-            <i class="bi bi-pencil-fill"></i> Редагувати
+            <i class="bi bi-pencil-fill"></i>
         </button>
-        <button type="button" class="btn btn-danger btn-sm">
+        <button type="button" class="btn btn-danger btn-sm"
+                hx-delete="{% url 'delete-supplier' supplier.pk %}"
+                hx-target="closest tr"
+                hx-swap="outerHTML"
+                hx-confirm="Ви впевнені, що хочете видалити постачальника?">
             <i class="bi bi-trash"></i>
         </button>
     </td>

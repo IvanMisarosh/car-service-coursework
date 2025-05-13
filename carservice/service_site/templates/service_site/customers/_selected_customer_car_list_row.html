@@ -1,0 +1,56 @@
+<div class="list-group-item p-3 mb-2 shadow-sm rounded" id="car-{{ car.pk }}"
+    hx-get="{% url 'selected-customer-car' car.pk %}"
+    hx-trigger="update-car-{{ car.pk }} from:body"
+    hx-swap="outerHTML"
+    hx-target="#car-{{ car.pk }}"
+    >
+    <!-- Header Row -->
+    <div class="d-flex justify-content-between align-items-center">
+        <h5 
+            class="mb-0 text-primary" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#car-details-{{ car.pk }}" 
+            aria-expanded="false" 
+            role="button"
+        >
+            {{ car.car_model.car_brand.brand_name }} {{ car.car_model.model_name }}
+        </h5>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-outline-primary"
+                    hx-get="{% url 'add-car-form' %}?customer_id={{ customer.customer_id }}&car_id={{ car.pk }}"
+                    hx-target="#add-car-form-container"
+                    hx-swap="innerHTML">
+                <i class="bi bi-pencil-square"></i> Редагувати
+            </button>
+            <button class="btn btn-sm btn-outline-danger"
+                    hx-delete="{% url 'delete-car' car.pk %}"
+                    hx-target="#car-{{ car.pk }}"
+                    hx-swap="outerHTML">
+                <i class="bi bi-trash"></i> Видалити
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Info -->
+    <div class="text-muted mt-2">
+        VIN: <strong>{{ car.vin }}</strong> |
+        Рік: <strong>{{ car.manufacture_year|default:"Н/д" }}</strong> |
+        Пробіг: <strong>{{ car.mileage|default:"Н/д" }} км</strong> |
+        Колір: <strong>{{ car.color.color_name }}</strong>
+    </div>
+
+    <!-- Collapse Details -->
+    <div class="collapse mt-3" id="car-details-{{ car.pk }}">
+        <div class="card card-body bg-light">
+            <p><strong>Тип кузова:</strong> {{ car.car_model.body_type.body_type_name|default:"Н/д" }}</p>
+            <p><strong>Привід:</strong> {{ car.car_model.drive_type.drive_type_name|default:"Н/д" }}</p>
+            <p><strong>Підвіска:</strong> {{ car.car_model.suspension_type.suspension_type_name|default:"Н/д" }}</p>
+            <p><strong>Трансмісія:</strong> {{ car.car_model.transmission_type.transmission_type_name|default:"Н/д" }}</p>
+            <p><strong>Двигун:</strong> {{ car.car_model.engine_type.engine_type_name|default:"Н/д" }}</p>
+            <p><strong>Габарити:</strong> {{ car.car_model.dimensions|default:"Немає даних" }}</p>
+            {% if car.note %}
+                <p><strong>Примітка:</strong> {{ car.note }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

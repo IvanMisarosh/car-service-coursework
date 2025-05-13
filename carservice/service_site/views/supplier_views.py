@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -6,11 +6,11 @@ from django.db.models import Q, Count, Max, F
 from ..models import Supplier, ProcurementOrder, ProcurementUnit
 from ..forms import SupplierForm
 from ..views_utils import render_htmx
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from django.shortcuts import get_object_or_404
+from django.db.models import ProtectedError
 from django.contrib import messages
 
 
@@ -111,4 +111,28 @@ class SupplierView(LoginRequiredMixin, PermissionRequiredMixin, View):
             # Render the new row for the supplier table
             return render_htmx(request, None, "supplier/_supplier_list_row.html", {"supplier": supplier, "request": request})
         return render_htmx(request, None, "supplier/_add_supplier_form.html", {"form": form})
+    
+    def delete(self, request, supplier_id):
+        supplier = get_object_or_404(Supplier, pk=supplier_id)
+        try:
+            supplier_name = supplier.supplier_name
+            supplier.delete()
+            messages.success(request, f"Постачальника {supplier_name} успішно видалено")
+            return HttpResponse("", status=200)
+        except ProtectedError:
+            messages.error(request, f"Неможливо видалити постачальника '{supplier.supplier_name}' оскільки він має посилання на закупки.")
+            
+            items_supplied = ProcurementUnit.objects.filter(procurement_order__supplier=supplier).count()
+            last_order_date = ProcurementOrder.objects.filter(supplier=supplier).aggregate(Max('order_date'))['order_date__max']
+            
+            supplier.items_supplied = items_supplied
+            supplier.last_order_date = last_order_date
+            
+            context = {
+                'supplier': supplier,
+            }
+            return render(request, "supplier/_supplier_list_row.html", context)
+        except Exception:
+            pass
+
     

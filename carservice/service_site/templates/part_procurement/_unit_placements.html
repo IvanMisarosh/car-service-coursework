@@ -20,9 +20,9 @@
               <button 
                 class="btn btn-sm btn-outline-danger"
                 hx-post="{% url 'remove-placement' placement.pk %}"
-                hx-target="#unit-row-{{ unit.pk }}"
+                hx-target="#placements-unit-{{ unit.pk }}"
                 hx-swap="outerHTML"
-                hx-on="htmx:afterRequest: this.closest('tr').remove()"
+                {% comment %} hx-on="htmx:afterRequest: this.closest('tr').remove()" {% endcomment %}
                 >
                 Видалити
               </button>

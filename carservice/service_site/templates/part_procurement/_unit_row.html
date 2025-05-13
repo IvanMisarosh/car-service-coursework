@@ -1,4 +1,8 @@
 <tr id="unit-row-{{ unit.pk }}"
+    hx-trigger="placementRemoved from:#expanded-placement-{{ unit.pk }}"
+    hx-get="{% url 'update-unit' unit.pk %}"
+    hx-target="this"
+    hx-swap="outerHTML"
     x-data="{ 
         editMode: false,
         quantity: {{ unit.quantity|default:0 }},
@@ -101,7 +105,12 @@
                 hx-swap="innerHTML">
                 <i class="bi bi-plus-circle"></i>
             </button>
-            <button type="button" class="btn btn-danger btn-sm">
+            <button type="button" class="btn btn-danger btn-sm" hx-delete="{% url 'delete-procurement-unit' unit.procurement_unit_id %}"
+                hx-target="closest tr"
+                hx-swap="outerHTML"
+                {% comment %} TODO: use trigger to update order price {% endcomment %}
+                @htmx:after-request="htmx.ajax('GET', '{% url 'update-order' unit.procurement_order.pk %}', {target: '#row-{{ unit.procurement_order.pk }}', swap: 'outerHTML'})"
+                >
                 <i class="bi bi-trash"></i>
             </button>
         </div>

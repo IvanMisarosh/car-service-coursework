@@ -6,7 +6,7 @@
     <div class="card-body">
         <form 
             hx-post="{% url 'add-car-model' %}" 
-            hx-target="#car-model-list"
+            hx-target="#add-car-model-form-container"
             hx-swap="innerHTML"
         >
             {% csrf_token %}

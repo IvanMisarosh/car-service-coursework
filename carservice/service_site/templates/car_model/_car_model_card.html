@@ -1,5 +1,5 @@
 <!-- This is a single car model card with edit functionality -->
-<div class="col-lg-3 col-md-4 col-sm-6 mb-4 model-card" id="car-model-{{ car_model.car_model_id }}">
+<div class="col-lg-3 col-md-4 col-sm-6 mb-4 model-card" id="car-model-{{ car_model.pk }}">
     <div class="card h-100 border-0 shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">
@@ -7,13 +7,17 @@
             </h5>
             <div>
                 <button class="btn btn-sm btn-light" 
-                    hx-get="{% url 'edit-car-model' car_model.car_model_id %}" 
-                    hx-target="#car-model-{{ car_model.car_model_id }}"
+                    hx-get="{% url 'edit-car-model' car_model.pk %}" 
+                    hx-target="#car-model-{{ car_model.pk }}"
                     hx-swap="outerHTML"
                     title="Редагувати">
                     <i class="bi bi-pencil-fill"></i>
                 </button>
-                <button type="button" class="btn btn-danger btn-sm">
+                <button type="button" 
+                    class="btn btn-danger btn-sm" 
+                    hx-delete="{% url 'delete-car-model' car_model.pk %}"
+                    hx-target="#car-model-list"
+                    hx-swap="innerHTML">
                     <i class="bi bi-trash"></i>
                 </button>
             </div>

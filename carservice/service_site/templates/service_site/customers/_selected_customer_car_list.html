@@ -1,0 +1,10 @@
+<div class="list-group" id="customer-cars"
+    hx-get="{% url 'selected-customer-car-list' customer.pk %}"
+    hx-trigger="update-selected-customer-car-list from:#car-form"
+    hx-target="#customer-cars"
+    hx-swap="outerHTML"
+    >
+    {% for car in customer_cars %}
+        {% include 'service_site/customers/_selected_customer_car_list_row.html' %}
+    {% endfor %}
+</div>

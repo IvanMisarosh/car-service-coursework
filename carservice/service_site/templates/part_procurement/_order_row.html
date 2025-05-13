@@ -1,4 +1,4 @@
-<tr id="row-{{ order.procurement_order_id }}"
+<tr id="row-{{ order.pk }}"
     class="
       {% if order.procurement_status.status_name == 'In progress' %} table-info
       {% elif order.procurement_status.status_name == 'Delivered' %} table-success
@@ -9,7 +9,7 @@
       align-middle
     ">
   <td class="py-1 px-2">
-    <span class="order-number cursor-pointer fw-bold" data-order-id="{{ order.procurement_order_id }}">
+    <span class="order-number cursor-pointer fw-bold" data-order-id="{{ order.pk }}">
       {{ order.order_number }}
     </span>
   </td>
@@ -36,23 +36,30 @@
   <td class="py-1 px-2">
     <button 
       class="btn btn-sm btn-primary me-1"
-      @click="toggleOrder('{{ order.procurement_order_id }}')"
+      @click="toggleOrder('{{ order.pk }}')"
       title="View order details"
-      x-show="!isExpanded('{{ order.procurement_order_id }}')"
-      hx-get="{% url 'procurement-order-items' order.procurement_order_id %}"
-      hx-target="#order-items-{{ order.procurement_order_id }}"
+      x-show="!isExpanded('{{ order.pk }}')"
+      hx-get="{% url 'procurement-order-items' order.pk %}"
+      hx-target="#order-items-{{ order.pk }}"
     >
       Деталі замовлення
     </button>
     <button 
       class="btn btn-sm btn-primary me-1"
-      @click="toggleOrder('{{ order.procurement_order_id }}')"
+      @click="toggleOrder('{{ order.pk }}')"
       title="Hide order details"
-      x-show="isExpanded('{{ order.procurement_order_id }}')"
+      x-show="isExpanded('{{ order.pk }}')"
     >
       приховати деталі
     </button>
-    <button type="button" class="btn btn-danger btn-sm">
+    <button 
+        hx-delete="{% url 'delete-procurement-order' order.pk %}" 
+        hx-target="#order-list"
+        hx-include="#filter-form, #order-search-bar"
+        hx-vals='js:{"items_per_page": document.getElementById("items-per-page").value}'
+        class="btn btn-sm btn-danger"
+        title="Видалити"
+    >
       <i class="bi bi-trash"></i>
     </button>
   </td>

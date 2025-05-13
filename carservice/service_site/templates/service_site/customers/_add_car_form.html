@@ -1,12 +1,12 @@
-<div class="card">
+<div class="card" id="car-form">
   <div class="card-header">
     <h5>{% if form.instance.pk %}Редагувати автомобіль{% else %}Додати новий автомобіль для{% endif %} {{customer}}</h5>
   </div>
   <div class="card-body">
     <form 
       hx-post="{% url 'add-car-form' %}" 
-      hx-target="#add-car-form-container"
-      hx-swap="innerHTML"
+      hx-target="#car-form"
+      hx-swap="outerHTML"
     >
       {% csrf_token %}
       {% if customer %}

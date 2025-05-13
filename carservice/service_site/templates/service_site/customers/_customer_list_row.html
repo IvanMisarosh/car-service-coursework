@@ -36,7 +36,10 @@
                         </a>
                     </li>
                     <li>
-                         <a class="dropdown-item">
+                         <a class="dropdown-item"
+                            hx-delete="{% url 'delete-customer' customer.customer_id %}" 
+                            hx-target="closest tr" 
+                            hx-swap="outerHTML">
                             <i class="bi bi-trash"></i>
                             Видалити
                         </a>
