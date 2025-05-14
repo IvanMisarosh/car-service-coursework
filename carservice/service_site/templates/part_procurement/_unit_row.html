@@ -65,11 +65,12 @@
     <!-- Actions -->
     <td class="py-1 px-2 small text-nowrap">
         <div class="btn-group btn-group-sm" role="group">
-            <button class="btn btn-outline-primary" 
-                @click="editMode ? cancelEdit() : editMode = true" 
-                x-text="editMode ? 'Відмінити' : 'Редагувати'">
-            </button>
-
+            {% if order.procurement_status.status_name != "Delivered"%}
+                <button class="btn btn-outline-primary" 
+                    @click="editMode ? cancelEdit() : editMode = true" 
+                    x-text="editMode ? 'Відмінити' : 'Редагувати'">
+                </button>
+            {% endif %}
             <button class="btn btn-outline-success" x-show="editMode"
                 hx-post="{% url 'edit_unit' unit.pk %}"
                 hx-include="closest tr"
@@ -84,7 +85,7 @@
                 Зберегти
             </button>
 
-            <button class="btn btn-outline-info"
+            <button class="btn btn-primary"
                 @click="toggleUnit('{{ unit.pk }}')"
                 x-show="!isExpanded('{{ unit.pk }}')"
                 hx-get="{% url 'unit_placements' unit.pk %}"
@@ -93,26 +94,28 @@
                 <i class="bi bi-eye"></i>
             </button>
 
-            <button class="btn btn-outline-info"
+            <button class="btn btn-primary"
                 @click="toggleUnit('{{ unit.pk }}')"
                 x-show="isExpanded('{{ unit.pk }}')">
                 <i class="bi bi-eye-slash"></i>
             </button>
 
-            <button class="btn btn-outline-secondary"
-                hx-get="{% url 'add_placement' unit.pk %}"
-                hx-target="#placement-form-container-{{ unit.procurement_order.pk }}"
-                hx-swap="innerHTML">
-                <i class="bi bi-plus-circle"></i>
-            </button>
-            <button type="button" class="btn btn-danger btn-sm" hx-delete="{% url 'delete-procurement-unit' unit.procurement_unit_id %}"
-                hx-target="closest tr"
-                hx-swap="outerHTML"
-                {% comment %} TODO: use trigger to update order price {% endcomment %}
-                @htmx:after-request="htmx.ajax('GET', '{% url 'update-order' unit.procurement_order.pk %}', {target: '#row-{{ unit.procurement_order.pk }}', swap: 'outerHTML'})"
-                >
-                <i class="bi bi-trash"></i>
-            </button>
+            {% if order.procurement_status.status_name != "Delivered"%}
+                <button class="btn btn-outline-secondary"
+                    hx-get="{% url 'add_placement' unit.pk %}"
+                    hx-target="#placement-form-container-{{ unit.procurement_order.pk }}"
+                    hx-swap="innerHTML">
+                    <i class="bi bi-plus-circle"></i>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" hx-delete="{% url 'delete-procurement-unit' unit.procurement_unit_id %}"
+                    hx-target="closest tr"
+                    hx-swap="outerHTML"
+                    {% comment %} TODO: use trigger to update order price {% endcomment %}
+                    @htmx:after-request="htmx.ajax('GET', '{% url 'update-order' unit.procurement_order.pk %}', {target: '#row-{{ unit.procurement_order.pk }}', swap: 'outerHTML'})"
+                    >
+                    <i class="bi bi-trash"></i>
+                </button>
+            {% endif %}
         </div>
     </td>
 </tr>

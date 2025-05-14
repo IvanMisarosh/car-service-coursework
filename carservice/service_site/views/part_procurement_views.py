@@ -121,7 +121,7 @@ def delete_procurement_order(request, order_id):
         return procurement_orders(request)
     except ProtectedError:
         messages.error(request, f"Неможливо видалити замовлення '{order_number}', оскільки воно має позиції.")
-        return update_order_row(request, order_id)
+        return procurement_orders(request)
 
 def order_info(request, pk):
     order = get_object_or_404(models.ProcurementOrder, pk=pk)
@@ -192,11 +192,19 @@ def edit_unit(request, unit_id):
     quantity = int(request.POST.get("quantity", unit.quantity))
 
     # TODO: validate input
+    if quantity < 1:
+        messages.error(request, "Кількість одиниць має бути вищою за 0")
+    elif quantity < unit.get_placed_count():
+        messages.error(request, f"Вказана кількість одиниць ({quantity}) менша за кількість вже розміщених запчастин ({unit.get_placed_count()})")
+    else:
+        unit.quantity = quantity
+    
+    if price <= 0:
+        messages.error(request, "Ціна за одиницю має бути вищою за 0")
+    else:
+        unit.price_per_unit = price
 
-    unit.quantity = quantity
-    unit.price_per_unit = price
     unit.save()
-
     return render(request, 'part_procurement/_unit_row.html', {'unit': unit, "placed_count": unit.get_placed_count})
 
 def unit_placements(request, pk):
@@ -265,8 +273,10 @@ def add_placement(request, unit_id):
         return HttpResponse(rendered_row)
     
 def remove_placement(request, placement_id):
-    placement = get_object_or_404(models.StoragePlacement, pk=placement_id)
+    placement = get_object_or_404(models.StoragePlacement.objects.select_related('part_in_station'), pk=placement_id)
     unit_id = placement.procurement_unit.pk
+    # TODO: add better validation and transaction
+    placement.part_in_station.quantity -= placement.quantity
     placement.delete()
 
     # Load the updated HTML fragment

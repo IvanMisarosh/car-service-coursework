@@ -1,36 +1,36 @@
 <tr class="placement-row" id="placements-unit-{{ unit.pk }}">
     <td colspan="100" class="p-2 d-flex">
       {% if unit.placements.exists %}
-      <table class="table table-sm table-bordered table-hover table-striped w-100 mb-0">
-        <thead class="table-light">
-          <tr class="align-middle">
-            <th class="py-1 px-2">Дата</th>
-            <th class="py-1 px-2">Кількість</th>
-            <th class="py-1 px-2">Станція</th>
-            <th class="py-1 px-2 text-end">Дії</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for placement in unit.placements.all %}
-          <tr id="placement-{{ placement.pk }}" class="align-middle">
-            <td class="py-1 px-2">{{ placement.placement_date|date:"Y-m-d H:i" }}</td>
-            <td class="py-1 px-2">{{ placement.quantity }}</td>
-            <td class="py-1 px-2">{{ placement.part_in_station.station.address }}</td>
-            <td class="py-1 px-2 text-end">
-              <button 
-                class="btn btn-sm btn-outline-danger"
-                hx-post="{% url 'remove-placement' placement.pk %}"
-                hx-target="#placements-unit-{{ unit.pk }}"
-                hx-swap="outerHTML"
-                {% comment %} hx-on="htmx:afterRequest: this.closest('tr').remove()" {% endcomment %}
-                >
-                Видалити
-              </button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <table class="table table-sm table-bordered table-hover table-striped w-100 mb-0">
+          <thead class="table-light">
+            <tr class="align-middle">
+              <th class="py-1 px-2">Дата</th>
+              <th class="py-1 px-2">Кількість</th>
+              <th class="py-1 px-2">Станція</th>
+              <th class="py-1 px-2 text-end">Дії</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for placement in unit.placements.all %}
+            <tr id="placement-{{ placement.pk }}" class="align-middle">
+              <td class="py-1 px-2">{{ placement.placement_date|date:"Y-m-d H:i" }}</td>
+              <td class="py-1 px-2">{{ placement.quantity }}</td>
+              <td class="py-1 px-2">{{ placement.part_in_station.station.address }}</td>
+              <td class="py-1 px-2 text-end">
+                <button 
+                  class="btn btn-sm btn-outline-danger"
+                  hx-post="{% url 'remove-placement' placement.pk %}"
+                  hx-target="#placements-unit-{{ unit.pk }}"
+                  hx-swap="outerHTML"
+                  {% comment %} hx-on="htmx:afterRequest: this.closest('tr').remove()" {% endcomment %}
+                  >
+                  Видалити
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       {% else %}
       {% comment %} <div class="text-muted small px-2 py-1">No placements for this unit.</div> {% endcomment %}
       {% endif %}

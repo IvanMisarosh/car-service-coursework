@@ -2,27 +2,72 @@
   hx-post="{% url 'edit-order-info' order.pk %}" 
   hx-target="#order-info-fields-{{ order.pk }}" 
   hx-swap="innerHTML"
-  @htmx:after-request="htmx.ajax('GET', '{% url 'update-order' order.pk %}', {target: '#row-{{ order.pk }}', swap: 'outerHTML'})"
+  @htmx:after-request="if(event.detail.successful) htmx.ajax('GET', '{% url 'update-order' order.pk %}', {target: '#row-{{ order.pk }}', swap: 'outerHTML'})"
   >
-    <!-- WHY htmx:afterRequest DOESNT WORK -->
-  
   {% csrf_token %}
+  
+  <!-- Non-field errors (form-level validation errors) -->
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger mt-2 mb-2" role="alert">
+    <strong>Помилка:</strong>
+    <ul class="mb-0">
+      {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  
   <div class="row">
     <div class="col-md-6">
-      {{ form.supplier.label_tag }} {{ form.supplier }}
+      {{ form.supplier.label_tag }}
+      {{ form.supplier }}
+      {% if form.supplier.errors %}
+      <div class="invalid-feedback d-block">
+        {% for error in form.supplier.errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
     <div class="col-md-6">
-      {{ form.employee.label_tag }} {{ form.employee }}
+      {{ form.employee.label_tag }}
+      {{ form.employee }}
+      {% if form.employee.errors %}
+      <div class="invalid-feedback d-block">
+        {% for error in form.employee.errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
   </div>
+  
   <div class="row mt-2">
     <div class="col-md-6">
-      {{ form.procurement_status.label_tag }} {{ form.procurement_status }}
+      {{ form.procurement_status.label_tag }}
+      {{ form.procurement_status }}
+      {% if form.procurement_status.errors %}
+      <div class="invalid-feedback d-block">
+        {% for error in form.procurement_status.errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
     <div class="col-md-6">
-      {{ form.order_date.label_tag }} {{ form.order_date }}
+      {{ form.order_date.label_tag }}
+      {{ form.order_date }}
+      {% if form.order_date.errors %}
+      <div class="invalid-feedback d-block">
+        {% for error in form.order_date.errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
   </div>
+  
   <div class="mt-2">
     <button type="submit" class="btn btn-sm btn-primary">Зберегти</button>
     <button type="button" class="btn btn-sm btn-secondary"

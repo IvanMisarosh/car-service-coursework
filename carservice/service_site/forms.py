@@ -189,6 +189,44 @@ class ProcurementOrderInfoForm(forms.ModelForm):
             if value:
                 self.initial[field] = timezone.localtime(value).strftime('%Y-%m-%d')
 
+    def clean(self):
+        cleaned_data = super().clean()
+        procurement_status = cleaned_data.get('procurement_status')
+        
+        # Assume COMPLETED status ID is 2 (replace with your actual completed status ID)
+        COMPLETED_STATUS_ID = 2  # Replace with your actual completed status ID
+        
+        # Check if status is being set to completed
+        if procurement_status and procurement_status.pk == COMPLETED_STATUS_ID:
+            # since procurement units won't exist yet
+            if not self.instance.pk:
+                raise forms.ValidationError("Не можна завершити замовлення без товарів.")
+            
+            # Get all procurement units for this order
+            procurement_units = self.instance.units.all()
+            
+            if not procurement_units:
+                raise forms.ValidationError("Не можна завершити замовлення без товарів.")
+            
+            # Check if each procurement unit has been fully placed in storage
+            unplaced_units = []
+            for unit in procurement_units:
+                placed_count = unit.get_placed_count()
+                if placed_count < unit.quantity:
+                    unplaced_units.append((unit, unit.quantity - placed_count))
+            
+            if unplaced_units:
+                # Format the error message with details about unplaced units
+                error_details = ", ".join([
+                    f"{unit.part.part_name} (не розміщено: {remaining})" 
+                    for unit, remaining in unplaced_units
+                ])
+                raise forms.ValidationError(
+                    f"Не можна завершити замовлення. Наступні товари не були повністю розміщені на складі: {error_details}"
+                )
+        
+        return cleaned_data
+
 class VisitForm(ModelForm):
     class Meta:
         model = models.Visit
