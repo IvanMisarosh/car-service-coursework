@@ -25,6 +25,7 @@ urlpatterns = [
 
     path('visits/', views.Visits.as_view(), name='visits'),
     path("visits/<int:visit_id>/delete/", views.Visits.as_view(), name="delete-visit"),
+    path('export/visits/', views.export_visits, name='export-visits'),
 
     path('add-staged-service/', views.add_staged_service, name='add-staged-service'),
     path('update-staged-service/', views.update_staged_service, name='update-staged-service'),

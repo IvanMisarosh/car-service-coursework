@@ -139,3 +139,71 @@ class CustomerResource(resources.ModelResource):
         
         # Join all car information with semicolons
         return "; ".join(car_info) if car_info else "No cars"
+    
+
+class VisitResource(resources.ModelResource):
+    visit_number = Field(
+        attribute='visit_number',
+        column_name='Visit Number'
+    )
+    customer_name = Field(
+        column_name='Customer Name'
+    )
+    car_vin = Field(
+        attribute='car__vin',
+        column_name='VIN'
+    )
+    employee_name = Field(
+        column_name='Employee Name'
+    )
+    station_address = Field(
+        attribute='employee__station__address',
+        column_name='Service Station'
+    )
+    visit_status = Field(
+        attribute='visit_status__status_name',
+        column_name='Visit Status'
+    )
+    payment_status = Field(
+        attribute='payment_status__payment_name',
+        column_name='Payment Status'
+    )
+    visit_date = Field(
+        attribute='visit_date',
+        column_name='Visit Date'
+    )
+    planned_end_date = Field(
+        attribute='planned_end_date',
+        column_name='Planned End Date'
+    )
+    actual_end_date = Field(
+        attribute='actual_end_date',
+        column_name='Actual End Date'
+    )
+    details = Field(
+        attribute='details',
+        column_name='Details'
+    )
+    price = Field(
+        attribute='price',
+        column_name='Price'
+    )
+    payment_date = Field(
+        attribute='payment_date',
+        column_name='Payment Date'
+    )
+    
+    class Meta:
+        model = models.Visit
+        fields = (
+            'visit_number', 'customer_name', 'car_vin', 'employee_name', 
+            'station_address', 'visit_status', 'payment_status', 'visit_date',
+            'planned_end_date', 'actual_end_date', 'details', 'price', 'payment_date'
+        )
+        export_order = fields
+    
+    def dehydrate_customer_name(self, visit):
+        return f"{visit.car.customer.first_name} {visit.car.customer.last_name}"
+    
+    def dehydrate_employee_name(self, visit):
+        return f"{visit.employee.first_name} {visit.employee.last_name}"

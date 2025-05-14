@@ -249,7 +249,7 @@ def delete_car(request, car_id):
         context = {
             'car': car,
         }
-        return render(request, "car/_car_list_row.html", context)
+        return render(request, "service_site/customers/_car_list_row.html", context)
     except Exception:
         return HttpResponse("Помилка під час видалення", status=500)    
 

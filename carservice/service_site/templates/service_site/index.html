@@ -1,6 +1,79 @@
-{%extends "base.html"%}
-{% block title%} {{title}} {% endblock %}
+{% extends "base.html" %}
+{% load group_filters %}
+{% block title %} {{title}} {% endblock %}
 
 {% block content %}
-    {% include 'service_site/includes/nav_bar.html'%}   
-{% endblock %}   
+    {% include 'service_site/includes/nav_bar.html' %}
+    
+    <div class="container py-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center">
+                <h2 class="my-3">Ласкаво просимо, {{request.user.employee.first_name}} {{request.user.employee.last_name}}!</h2>
+                <h4>{{ request.user.employee.employee_position.position_name }}</h4>
+            </div>
+            <div class="card-body p-4">
+                {% if request.user|has_group:"manager" %}
+                    <div class="welcome-content">
+                        <h3 class="text-center mb-4">Панель Менеджера</h3>
+                        <div class="role-description">
+                            <p class="lead">Як <strong>Менеджер</strong>, Ви є ключовою ланкою у взаємодії з клієнтами та організації процесу обслуговування.</p>
+                            
+                            <div class="capabilities mt-4">
+                                <h5 class="text-primary">Ваші можливості:</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><i class="fas fa-user-plus me-2"></i> Реєстрація нових клієнтів та редагування існуючих даних</li>
+                                    <li class="list-group-item"><i class="fas fa-car me-2"></i> Додавання та оновлення інформації про автомобілі клієнтів</li>
+                                    <li class="list-group-item"><i class="fas fa-calendar-alt me-2"></i> Створення та управління візитами клієнтів</li>
+                                    <li class="list-group-item"><i class="fas fa-tasks me-2"></i> Планування сервісних послуг для візитів</li>
+                                    <li class="list-group-item"><i class="fas fa-money-bill-wave me-2"></i> Управління платіжною інформацією</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% elif request.user|has_group:"part_manager" %}
+                    <div class="welcome-content">
+                        <h3 class="text-center mb-4">Панель Менеджера з Закупівель</h3>
+                        <div class="role-description">
+                            <p class="lead">Як <strong>Менеджер з закупівель</strong>, Ви забезпечуєте своєчасне поповнення запасів запчастин для безперебійної роботи автосервісу.</p>
+                            
+                            <div class="capabilities mt-4">
+                                <h5 class="text-primary">Ваші можливості:</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><i class="fas fa-boxes me-2"></i> Перегляд наявних запчастин на всіх станціях обслуговування</li>
+                                    <li class="list-group-item"><i class="fas fa-shopping-cart me-2"></i> Доступ до даних закупок, редагування існуючих та створення нових</li>
+                                    <li class="list-group-item"><i class="fas fa-industry me-2"></i> Управління інформацією про постачальників</li>
+                                    <li class="list-group-item"><i class="fas fa-user-plus me-2"></i> Додавання нових постачальників та оновлення їхньої контактної інформації</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% elif request.user|has_group:"mechanic" %}
+                    <div class="welcome-content">
+                        <h3 class="text-center mb-4">Панель Механіка</h3>
+                        <div class="role-description">
+                            <p class="lead">Як <strong>Механік сервісу</strong>, Ви відповідаєте за виконання запланованих робіт та забезпечення якісного обслуговування автомобілів.</p>
+                            
+                            <div class="capabilities mt-4">
+                                <h5 class="text-primary">Ваші можливості:</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><i class="fas fa-clipboard-list me-2"></i> Перегляд списку запланованих сервісних послуг для візитів</li>
+                                    <li class="list-group-item"><i class="fas fa-check-circle me-2"></i> Реєстрація факту надання послуги із зазначенням дати виконання</li>
+                                    <li class="list-group-item"><i class="fas fa-tools me-2"></i> Доступ до інформації про наявні запчастини та реєстрація їх використання</li>
+                                    <li class="list-group-item"><i class="fas fa-car-side me-2"></i> Перегляд технічних характеристик автомобілів для правильного виконання робіт</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="welcome-content">
+                        <h3 class="text-center mb-4">Ласкаво просимо до системи управління автосервісом</h3>
+                        <p class="text-center">Будь ласка, зверніться до адміністратора для отримання відповідної ролі в системі.</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-footer text-muted text-center">
+                <p>Станція обслуговування: {{ request.user.employee.station.address }}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

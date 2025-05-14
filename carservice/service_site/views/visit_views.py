@@ -9,7 +9,9 @@ from django.contrib import messages
 from django.db.models import ProtectedError
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
-
+from .. import models, resources, filters
+from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['service_site.view_customer']
@@ -69,3 +71,58 @@ class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
             messages.error(request, "Сталася невідома помилка під час видалення візиту.")
         finally:
             return self.get(request)
+
+
+@login_required
+def export_visits(request):
+    """
+    Export visit data with customer, car, employee, and station details.
+    Supported formats: csv, json
+    """
+    format = request.GET.get('format', 'csv')
+    
+    if request.htmx:
+        return HttpResponse(headers={'HX-Redirect': request.get_full_path()})
+    
+    sorting_method = request.GET.get("sorting_method", "visit_date")
+    search_query = request.GET.get("search", '')
+    query = Q()
+    search_terms = search_query.split()
+    qs = None
+    
+    if request.GET.get('export_selection') == 'true':
+        # Export filtered results
+        for term in search_terms:
+            query |= (
+                Q(car__customer__first_name__icontains=term) | 
+                Q(car__customer__last_name__icontains=term) | 
+                Q(car__vin__icontains=term) | 
+                Q(employee__first_name__icontains=term) | 
+                Q(employee__last_name__icontains=term) |
+                Q(visit_number__icontains=term)
+            )
+        visits = models.Visit.objects.all().filter(query).order_by(sorting_method)
+        visit_filter = filters.VisitFilter(request.GET, visits)
+        qs = visit_filter.qs
+    else:
+        # Export all visits
+        visits = models.Visit.objects.all().order_by(sorting_method)
+        qs = visits
+    
+    resource = resources.VisitResource()
+    dataset = resource.export(qs)
+    
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f'visits_{timestamp}'
+    
+    if format == 'csv':
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+    elif format == 'json':
+        response = HttpResponse(dataset.json, content_type='application/json')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.json"'
+    else:
+        response = HttpResponse(dataset.csv, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+    
+    return response
