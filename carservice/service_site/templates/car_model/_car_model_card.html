@@ -1,3 +1,4 @@
+{% load group_filters %}
 <!-- This is a single car model card with edit functionality -->
 <div class="col-lg-3 col-md-4 col-sm-6 mb-4 model-card" id="car-model-{{ car_model.pk }}">
     <div class="card h-100 border-0 shadow-sm">
@@ -5,22 +6,24 @@
             <h5 class="card-title mb-0">
                 {{ car_model.car_brand.brand_name }} {{ car_model.model_name }}
             </h5>
-            <div>
-                <button class="btn btn-sm btn-light" 
-                    hx-get="{% url 'edit-car-model' car_model.pk %}" 
-                    hx-target="#car-model-{{ car_model.pk }}"
-                    hx-swap="outerHTML"
-                    title="Редагувати">
-                    <i class="bi bi-pencil-fill"></i>
-                </button>
-                <button type="button" 
-                    class="btn btn-danger btn-sm" 
-                    hx-delete="{% url 'delete-car-model' car_model.pk %}"
-                    hx-target="#car-model-list"
-                    hx-swap="innerHTML">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
+            {% if not request.user|has_group:"mechanic" %}
+                <div>
+                    <button class="btn btn-sm btn-light" 
+                        hx-get="{% url 'edit-car-model' car_model.pk %}" 
+                        hx-target="#car-model-{{ car_model.pk }}"
+                        hx-swap="outerHTML"
+                        title="Редагувати">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button type="button" 
+                        class="btn btn-danger btn-sm" 
+                        hx-delete="{% url 'delete-car-model' car_model.pk %}"
+                        hx-target="#car-model-list"
+                        hx-swap="innerHTML">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            {% endif %}
         </div>
         <div class="card-body">
             <ul class="list-unstyled mb-0">

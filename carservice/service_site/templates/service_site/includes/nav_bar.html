@@ -9,6 +9,7 @@
                 <a class="nav-link text-light" method='GET' href="{%url 'car-models'%}">Моделі авто</a>
             {% elif request.user|has_group:"mechanic" %}
                 <a class="nav-link text-light" method='GET' href="{%url 'visits'%}">Візити</a>
+                <a class="nav-link text-light" method='GET' href="{%url 'car-models'%}">Моделі авто</a>
             {% elif request.user|has_group:"part_manager" %}
                 <a class="nav-link text-light" method='GET' href="{%url 'procurement-orders'%}">Закупки</a>
                 <a class="nav-link text-light" method='GET' href="{%url 'suppliers'%}">Постачальники</a>
