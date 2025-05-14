@@ -1,6 +1,16 @@
 {% load group_filters %}
 <div class="ms-2 me-auto flex-grow-1">
-    <div class="fw-bold">{{v_service.service.service_name}}</div>
+    <div 
+        {% if request.user|has_group:"mechanic" and not v_service.visit.visit_status.status_name == "Completed" and not v_service.visit.visit_status.status_name == "Cancelled"%}
+            class="mb-0 text-primary btn"
+            hx-get="{% url 'service-part-search' v_service.pk %}"
+            hx-target="#mechanic-service-widget"
+            hx-swap="innerHTML"
+        {% else %}
+            class="fw-bold"
+        {% endif %}
+        >
+                    {{v_service.service.service_name}}</div>
     <div>Категорія: {{v_service.service.service_type.service_type_name}}</div>
 
     <span x-show="!editing" >
@@ -33,11 +43,11 @@
     </div>
 
     {% if v_service.provided_service %}
-        <div x-data="{ show_used_parts: false, button_text: 'Show'}">
-            <button class="btn btn-sm btn-outline-primary me-2 mt-2" @click="show_used_parts = !show_used_parts; button_text = show_used_parts ? 'Hide' : 'Show'">
+        <div x-data="{ show_used_parts: false, button_text: 'Показати'}">
+            <button class="btn btn-sm btn-outline-primary me-2 mt-2" @click="show_used_parts = !show_used_parts; button_text = show_used_parts ? 'Приховати' : 'Показати'">
                 <i class="bi bi-tools"></i> 
                 <span x-text='button_text'></span>
-                Використані запчастини
+                використані запчастини
             </button>
             <div x-show="show_used_parts" class="bg-light p-2 rounded mt-2 w-100">
                 <ul class="list-group">

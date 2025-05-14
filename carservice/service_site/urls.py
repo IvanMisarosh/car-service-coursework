@@ -39,11 +39,13 @@ urlpatterns = [
 
     path('select-car-in-car-search-modal', views.select_car_in_car_search_modal, name='select-car-in-car-search-modal'),
 
-    path('visit-detail/', views.VisitDetailView.as_view(), name='create-visit'),
     path('visit-detail/car-search', views.car_search, name='car-search'),
     path('visit-detail/service-search', views.service_search, name='service-search'),
     path('visit-detail/update-visit-car', views.update_visit_car, name='update-visit-car'),
-    path('visit-detail/<int:visit_id>/', views.VisitDetailView.as_view(), name='visit-detail'),
+    path('visit-detail/<int:visit_id>/', views.visit_details, name='visit-detail'),
+    path('visit/info/<int:visit_id>/', views.visit_info, name='visit-info'),
+    path('visit-detail/get-form', views.get_visit_form, name='get-visit-form'),
+    path('visit-detail/', views.save_visit_form, name='save-visit'),
 
     path('export-visit-services/<int:visit_id>', views.export_visit_services, name='export-visit-services'),
 
@@ -51,6 +53,7 @@ urlpatterns = [
     path('visit-services/<int:visit_id>/', views.visit_services, name='visit-services'),
 
     path('visit-service/part-search', views.part_search, name='part-search'),
+    path('required-parts/<int:required_part_id>/delete/', views.delete_required_part, name='delete-required-part'),
     path('service-part-search/<int:visit_service_id>', views.visit_service_with_part_search, name='service-part-search'),
 
     path('procurement/orders/add/', views.add_order, name='add-procurement-order'),

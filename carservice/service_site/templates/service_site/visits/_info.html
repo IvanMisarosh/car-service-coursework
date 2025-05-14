@@ -1,0 +1,125 @@
+<div class="card px-0 mt-2 me-1 align-self-start rounded" id="visit-details-card"
+    x-data="{customer_editing_mode : false,
+            is_form: false        
+    }">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5>Деталі візиту: {{ visit.visit_number }}{% if visit %}, станція: {{visit.employee.station.address}}{% endif %}</h5>
+        {% if visit %}
+            <!-- Add this dropdown to your visit services list page -->
+            <div class="col-2 dropdown">
+                <button class="btn btn-primary dropdown-toggle mt-2 mb-2 w-100" type="button" id="exportServicesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Експортувати вибірку
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="exportServicesDropdown">
+                    <li>
+                        <a class="dropdown-item" hx-get="{% url 'export-visit-services' visit.pk %}?format=csv" 
+                        hx-include="#filter-form">
+                            CSV
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" hx-get="{% url 'export-visit-services' visit.pk %}?format=json"
+                        hx-include="#filter-form">
+                            JSON
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+        {% if visit.visit_status.status_name != "Completed"%}
+                <a class="btn btn-sm btn-outline-light"
+                    hx-get="{% url 'get-visit-form' %}?visit_id={{visit.pk}}"
+                    hx-target="#visit-info-container"
+                    hx-swap="innerHTML"
+                    >
+                    <i class="bi bi-pencil"></i> 
+                    <span Редагувати></span>
+                </a>
+        {% else %}
+            <h5> <span class="badge bg-success">Візит закінчений, редагування даних не можливе</span></h5>
+        {% endif %}
+    </div>
+
+    <div class="card-body">
+        <div class="row g-2">
+            <div class="col-5">
+                <input class='form-control' type="hidden" name="visit_id" id="visit-id-hidden-input" value="{{ visit.pk }}">
+
+                <div id="visit-car-input">
+                    <input class='form-control' type="hidden" name="car" id="car-id-input" value="{{ visit_car.pk }}">
+                </div>
+                <!-- Visit State Card -->
+                <div class="card mb-2">
+                    <div class="card-header pb-0 {% if visit.visit_status.status_name == 'Completed' %}bg-success{% elif visit.visit_status.status_name == 'Cancelled' %}bg-danger{% else %}bg-warning{% endif %} text-white">
+                        <h6>Стан візиту</h6>
+                    </div>
+                    <div class="card-body py-1 px-2">
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Дата візиту:</strong><br> {{ visit.visit_date|date:"Y-m-d H:i" }}
+                            </div>
+                            <div class="col-md-6">
+                                {% if visit.visit_status.status_name == "Pending" %}
+                                    <strong>Статус:</strong><br><span class="badge bg-warning text-dark">Pending</span>
+                                {% elif visit.visit_status.status_name == "In Progress" %}
+                                    <strong>Статус:</strong><br><span class="badge bg-primary">In Progress</span>
+                                {% elif visit.visit_status.status_name == "Completed" %}
+                                    <strong>Статус:</strong><br><span class="badge bg-success">Completed</span>
+                                {% elif visit.visit_status.status_name == "Cancelled" %}
+                                    <strong>Статус:</strong><br><span class="badge bg-danger">Cancelled</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Орієнтовна дата закінчення:</strong><br> {{ visit.planned_end_date|date:"Y-m-d H:i"|default:"Не вказано" }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Фактична дата закінчення:</strong><br> {{ visit.actual_end_date|date:"Y-m-d H:i"|default:"Не вказано"  }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Працівник:</strong><br> {{ visit.employee }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Нотатки:</strong><br> 
+                                {{ visit.details|default:"Нотаток немає"|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Details Card -->
+                <div class="card mb-2">
+                    <div class="card-header pb-0 {% if visit.payment_status.payment_name == 'Paid' %}bg-success{% elif visit.payment_status.payment_name == 'Pending' %}bg-warning{% else %}bg-danger{% endif %} text-white">
+                        <h6>Оплата</h6>
+                    </div>
+                    <div class="card-body row py-1 px-2">
+                        <div class="col-md-6 mb-2">
+                            <strong>Дата оплати:</strong><br> {{ visit.payment_date|date:"Y-m-d H:i"|default:"Не вказано"  }}
+                        </div>
+                        <div class="col-md-6">
+                            {% if visit.payment_status.payment_name == "Pending" %}
+                                <strong>Статус оплати:</strong><br> <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif visit.payment_status.payment_name == "Paid" %}
+                                <strong>Статус оплати:</strong><br> <span class="badge bg-success">Paid</span>
+                            {% elif visit.payment_status.payment_name == "Refunded" %}
+                                <strong>Статус оплати:</strong><br> <span class="badge bg-info text-dark">Refunded</span>
+                            {% elif visit.payment_status.payment_name == "Cancelled" %}
+                                <strong>Статус оплати:</strong><br> <span class="badge bg-danger">Cancelled</span>
+                            {% else %}
+                                <strong>Статус оплати:</strong><br> <span class="badge bg-secondary">Не вказано</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Car Details -->
+            <div class="col-7 mt-2 align-self-start rounded" id="visit-customer-details-readonly">
+                {% include 'service_site/visits/_visit_car_details.html' %}
+            </div>
+        </div>
+    </div>
+</div>

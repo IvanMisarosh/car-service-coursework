@@ -145,23 +145,8 @@
                 {% include 'service_site/visits/_visit_services.html' %}
             </div>
 
-            <div class="col-5 align-self-start ps-2">
-                <div class="card px-0 mt-2" id="required-parts-selection-container" x-data="{ staged_part_count: 0 }">
-                    <dic class='card-header pb-1'>
-                        <h5 class='mb-1'>Вибрана послуга</h5>
-                    </dic>
-                    <div class="row card-body px-1 py-1">
-                        <div class="col-6 border-end" id="required-parts-search">
-                            {% include 'service_site/visits/_required_parts_search_widget.html' %}    
-                        </div>
-                        
-                        <div class="col-6 ms-auto" id="staged-required-parts-container">
-                            <div class="list-group card-body py-1" id="staged-required-parts" 
-                                x-show="staged_part_count > 0">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-5 align-self-start ps-2" id="mechanic-service-widget">
+                {% include 'service_site/visits/_required_parts_search_widget.html' %}
             </div>
         </div>
     </div>

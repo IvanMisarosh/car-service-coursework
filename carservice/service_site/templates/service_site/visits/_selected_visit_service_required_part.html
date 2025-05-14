@@ -1,0 +1,24 @@
+<li class="list-group-item d-flex justify-content-between align-items-start" id="required-part-{{r_part.pk}}"
+    >
+    <div>
+        <div>
+            <span class="fw-bold">  
+                {{ r_part.part_in_station.part.part_name }},
+            </span>
+            <span>  
+                Категорія: {{ r_part.part_in_station.part.part_type.part_type_name }}
+            </span>
+        </div>
+        <span>
+            К-сть: {{ r_part.quantity }} x {{ r_part.get_part_price }} ₴, 
+            загальна: {{ r_part.get_total_price }} ₴
+        </span>
+    </div>
+    <button class="btn btn-sm btn-outline-danger" title="Видалити"
+        hx-delete="{% url 'delete-required-part' r_part.pk %}"
+        hx-swap="innerHTML"
+        hx-target="#mechanic-service-widget"
+        >
+        <i class="bi bi-trash"></i>
+    </button>
+</li>

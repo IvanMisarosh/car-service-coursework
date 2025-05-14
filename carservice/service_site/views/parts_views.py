@@ -14,6 +14,7 @@ from datetime import datetime
 from django.core.paginator import Paginator
 import json
 from django.db.models import ProtectedError
+from django.template.loader import render_to_string
 
 
 
@@ -232,7 +233,7 @@ def add_staged_part(request):
         'part_brand_name': part.part_brand.brand_name if part.part_brand else 'Unknown',
         'part_type_name': part.part_type.part_type_name if part.part_type else 'Unknown',
         'quantity_per_package': part.quantity_per_package,
-        'avaliable_units': part.quantity_per_package * part_in_station.quantity,
+        'avaliable_units': part_in_station.quantity,
         'price_per_package': float(part.price_per_package),
         'description': part.description,
         'quantity': 1,
@@ -259,13 +260,15 @@ def update_staged_part(request):
     for part in staged_parts:
         if part['temp_id'] == temp_id:
             # Check if quantity is greater than available units
+            print(part['avaliable_units'])
             if quantity > part['avaliable_units']:
-                # messages.error(request, f"Quantity exceeds available units ({part['avaliable_units']}).")
-                # return HttpResponse("")
-                part['quantity'] = part['avaliable_units']
+                messages.error(request, f"Кількість перевищує доступну ({part['avaliable_units']}).")
+                return HttpResponse("")
+            elif  quantity < 0:
+                messages.error(request, f"Кількість запчастин має бути більшою за 0.")
+                return HttpResponse("")
             else:
-                part['quantity'] = max(1, quantity)
-            
+                part['quantity'] = quantity
             break
 
     request.session[f'staged_parts_{v_service_id}'] = staged_parts
@@ -290,44 +293,80 @@ def save_staged_parts(request):
     staged_parts = request.session.get(f'staged_parts_{v_service_id}', [])
     visit_service = models.VisitService.objects.get(pk=v_service_id)
     employee = request.user.employee
-    error = False
-    messages.error(request, "No parts staged.")
-    # if len(staged_parts) == 0:
-    #     messages.error(request, "No parts staged.")
-    #     error = True
-        
+
     if models.ProvidedService.objects.filter(visit_service=visit_service).exists():
-        
-        messages.error(request, "This service has already been provided.")
-        error = True
-
-    if error:
-        messages.error(request, "This service has already been provided.")
-        response = HttpResponse("")
-        response['HX-Refresh'] = 'true'
-        return response
-        
-
-    provided_service = models.ProvidedService.objects.create(
-        visit_service=visit_service,
-        employee=employee,
-        provided_date=datetime.now(),
-    )
+        provided_service = models.ProvidedService.objects.get(visit_service=visit_service)
+    else:
+        provided_service = models.ProvidedService.objects.create(
+            visit_service=visit_service,
+            employee=employee,
+            provided_date=datetime.now(),
+        )
 
     for staged in staged_parts:
-        part_in_station = models.PartInStation.objects.get(pk=staged['part_id'])
-        models.RequiredPart.objects.create(
-            provided_service=provided_service,
-            part_in_station=part_in_station,
-            quantity=staged['quantity']
-        )
+        part_in_station = models.PartInStation.objects.select_related("part").get(pk=staged['part_id'])
+        if part_in_station.quantity < staged['quantity']:
+            messages.error(request, f'При збереженні запчастини ({part_in_station.part.part_name}) для використання сталась помилка (в наявності: {part_in_station.quantity}, ви запросили: {staged['quantity']}). Додавання цієї запчастини пропущено') 
+        else:
+            models.RequiredPart.objects.create(
+                provided_service=provided_service,
+                part_in_station=part_in_station,
+                quantity=staged['quantity']
+            )
+            part_in_station.quantity -= staged['quantity']
+            part_in_station.save()
 
     if f'staged_parts_{v_service_id}' in request.session:
         del request.session[f'staged_parts_{v_service_id}']
         request.session.modified = True
 
-    # return redirect('visit-services', visit_id=visit_id)
-    response = HttpResponse("")
-    response['HX-Refresh'] = 'true'
+    context = get_visit_service_with_part_search_context(request, v_service_id)
+    rendered = render_to_string("service_site/visits/_required_parts_search_widget.html", context, request=request)
+    response = HttpResponse(rendered)
+    response['HX-Trigger'] = 'update-visit-services'
+    messages.success(request, "Дані послуги оновлені.")
     return response
 
+def delete_required_part(request, required_part_id):
+    required_part = get_object_or_404(models.RequiredPart.objects.select_related("provided_service__visit_service", "part_in_station"), pk=required_part_id)
+    try:
+        part_in_station = required_part.part_in_station
+        qty = required_part.quantity
+        required_part.delete()
+        part_in_station.quantity += qty
+        part_in_station.save()
+        context = get_visit_service_with_part_search_context(request, required_part.provided_service.visit_service.pk)
+        rendered = render_to_string("service_site/visits/_required_parts_search_widget.html", context, request=request)
+        response = HttpResponse(rendered)
+        response['HX-Trigger'] = 'update-visit-services'
+        messages.success(request, "Запчастину успішно видалено.")
+        return response 
+    except Exception as e:
+        print(e)
+        messages.error(request, "Сталася помилка при видаленні.")
+        return HttpResponseBadRequest()
+    
+
+def get_visit_service_data(pk):
+    return models.VisitService.objects.select_related(
+            'service', 'service__service_type', 'provided_service', 
+            'provided_service__employee', 'visit'
+        ).prefetch_related('provided_service__required_parts').get(pk=pk)
+
+
+def get_visit_service_with_part_search_context(request, visit_service_id):
+    visit_service = get_visit_service_data(pk=visit_service_id)
+    part_brands = models.PartBrand.objects.all()
+    part_types = models.PartType.objects.all()
+
+    context = {
+        "visit_service": visit_service,
+        'part_brands': part_brands,
+        'part_types': part_types,
+    }
+
+    if f'staged_parts_{visit_service_id}' in request.session:
+        del request.session[f'staged_parts_{visit_service_id}']
+        request.session.modified = True
+
+    return context

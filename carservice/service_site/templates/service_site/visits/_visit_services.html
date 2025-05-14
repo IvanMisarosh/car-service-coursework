@@ -1,5 +1,10 @@
 {% load group_filters %}
-<div class="card mt-2" id="visit-services">
+<div class="card mt-2" id="visit-services"
+    hx-get="{% url 'visit-services' visit.pk%}"
+    hx-trigger="update-visit-services from:body"
+    hx-swap="outerHTML"
+    hx-target="#visit-services"
+    >
     <div class="card-header mb-2 d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Заплановані послуги</h5>
         {% if visit_price > 0 %} 
@@ -15,11 +20,6 @@
             {% for v_service in visit_services %}
                 <div class="list-group-item px-0 list-group-item-action d-flex justify-content-between align-items-center"
                     x-data="{ editing: false }"
-                    {% if request.user|has_group:"mechanic" and not v_service.provided_service %}
-                        hx-get="{% url 'service-part-search' v_service.pk %}"
-                        hx-target="#required-parts-search"
-                        hx-swap="innerHTML"
-                    {% endif %}
                     >
                     {% include 'service_site/visits/_visit_service.html' %}
                 </div>
@@ -32,9 +32,4 @@
         
     </div>
 </div>
-
- {% comment %} WHY OOB DOESNT WORK???{% endcomment %} 
-{% comment %} <section id="messages" hx-swap-oob="true" hx-swap="innerHTML">
-    {% include 'service_site/visits/_toast.html'%}
-</section> {% endcomment %}
 

@@ -43,7 +43,7 @@
                 <label for="sorting_method" class="mb-0 me-2" id='items-lable'>Sorting: </label>
             </div> {% endcomment %}
             {% if not request.user|has_group:"mechanic" %}
-                <a class="col-2" method='GET' href="{% url 'create-visit' %}"><button class="btn btn-primary mt-2 mb-2">Додати візит</button></a>
+                <a class="col-2" method='GET' href="{% url 'get-visit-form' %}"><button class="btn btn-primary mt-2 mb-2">Додати візит</button></a>
             {% endif %}
         </div>
         

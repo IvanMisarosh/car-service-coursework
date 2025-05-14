@@ -1,0 +1,148 @@
+{% load crispy_forms_tags %}
+<div class="card px-0 mt-2 me-1 align-self-start rounded" id="visit-form-container"
+    x-data="{customer_editing_mode : false,
+            is_form: true        
+    }"
+    >
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5>Деталі візиту: {{ visit.visit_number }}{% if visit %}, станція: {{visit.employee.station.address}}{% endif %}</h5>
+        {% if visit %}
+            <!-- Add this dropdown to your visit services list page -->
+            <div class="col-2 dropdown">
+                <button class="btn btn-primary dropdown-toggle mt-2 mb-2 w-100" type="button" id="exportServicesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Експортувати вибірку
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="exportServicesDropdown">
+                    <li>
+                        <a class="dropdown-item" hx-get="{% url 'export-visit-services' visit.pk %}?format=csv" 
+                        hx-include="#filter-form">
+                            CSV
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" hx-get="{% url 'export-visit-services' visit.pk %}?format=json"
+                        hx-include="#filter-form">
+                            JSON
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="card-body">
+        <!-- Додаємо блок для відображення загальних помилок форми -->
+        {% if visit_form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+            <strong>Помилка:</strong>
+            <ul class="mb-0">
+                {% for error in visit_form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        <div class="row g-2">
+            <form method="post" class='col-5' id="visit-form" 
+                hx-post="{% url 'save-visit' %}?visit_id={{visit_id}}"
+                hx-target="#visit-form-container"
+                hx-push-url="false" 
+                hx-swap="outerHTML"
+
+                >
+                
+                {% csrf_token %}
+                <div class='card'>
+                    <div class="card-header pb-0">
+                        <h6>Стан візиту</h6>
+                    </div>
+                    <div class="card-body py-1 px-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ visit_form.visit_date|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ visit_form.visit_status|as_crispy_field }}                     
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ visit_form.planned_end_date|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ visit_form.actual_end_date|as_crispy_field }}                     
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ visit_form.employee|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ visit_form.details|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-2">
+                    <div class="card-header pb-0">
+                        <h6>Оплата</h6>
+                    </div>
+                    <div class="card-body py-1 px-2">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ visit_form.payment_date|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ visit_form.payment_status|as_crispy_field }}                     
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <input class='form-control' type="hidden" name="visit_id" id="visit-id-hidden-input" value="{{ visit.pk }}">
+
+                <div id="visit-car-input">
+                    <input class='form-control' type="hidden" name="car" id="car-id-input" value="{{ visit_car.pk }}">
+                </div>                            
+                
+                <button type="submit" class="btn btn-primary my-2 mx-2" :disabled="customer_editing_mode">
+                    {% if visit %} Зберегти {% else %} Створити {% endif %}
+                    <span x-show="customer_editing_mode"> (Виберіть клієнта та машину щоб зберегти)</span>
+                </button>
+
+                {% if visit_id %}
+                    <button class="btn btn-secondary my-2 mx-2"
+                        hx-get="{% url 'visit-info' visit_id %}"
+                        hx-target="#visit-info-container"
+                        hx-swap="innerHTML"
+                        hx-push-url="false"
+                        >
+                        Закрити зміни
+                    </button>
+                {% else %}
+
+                {% endif %}
+
+            </form>
+            <div class="col-7 g-2 mt-2 align-self-start rounded" id="visit-customer-details">
+                {% if visit_form.car.errors %}
+                <div class="alert alert-danger mt-1">
+                    <strong>Помилка при виборі авто:</strong>
+                    {% for error in visit_form.car.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if visit_car %}
+                    {% include 'service_site/visits/_visit_car_details.html'%}
+                {% else %}
+                    {% include 'service_site/visits/_visit_customer_details.html' %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

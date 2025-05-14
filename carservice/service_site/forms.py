@@ -227,3 +227,48 @@ class VisitForm(ModelForm):
             value = self.initial.get(field) or self.instance.__dict__.get(field)
             if value:
                 self.initial[field] = timezone.localtime(value).strftime('%Y-%m-%dT%H:%M')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        visit_status = cleaned_data.get('visit_status')
+        
+        # Assume we have a COMPLETED status with ID=2 (adjust as needed)
+        COMPLETED_STATUS_ID = 2  # Replace with your actual completed status ID
+        print(visit_status, visit_status.pk)
+        # Check if the status is being changed to completed
+        if visit_status and visit_status.pk == COMPLETED_STATUS_ID:
+            # If it's a new visit being created as completed, skip validation
+            if not self.instance.pk:
+                raise forms.ValidationError("Не можна завершити візит без послуг.")
+                
+            # Get all services for this visit
+            visit_services = self.instance.visit_services.all()
+            print(visit_services)
+            
+            if not visit_services:
+                # If no services are associated with this visit, raise validation error
+                raise forms.ValidationError("Не можна завершити візит без послуг.")
+            
+            # Check if each service has an associated provided service
+            missing_services = []
+            for visit_service in visit_services:
+                try:
+                    # Try to get the related provided service
+                    provided_service = visit_service.provided_service
+                    if not provided_service:
+                        missing_services.append(visit_service.service)
+                except models.ProvidedService.DoesNotExist:
+                    missing_services.append(visit_service.service)
+            
+            if missing_services:
+                service_names = ', '.join([str(service) for service in missing_services])
+                raise forms.ValidationError(
+                    f"Не можна завершити візит. Наступні послуги не були виконані: {service_names}"
+                )
+                
+            # Ensure actual_end_date is set when completing a visit
+            if not cleaned_data.get('actual_end_date'):
+                # self.add_error('actual_end_date', 'Фактична дата закінчення повинна бути встановлена для завершеного візиту.')
+                cleaned_data['actual_end_date'] = timezone.localtime(timezone.now()).strftime('%Y-%m-%dT%H:%M')
+        
+        return cleaned_data

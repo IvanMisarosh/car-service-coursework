@@ -1,25 +1,40 @@
-<div class="py-0" id="selected-service-detailed-view">
-    {% if visit_service %}
-        {% include 'service_site/visits/_selected_visit_service.html' %}
-    {% else %}
-        <p>Виберіть невиконану послугу</p>
-    {% endif %}
-</div>
-{% comment %} {% if visit_service %} {% endcomment %}
-    <button class="btn btn-primary btn-sm mb-2" id="add-required-parts-button" type="button" 
-            hx-post="{% url 'save-staged-parts' %}" 
-            hx-target="#visit-services"
-            hx-include="#visit_service_id"
-            hx-target="#messages"
-            x-show="staged_part_count > 0"
-        >
-        Виконати послгу
-    </button>
-{% comment %} {% endif %} {% endcomment %}
-<div class="pb-2" id="part-search-container">
-    {% if visit_service %}
-        {% include 'service_site/visits/_part_search.html' %}
-    {% else %}
-        <p>Виберіть невиконану послугу</p>
-    {% endif %}
+ <div class="card px-0 mt-2" id="required-parts-selection-container" x-data="{ staged_part_count: 0 }">
+    <dic class='card-header pb-1'>
+        <h5 class='mb-1'>Вибрана послуга</h5>
+    </dic>
+    <div class="row card-body px-1 py-1">
+        <div class="col-6 border-end" id="required-parts-search">
+            <div class="py-0" id="selected-service-detailed-view">
+                {% if visit_service %}
+                    {% include 'service_site/visits/_selected_visit_service.html' %}
+                {% else %}
+                    <p>Виберіть невиконану послугу</p>
+                {% endif %}
+            </div>
+            {% comment %} {% if visit_service %} {% endcomment %}
+                <button class="btn btn-primary btn-sm mb-2" id="add-required-parts-button" type="button" 
+                        hx-post="{% url 'save-staged-parts' %}" 
+                        hx-target="#mechanic-service-widget"
+                        hx-swap="innerHTML"
+                        hx-include="#visit_service_id"
+                        x-show="staged_part_count > 0"
+                    >
+                    Виконати послгу
+                </button>
+            {% comment %} {% endif %} {% endcomment %}
+            <div class="pb-2" id="part-search-container">
+                {% if visit_service %}
+                    {% include 'service_site/visits/_part_search.html' %}
+                {% else %}
+                    <p>Виберіть невиконану послугу</p>
+                {% endif %}
+            </div>    
+        </div>
+        
+        <div class="col-6 ms-auto" id="staged-required-parts-container">
+            <div class="list-group card-body py-1" id="staged-required-parts" 
+                x-show="staged_part_count > 0">
+            </div>
+        </div>
+    </div>
 </div>

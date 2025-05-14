@@ -27,26 +27,16 @@
 </div>
 
 {% if visit_service.provided_service %}
-    <div x-data="{ show_used_parts: false, button_text: 'Show'}">
-        <button class="btn btn-sm btn-outline-primary me-2 mt-2" @click="show_used_parts = !show_used_parts; button_text = show_used_parts ? 'Hide' : 'Show'">
+    <div x-data="{ show_used_parts: false, button_text: 'Показати'}">
+        <button class="btn btn-sm btn-outline-primary me-2 mt-2" @click="show_used_parts = !show_used_parts; button_text = show_used_parts ? 'Приховати' : 'Показати'">
             <i class="bi bi-tools"></i> 
             <span x-text='button_text'></span>
-            Використані запчастини
+            використані запчастини
         </button>
         <div x-show="show_used_parts" class="bg-light p-2 rounded mt-2 w-100">
             <ul class="list-group">
                 {% for r_part in visit_service.provided_service.required_parts.all %}
-                    <li class="list-group-item">
-                        <div>
-                            <span class="fw-bold">  
-                                {{r_part.part_in_station.part.part_name}},
-                            </span>
-                            <span>  
-                                Категорія: {{r_part.part_in_station.part.part_type.part_type_name}}
-                            </span>
-                        </div>
-                        <span>К-сть: {{r_part.quantity}} x {{r_part.get_part_price}} ₴, загальна: {{ r_part.get_total_price }} ₴</span>
-                    </li>
+                    {% include "service_site/visits/_selected_visit_service_required_part.html"%}
                 {% endfor %}
             </ul>
         </div>

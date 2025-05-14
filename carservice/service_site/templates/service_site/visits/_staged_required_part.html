@@ -18,7 +18,9 @@
             <span class='badge bg-secondary rounded-pill'>Тип:</span> {{ staged_part.part_type_name }}
         </div>
         <div>
-            К-сть в пакунку: {{ staged_part.quantity_per_package }}
+            {% comment %} К-сть в пакунку: {{ staged_part.quantity_per_package }}
+            <br> {% endcomment %}
+            Доступно на складі: {{ staged_part.avaliable_units }}
             <br>
             Ціна за одиницю: ₴{{ staged_part.price_per_unit }} 
         </div>
