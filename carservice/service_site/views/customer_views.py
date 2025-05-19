@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from .. import models
-from django.contrib.auth.decorators import permission_required
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from .. import filters
 from django.db.models import Q
 from ..views_utils import render_htmx
@@ -34,7 +33,6 @@ def export_customers(request):
 
     search_terms = search_query.split()
     qs = None
-    print(request.GET.get('export_selection'))
     if request.GET.get('export_selection') == 'true':
         for term in search_terms:
             query |= Q(first_name__icontains=term) | Q(

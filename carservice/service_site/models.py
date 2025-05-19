@@ -216,6 +216,12 @@ class PartInStation(models.Model):
     
     def __str__(self):
         return f"{self.part} at {self.station}"
+    
+    def add_parts(self, qty):
+        self.quantity += qty
+
+    def remove_parts(self, qty):
+        self.quantity -= qty
 
 class EmployeePosition(models.Model):
     employee_position_id = models.AutoField(primary_key=True, db_column='EmployeePositionID')

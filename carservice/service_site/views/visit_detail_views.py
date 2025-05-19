@@ -127,13 +127,11 @@ def save_visit_form(request):
     if form.is_valid():
         visit = form.save()
         messages.success(request, f"Візит №{visit.visit_number} був успішно збережений.")
-        print("coocked")
         response = HttpResponse()
         response['HX-Redirect'] = reverse('visit-detail', kwargs={'visit_id': visit.pk})
         return response
     else:
         car = getattr(form.instance, 'car', None)
-        print("not coocked")
         visit_services = getattr(form.instance, 'visit_services', None)
         context = {
             "visit_form": form,
@@ -197,11 +195,10 @@ class VisitDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
         if form.is_valid():
             visit = form.save()
             messages.success(request, f"Візит №{visit.visit_number} був успішно збережений.")
-            print("coocked")
             return redirect('visit-detail', visit_id=visit.pk)
         else:
             car = getattr(form.instance, 'car', None)
-            print("not coocked")
+
             visit_services = getattr(form.instance, 'visit_services', None)
             context = {
                 "visit_form": form,

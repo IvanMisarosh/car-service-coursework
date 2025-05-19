@@ -272,7 +272,6 @@ class VisitForm(ModelForm):
         
         # Assume we have a COMPLETED status with ID=2 (adjust as needed)
         COMPLETED_STATUS_ID = 2  # Replace with your actual completed status ID
-        print(visit_status, visit_status.pk)
         # Check if the status is being changed to completed
         if visit_status and visit_status.pk == COMPLETED_STATUS_ID:
             # If it's a new visit being created as completed, skip validation
@@ -281,7 +280,6 @@ class VisitForm(ModelForm):
                 
             # Get all services for this visit
             visit_services = self.instance.visit_services.all()
-            print(visit_services)
             
             if not visit_services:
                 # If no services are associated with this visit, raise validation error

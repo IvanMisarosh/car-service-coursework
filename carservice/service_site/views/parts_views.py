@@ -114,8 +114,6 @@ class PartFormView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 "part_types": part_types,
                 "part_brands": part_brands
             })
-        
-        print(form.errors)
 
         return HttpResponseBadRequest("")
     
@@ -150,7 +148,6 @@ class PartEditView(LoginRequiredMixin, PermissionRequiredMixin, View):
     
     def post(self, request, part_id):
         part = get_object_or_404(models.Part, pk=part_id)
-        print(f"Request Body: {request.POST}") 
         data = request.POST
 
         # Update the part with the data from HTMX
@@ -291,7 +288,6 @@ def update_staged_part(request):
     for part in staged_parts:
         if part['temp_id'] == temp_id:
             # Check if quantity is greater than available units
-            print(part['avaliable_units'])
             if quantity > part['avaliable_units']:
                 messages.error(request, f"Кількість перевищує доступну ({part['avaliable_units']}).")
                 return HttpResponse("")
@@ -373,7 +369,6 @@ def delete_required_part(request, required_part_id):
         messages.success(request, "Запчастину успішно видалено.")
         return response 
     except Exception as e:
-        print(e)
         messages.error(request, "Сталася помилка при видаленні.")
         return HttpResponseBadRequest()
     

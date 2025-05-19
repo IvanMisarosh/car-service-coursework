@@ -62,7 +62,6 @@ def get_supplier_edit_row(request, pk):
         return render_htmx(request, None, "service_site/supplier/_supplier_edit_row.html", context)
     elif request.method == "POST":
         data = request.POST
-        print(data)
         supplier = get_object_or_404(Supplier, pk=pk)
         supplier.supplier_name = data.get('supplier_name', supplier.supplier_name)
         supplier.email = data.get('email', supplier.email)
