@@ -101,6 +101,7 @@ urlpatterns = [
     path("parts/<int:part_id>/delete/", views.delete_part, name="delete-part"),
     path('part/<int:part_id>/edit-form/', views.PartEditView.as_view(), name='edit-part-form'),
     path('part/<int:part_id>/row/', views.PartRowView.as_view(), name='get-part-row'),
+    path('parts/<int:part_id>/availability/', views.part_availability, name='part-availability'),
 
     # Маршрути для станцій
     path('stations/', views.StationsView.as_view(), name='stations'),

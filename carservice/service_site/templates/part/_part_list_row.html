@@ -1,26 +1,37 @@
 {% load group_filters %}
-<tr>
+<!-- _part_list_row.html -->
+<tr class="part-row"
+    hx-get="{% url 'part-availability' part.pk %}"
+    hx-target="#part-availability-container"
+    hx-swap="innerHTML"
+    hx-trigger="click"
+    style="cursor: pointer;"
+    >
     <td class="py-1 px-1">{{ part.part_name }}</td>
     <td>{{ part.part_brand.brand_name|default:"Не вказано" }}</td>
     <td>{{ part.part_type.part_type_name|default:"Не вказано" }}</td>
     <td>{{ part.weight }}</td>
     <td>{{ part.dimensions|default:"Не вказано" }}</td>
-    <td>{{ part.description|default:"Не вказано" }}</td>
+    <td class="text-truncate" style="max-width: 200px;" title="{{ part.description|default:'Не вказано' }}">
+        {{ part.description|default:"Не вказано"|truncatechars:50 }}
+    </td>
     <td>{{ part.quantity_per_package }}</td>
     <td>{{ part.price_per_package }}</td>
     <td>{{ part.get_price_per_unit }}</td>
-    <td class="d-flex gap-1">
-        <button class="btn btn-sm btn-primary"
-                hx-get="{% url 'edit-part-form' part.pk %}"
-                hx-target="closest tr"
-                hx-swap="outerHTML">
-            <i class="bi bi-pencil-fill"></i>
-        </button>
-        <button type="button" class="btn btn-danger btn-sm"
-                hx-delete="{% url 'delete-part' part.pk %}"
-                hx-target="closest tr"
-                hx-swap="outerHTML">
-            <i class="bi bi-trash"></i>
-        </button>
+    <td>
+        <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-primary"
+                        hx-get="{% url 'edit-part-form' part.pk %}"
+                        hx-target="closest tr"
+                        hx-swap="outerHTML">
+                    <i class="bi bi-pencil-fill"></i>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm"
+                        hx-delete="{% url 'delete-part' part.pk %}"
+                        hx-target="closest tr"
+                        hx-swap="outerHTML">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
     </td>
 </tr>

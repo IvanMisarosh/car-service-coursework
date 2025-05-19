@@ -52,6 +52,37 @@ class PartsView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         return render_htmx(request, "part/parts.html", "part/_part_list.html", context)
 
+@login_required
+def part_availability(request, part_id):
+    """
+    View to return part availability across different stations.
+    This is designed to be loaded via HTMX.
+    """
+    part = get_object_or_404(models.Part, pk=part_id)
+    part_in_stations = models.PartInStation.objects.filter(part=part).select_related('station')
+    
+    # Get all stations, including those without this part
+    all_stations = models.Station.objects.all()
+    
+    # Create a dictionary of station_id: quantity for quick lookups
+    availability_dict = {pis.station_id: pis.quantity for pis in part_in_stations}
+    
+    # Create a list of station availability info
+    stations_availability = []
+    for station in all_stations:
+        stations_availability.append({
+            'station': station,
+            'quantity': availability_dict.get(station.station_id, 0),
+            'is_available': station.station_id in availability_dict
+        })
+    
+    context = {
+        'part': part,
+        'stations_availability': stations_availability
+    }
+    
+    return render(request, 'part/_part_availability.html', context)
+
 
 class PartFormView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['service_site.add_part']
