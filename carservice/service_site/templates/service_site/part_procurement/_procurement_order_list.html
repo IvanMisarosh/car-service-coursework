@@ -1,4 +1,4 @@
-{% comment %} part_procurement/_procurement_order_list.html {% endcomment %}
+{% comment %} service_site/part_procurement/_procurement_order_list.html {% endcomment %}
 <!-- Table-based Layout for Procurement Orders using Alpine.js -->
 <div class="container-fluid"
     x-data="{
@@ -31,7 +31,7 @@
       </thead>
       <tbody id="order-table-body">
         {% for order in procurement_orders %}
-          {% include 'part_procurement/_order_row_expandable.html'%}
+          {% include 'service_site/part_procurement/_order_row_expandable.html'%}
         {% empty %}
         <tr>
           <td colspan="8" class="text-center py-4">Не знайдено замовлень.</td>

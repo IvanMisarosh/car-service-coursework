@@ -46,9 +46,9 @@ def procurement_orders(request):
     
     # Check if request is HTMX
     if request.headers.get('HX-Request'):
-        return render(request, 'part_procurement/_procurement_order_list.html', context)
+        return render(request, 'service_site/part_procurement/_procurement_order_list.html', context)
     
-    return render(request, 'part_procurement/procurement_orders.html', context)
+    return render(request, 'service_site/part_procurement/procurement_orders.html', context)
 
 
 @login_required
@@ -100,7 +100,7 @@ def export_procurement_orders(request):
 def add_order(request):
     if request.method == "GET":
         form = forms.ProcurementOrderInfoForm()
-        return render(request, 'part_procurement/_add_order_form.html', {'form': form})
+        return render(request, 'service_site/part_procurement/_add_order_form.html', {'form': form})
     if request.method == 'POST':
         form = forms.ProcurementOrderInfoForm(request.POST)
         
@@ -109,8 +109,8 @@ def add_order(request):
             form.instance.total_price = 0
             order = form.save()
             messages.success(request, f'Замовлення №{order.order_number} успішно додано')
-            return render(request, "part_procurement/_order_row_expandable.html", {"order": order})
-    return render(request, 'part_procurement/_add_order_form.html', {'form': form}, status=400)
+            return render(request, "service_site/part_procurement/_order_row_expandable.html", {"order": order})
+    return render(request, 'service_site/part_procurement/_add_order_form.html', {'form': form}, status=400)
 
 def delete_procurement_order(request, order_id):
     procurement_order = get_object_or_404(models.ProcurementOrder, pk=order_id)
@@ -125,7 +125,7 @@ def delete_procurement_order(request, order_id):
 
 def order_info(request, pk):
     order = get_object_or_404(models.ProcurementOrder, pk=pk)
-    return render(request, 'part_procurement/_order_info_fields.html', {'order': order})
+    return render(request, 'service_site/part_procurement/_order_info_fields.html', {'order': order})
 
 def edit_order_info(request, pk):
     order = get_object_or_404(models.ProcurementOrder, pk=pk)
@@ -136,11 +136,11 @@ def edit_order_info(request, pk):
             return order_info(request, pk)  # Rerender view mode
     else:
         form = forms.ProcurementOrderInfoForm(instance=order)
-    return render(request, 'part_procurement/_edit_order_info_form.html', {'form': form, 'order': order})
+    return render(request, 'service_site/part_procurement/_edit_order_info_form.html', {'form': form, 'order': order})
 
 def procurement_order_items(request, order_id):
     order = models.ProcurementOrder.objects.prefetch_related("units", "units__part", "units__part__part_type", "units__part__part_brand").get(pk=order_id)
-    return render(request, 'part_procurement/_order_details.html', {
+    return render(request, 'service_site/part_procurement/_order_details.html', {
         'order': order
     })
 
@@ -156,7 +156,7 @@ def add_order_unit(request, order_id):
             "part_types" : part_types,
             'order_id' : order_id 
         }
-        return render(request, 'part_procurement/_add_order_unit.html', context)
+        return render(request, 'service_site/part_procurement/_add_order_unit.html', context)
     elif request.method == 'POST':
         #TODO: add validation
         part_id = request.POST.get('part_id', None)
@@ -171,7 +171,7 @@ def add_order_unit(request, order_id):
             part=part
         )
         # messages.error(request, "Quantity must be greater than 0.")
-        return render(request, 'part_procurement/_unit_row_with_placement.html', 
+        return render(request, 'service_site/part_procurement/_unit_row_with_placement.html', 
                       {'unit': order_unit, "placed_count": order_unit.get_placed_count})
     
 def delete_procurement_unit(request, unit_id):
@@ -183,7 +183,7 @@ def delete_procurement_unit(request, unit_id):
     except ProtectedError:
         placed_count = procurement_unit.get_placed_count()
         messages.error(request, f"Неможливо видалити, оскільки {placed_count} одиниці вже розміщені.")
-        return render(request, 'part_procurement/_unit_row.html', {'unit': procurement_unit, "placed_count": placed_count})
+        return render(request, 'service_site/part_procurement/_unit_row.html', {'unit': procurement_unit, "placed_count": placed_count})
 
 def edit_unit(request, unit_id):
     unit = get_object_or_404(models.ProcurementUnit, pk=unit_id)
@@ -205,11 +205,11 @@ def edit_unit(request, unit_id):
         unit.price_per_unit = price
 
     unit.save()
-    return render(request, 'part_procurement/_unit_row.html', {'unit': unit, "placed_count": unit.get_placed_count})
+    return render(request, 'service_site/part_procurement/_unit_row.html', {'unit': unit, "placed_count": unit.get_placed_count})
 
 def unit_placements(request, pk):
     unit = get_object_or_404(models.ProcurementUnit.objects.prefetch_related('placements__part_in_station__station'), pk=pk)
-    return render(request, 'part_procurement/_unit_placements.html', {'unit': unit})
+    return render(request, 'service_site/part_procurement/_unit_placements.html', {'unit': unit})
 
 def add_placement(request, unit_id):
     print(request.method)
@@ -221,7 +221,7 @@ def add_placement(request, unit_id):
             'unit': unit,
             'stations': stations
         }
-        return render(request, 'part_procurement/_placement_form.html', context)
+        return render(request, 'service_site/part_procurement/_placement_form.html', context)
     elif request.method == "POST":
         station_id = request.POST.get('station_id')
         quantity = int(request.POST.get('quantity', 0))
@@ -235,7 +235,7 @@ def add_placement(request, unit_id):
             placed_count = unit.get_placed_count()
 
             # Render only this updated row
-            rendered_row = render_to_string("part_procurement/_unit_row.html", {
+            rendered_row = render_to_string("service_site/part_procurement/_unit_row.html", {
                 "unit": unit,
                 "placed_count": placed_count
             }, request=request)
@@ -265,7 +265,7 @@ def add_placement(request, unit_id):
         placed_count = unit.get_placed_count()
 
         # Render only this updated row
-        rendered_row = render_to_string("part_procurement/_unit_row.html", {
+        rendered_row = render_to_string("service_site/part_procurement/_unit_row.html", {
             "unit": unit,
             "placed_count": placed_count
         }, request=request)
@@ -284,7 +284,7 @@ def remove_placement(request, placement_id):
         models.ProcurementUnit.objects.prefetch_related('placements__part_in_station__station'),
         pk=unit_id
     )
-    rendered = render_to_string('part_procurement/_unit_placements.html', {'unit': unit}, request=request)
+    rendered = render_to_string('service_site/part_procurement/_unit_placements.html', {'unit': unit}, request=request)
 
     # Return response with HX-Trigger
     response = HttpResponse(rendered)
@@ -297,7 +297,7 @@ def update_row(request, unit_id):
     unit.refresh_from_db()
     placed_count = unit.get_placed_count()
 
-    return render(request, "part_procurement/_unit_row.html", {
+    return render(request, "service_site/part_procurement/_unit_row.html", {
         "unit": unit,
         "placed_count": placed_count
     })
@@ -305,6 +305,6 @@ def update_row(request, unit_id):
 def update_order_row(request, order_id):
     order = get_object_or_404(models.ProcurementOrder, pk=order_id)
 
-    return render(request, "part_procurement/_order_row.html", {
+    return render(request, "service_site/part_procurement/_order_row.html", {
         "order": order,
     })

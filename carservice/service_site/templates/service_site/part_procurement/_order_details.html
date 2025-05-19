@@ -55,7 +55,7 @@
       <tbody id="order-units-table-body-{{order.pk}}">
         {% for unit in order.units.all %}
         {% with placed_count=unit.get_placed_count %}
-          {% include 'part_procurement/_unit_row_with_placement.html'%}
+          {% include 'service_site/part_procurement/_unit_row_with_placement.html'%}
         {% endwith %}
         {% empty %}
         <tr>

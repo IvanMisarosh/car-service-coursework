@@ -244,7 +244,7 @@ def part_search_for_unit(request):
         search_query &= Q(part_type__part_type_id=part_type_id)
         
     parts = parts.filter(search_query).distinct()
-    return render(request, "part_procurement/_unit_part_select.html", {'parts': parts})
+    return render(request, "service_site/part_procurement/_unit_part_select.html", {'parts': parts})
 
 def add_staged_part(request):
     part_id = request.POST.get('part_id')
