@@ -45,7 +45,7 @@ class SuppliersView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "suppliers": page_obj,
         }
 
-        return render_htmx(request, "supplier/suppliers.html", "supplier/_supplier_list.html", context)
+        return render_htmx(request, "service_site/supplier/suppliers.html", "service_site/supplier/_supplier_list.html", context)
     
 
 def get_supplier_edit_row(request, pk):
@@ -59,7 +59,7 @@ def get_supplier_edit_row(request, pk):
         context = {
             'supplier': supplier,
         }
-        return render_htmx(request, None, "supplier/_supplier_edit_row.html", context)
+        return render_htmx(request, None, "service_site/supplier/_supplier_edit_row.html", context)
     elif request.method == "POST":
         data = request.POST
         print(data)
@@ -79,7 +79,7 @@ def get_supplier_edit_row(request, pk):
         context = {
             'supplier': supplier,
         }
-        return render_htmx(request, None, "supplier/_supplier_list_row.html", context)
+        return render_htmx(request, None, "service_site/supplier/_supplier_list_row.html", context)
 
 def get_supplier_row(request, pk):
     supplier = get_object_or_404(Supplier, pk=pk)
@@ -92,7 +92,7 @@ def get_supplier_row(request, pk):
     context = {
         'supplier': supplier,
     }
-    return render_htmx(request, None, "supplier/_supplier_list_row.html", context)
+    return render_htmx(request, None, "service_site/supplier/_supplier_list_row.html", context)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -102,15 +102,15 @@ class SupplierView(LoginRequiredMixin, PermissionRequiredMixin, View):
     
     def get(self, request):
         form = SupplierForm()
-        return render_htmx(request, None, "supplier/_add_supplier_form.html", {"form": form})
+        return render_htmx(request, None, "service_site/supplier/_add_supplier_form.html", {"form": form})
 
     def post(self, request):
         form = SupplierForm(request.POST)
         if form.is_valid():
             supplier = form.save()
             # Render the new row for the supplier table
-            return render_htmx(request, None, "supplier/_supplier_list_row.html", {"supplier": supplier, "request": request})
-        return render_htmx(request, None, "supplier/_add_supplier_form.html", {"form": form})
+            return render_htmx(request, None, "service_site/supplier/_supplier_list_row.html", {"supplier": supplier, "request": request})
+        return render_htmx(request, None, "service_site/supplier/_add_supplier_form.html", {"form": form})
     
     def delete(self, request, supplier_id):
         supplier = get_object_or_404(Supplier, pk=supplier_id)
@@ -131,7 +131,7 @@ class SupplierView(LoginRequiredMixin, PermissionRequiredMixin, View):
             context = {
                 'supplier': supplier,
             }
-            return render(request, "supplier/_supplier_list_row.html", context)
+            return render(request, "service_site/supplier/_supplier_list_row.html", context)
         except Exception:
             pass
 
