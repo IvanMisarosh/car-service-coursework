@@ -55,7 +55,7 @@ class CarModelsView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'suspension_types': models.SuspensionType.objects.all(),
         }
 
-        return render_htmx(request, "car_model/car_models.html", "car_model/_car_model_list.html", context)
+        return render_htmx(request, "service_site/car_model/car_models.html", "service_site/car_model/_car_model_list.html", context)
     
     def delete(self, request, car_model_id):
         car_model = get_object_or_404(models.CarModel, pk=car_model_id)
@@ -75,7 +75,7 @@ def add_car_model(request):
         context = {
             "form": forms.CarModelForm()
         }
-        return render(request, 'car_model/_car_model_add_form.html', context)
+        return render(request, 'service_site/car_model/_car_model_add_form.html', context)
     elif request.method == "POST":
         form = forms.CarModelForm(request.POST)
         if form.is_valid():
@@ -93,7 +93,7 @@ def check_model_name(request):
 def view_car_model(request, pk):
     car_model = get_object_or_404(models.CarModel, pk=pk)
     context = {"car_model": car_model}
-    return render(request, "car_model/_car_model_card.html", context)
+    return render(request, "service_site/car_model/_car_model_card.html", context)
 
 def edit_car_model(request, pk):
     car_model = get_object_or_404(models.CarModel, pk=pk)
@@ -102,8 +102,8 @@ def edit_car_model(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, f"Модель {form.instance.model_name} була успішно змінена")
-            return render(request, 'car_model/_car_model_card.html', {'car_model': car_model})
+            return render(request, 'service_site/car_model/_car_model_card.html', {'car_model': car_model})
     elif request.method == "GET":
         form = forms.CarModelForm(instance=car_model)
-        return render(request, 'car_model/_car_model_form.html', {'form': form, 'car_model': car_model})
+        return render(request, 'service_site/car_model/_car_model_form.html', {'form': form, 'car_model': car_model})
     

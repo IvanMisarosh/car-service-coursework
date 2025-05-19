@@ -50,7 +50,7 @@ class PartsView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "part_brands": part_brands,
         }
 
-        return render_htmx(request, "part/parts.html", "part/_part_list.html", context)
+        return render_htmx(request, "service_site/part/parts.html", "service_site/part/_part_list.html", context)
 
 @login_required
 def part_availability(request, part_id):
@@ -81,7 +81,7 @@ def part_availability(request, part_id):
         'stations_availability': stations_availability
     }
     
-    return render(request, 'part/_part_availability.html', context)
+    return render(request, 'service_site/part/_part_availability.html', context)
 
 
 class PartFormView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -98,7 +98,7 @@ class PartFormView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "part_types": part_types,
             "part_brands": part_brands,
         }
-        return render_htmx(request, None, "part/_add_part_form.html", context)
+        return render_htmx(request, None, "service_site/part/_add_part_form.html", context)
 
     def post(self, request):
         form = forms.PartForm(request.POST)
@@ -109,7 +109,7 @@ class PartFormView(LoginRequiredMixin, PermissionRequiredMixin, View):
             part_brands = models.PartBrand.objects.all().order_by('brand_name')
             
             # Render the new row for the part table
-            return render_htmx(request, None, "part/_part_list_row.html", {
+            return render_htmx(request, None, "service_site/part/_part_list_row.html", {
                 "part": part, 
                 "part_types": part_types,
                 "part_brands": part_brands
@@ -129,7 +129,7 @@ def delete_part(request, part_id):
     except ProtectedError:
         messages.error(request, f"Неможливо видалити запчастину '{part.part_name}', оскільки вона використовується у послугах.")
         context = {'part': part}
-        return render(request, "part/_part_list_row.html", context)
+        return render(request, "service_site/part/_part_list_row.html", context)
 
 
 class PartEditView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -146,7 +146,7 @@ class PartEditView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "part_types": part_types,
             "part_brands": part_brands,
         }
-        return render_htmx(request, None, "part/_part_edit_form_row.html", context)
+        return render_htmx(request, None, "service_site/part/_part_edit_form_row.html", context)
     
     def post(self, request, part_id):
         part = get_object_or_404(models.Part, pk=part_id)
@@ -183,7 +183,7 @@ class PartEditView(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
         
         # Return the updated part row as HTMX response
-        return render_htmx(request, None, "part/_part_list_row.html", context)
+        return render_htmx(request, None, "service_site/part/_part_list_row.html", context)
 
 
 class PartRowView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -200,7 +200,7 @@ class PartRowView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'part_types': part_types,
             'part_brands': part_brands,
         }
-        return render_htmx(request, None, "part/_part_list_row.html", context)
+        return render_htmx(request, None, "service_site/part/_part_list_row.html", context)
 
 def part_search(request):
     search = request.GET.get("search", '')
