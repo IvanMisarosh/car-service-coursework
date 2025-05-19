@@ -82,7 +82,7 @@ class StationsView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "stations": page_obj,
         }
         
-        return render_htmx(request, "station/stations.html", "station/_station_list.html", context)
+        return render_htmx(request, "service_site/station/stations.html", "service_site/station/_station_list.html", context)
     
 def delete_station(request, station_id):
     station = get_object_or_404(models.Station, pk=station_id)
@@ -100,7 +100,7 @@ def add_station(request):
         context = {
             "form": forms.StationForm()
         }
-        return render(request, 'station/_station_add_form.html', context)
+        return render(request, 'service_site/station/_station_add_form.html', context)
     elif request.method == "POST":
         form = forms.StationForm(request.POST)
         if form.is_valid():
@@ -110,7 +110,7 @@ def add_station(request):
             context = {
                 "form": form
             }
-            return render(request, 'station/_station_add_form.html', context)
+            return render(request, 'service_site/station/_station_add_form.html', context)
     
 def view_station(request, pk):
     station = get_object_or_404(models.Station, pk=pk)
@@ -132,7 +132,7 @@ def view_station(request, pk):
         "parts_in_station": parts_in_station,
         "active_tab": active_tab,
     }
-    return render(request, "station/_station_card.html", context)
+    return render(request, "service_site/station/_station_card.html", context)
 
 def edit_station(request, pk):
     station = get_object_or_404(models.Station, pk=pk)
@@ -143,7 +143,7 @@ def edit_station(request, pk):
             return redirect('view-station', pk=station.station_id)
     elif request.method == "GET":
         form = forms.StationForm(instance=station)
-        return render(request, 'station/_station_form.html', {'form': form, 'station': station})
+        return render(request, 'service_site/station/_station_form.html', {'form': form, 'station': station})
 
 def station_employees(request, pk):
     station = get_object_or_404(models.Station, pk=pk)
@@ -154,7 +154,7 @@ def station_employees(request, pk):
         "employees": employees,
         "active_tab": "employees"
     }
-    return render(request, "station/_station_employees_tab.html", context)
+    return render(request, "service_site/station/_station_employees_tab.html", context)
 
 def station_equipment(request, pk):
     station = get_object_or_404(models.Station, pk=pk)
@@ -165,7 +165,7 @@ def station_equipment(request, pk):
         "parts_in_station": parts_in_station,
         "active_tab": "equipment"
     }
-    return render(request, "station/_station_equipment_tab.html", context)
+    return render(request, "service_site/station/_station_equipment_tab.html", context)
 
 def station_empty(request, pk):
     station = get_object_or_404(models.Station, pk=pk)
@@ -181,4 +181,4 @@ def station_empty(request, pk):
         "active_tab": "summary",
     }
     
-    return render(request, "station/_station_summary_tab.html", context)
+    return render(request, "service_site/station/_station_summary_tab.html", context)

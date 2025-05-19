@@ -74,13 +74,13 @@
             <!-- Tab content -->
             <div class="tab-content" id="stationTabContent-{{ station.station_id }}">
                 {% if active_tab == 'employees' %}
-                    {% include 'station/_station_employees_tab.html' %}
+                    {% include 'service_site/station/_station_employees_tab.html' %}
                 {% elif active_tab == 'equipment' %}
-                    {% include 'station/_station_equipment_tab.html' %}
+                    {% include 'service_site/station/_station_equipment_tab.html' %}
                 {% elif active_tab == 'summary' %}
-                    {% include 'station/_station_summary_tab.html' %}
+                    {% include 'service_site/station/_station_summary_tab.html' %}
                 {% else %}
-                    {% include 'station/_station_summary_tab.html' %}
+                    {% include 'service_site/station/_station_summary_tab.html' %}
                 {% endif %}
             </div>
         </div>
