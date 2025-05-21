@@ -7,3 +7,12 @@ class ProcurementIsCompletedError(BusinessLogicError):
 
 class NotEnoughPartsError(BusinessLogicError):
     pass
+
+class InvalidPlacementError(BusinessLogicError):
+    pass
+
+class UnitHasPlacementsError(BusinessLogicError):
+    pass
+
+class InvalidProcurementUnitData(BusinessLogicError):
+    pass

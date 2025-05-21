@@ -75,6 +75,7 @@
                 hx-post="{% url 'edit_unit' unit.pk %}"
                 hx-include="closest tr"
                 hx-target="closest tr"
+                hx-target-error="closest tr"
                 hx-swap="outerHTML"
                 @htmx:after-request="htmx.ajax('GET', '{% url 'update-order' unit.procurement_order.pk %}', {target: '#row-{{ unit.procurement_order.pk }}', swap: 'outerHTML'})"
                 @click="

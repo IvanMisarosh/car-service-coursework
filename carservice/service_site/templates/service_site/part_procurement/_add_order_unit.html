@@ -4,6 +4,7 @@
         class="row g-2 order-unit-form"
         hx-post="{% url 'add-order-unit' order_id %}"
         hx-target="#order-units-table-body-{{ order_id }}" 
+        hx-target-error="#order-units-table-body-{{ order_id }}" 
         @htmx:after-request="htmx.ajax('GET', '{% url 'update-order' order_id %}', {target: '#row-{{ order_id }}', swap: 'outerHTML'})"
         hx-swap="afterbegin"
       >

@@ -70,10 +70,10 @@ urlpatterns = [
 
     path('procurement/unit/<int:unit_id>', views.edit_unit, name="edit_unit"),
 
-    path('procurement/order/<int:order_id>/unit/add', views.add_order_unit, name='add-order-unit'),
+    path('procurement/order/<int:order_id>/unit/add', views.AddOrderUnitView.as_view(), name='add-order-unit'),
     path("procurement-units/<int:unit_id>/delete/", views.delete_procurement_unit, name="delete-procurement-unit"),
     path('unit/<int:pk>/placements/', views.unit_placements, name='unit_placements'),
-    path('unit/<int:unit_id>/add-placement/', views.add_placement, name='add_placement'),
+    path('unit/<int:unit_id>/add-placement/', views.AddPlacementView.as_view(), name='add_placement'),
     path('unit/<int:unit_id>/update/', views.update_row, name='update-unit'),
     path("unit/<int:placement_id>/remove-placement/", views.remove_placement, name="remove-placement"),
 

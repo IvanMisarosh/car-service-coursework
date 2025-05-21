@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
-from django.db.models import Q, F
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.db.models import Q
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
 from .. import models
 from .. import filters
 from .. import forms
@@ -13,10 +13,15 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from datetime import datetime
 from django.template.loader import render_to_string
-import json
 from django.db.models import ProtectedError
+from django.views.generic import View 
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 
 @login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_procurementorder'], raise_exception=True)
 def procurement_orders(request):
     """View for displaying all procurement orders with filtering and pagination."""
     search_query = request.GET.get('search', '')
@@ -26,19 +31,20 @@ def procurement_orders(request):
     queryset = models.ProcurementOrder.objects.select_related(
         'employee', 'employee__employee_position', 'supplier', 'procurement_status'
     ).order_by("-order_date")
-
+    
+    query = Q()
     if search_query:
-        queryset = queryset.filter(
-            Q(order_number__icontains=search_query) |
-            Q(employee__first_name__icontains=search_query) |
-            Q(employee__last_name__icontains=search_query) |
-            Q(supplier__supplier_name__icontains=search_query)
-        )
+        search_terms = search_query.split()
+        for term in search_terms:
+            query |= Q(order_number__icontains=term) | Q(
+                employee__first_name__icontains=term) | Q(
+                employee__last_name__icontains=term) | Q(
+                supplier__supplier_name__icontains=term)
+       
+    qs = queryset.filter(query)
+    filter = filters.ProcurementOrderFilter(request.GET, queryset=qs)
 
-    filter = filters.ProcurementOrderFilter(request.GET, queryset=queryset)
-    filtered_qs = filter.qs
-
-    paginator = Paginator(filtered_qs, items_per_page)
+    paginator = Paginator(filter.qs, items_per_page)
     page_obj = paginator.get_page(page_number)
 
     context = {
@@ -54,6 +60,8 @@ def procurement_orders(request):
 
 
 @login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_procurementorder'], raise_exception=True)
 def export_procurement_orders(request):
     """
     Export procurement orders data to various formats.
@@ -69,15 +77,17 @@ def export_procurement_orders(request):
         'employee', 'employee__employee_position', 'supplier', 'procurement_status'
     ).order_by("-order_date")
 
+    query = Q()
     if search_query:
-        queryset = queryset.filter(
-            Q(order_number__icontains=search_query) |
-            Q(employee__first_name__icontains=search_query) |
-            Q(employee__last_name__icontains=search_query) |
-            Q(supplier__supplier_name__icontains=search_query)
-        )
-
-    filter = filters.ProcurementOrderFilter(request.GET, queryset=queryset)
+        search_terms = search_query.split()
+        for term in search_terms:
+            query |= Q(order_number__icontains=term) | Q(
+                employee__first_name__icontains=term) | Q(
+                employee__last_name__icontains=term) | Q(
+                supplier__supplier_name__icontains=term)
+       
+    qs = queryset.filter(query)
+    filter = filters.ProcurementOrderFilter(request.GET, queryset=qs)
     filtered_qs = filter.qs
     
     resource = resources.ProcurementOrderResource()
@@ -99,11 +109,15 @@ def export_procurement_orders(request):
     
     return response
 
+@login_required
+@require_http_methods(["GET", "POST"])
+@permission_required(['service_site.add_procurementorder'], raise_exception=True)
 def add_order(request):
     if request.method == "GET":
         form = forms.ProcurementOrderInfoForm()
         return render(request, 'service_site/part_procurement/_add_order_form.html', {'form': form})
     if request.method == 'POST':
+        # TODO: Refactor this to avoid using model forms
         form = forms.ProcurementOrderInfoForm(request.POST)
         
         if form.is_valid():
@@ -112,26 +126,41 @@ def add_order(request):
             order = form.save()
             messages.success(request, f'Замовлення №{order.order_number} успішно додано')
             return render(request, "service_site/part_procurement/_order_row_expandable.html", {"order": order})
+
     return render(request, 'service_site/part_procurement/_add_order_form.html', {'form': form}, status=400)
 
+@login_required
+@require_http_methods(["DELETE"])
+@permission_required(['service_site.delete_procurementorder'], raise_exception=True)
 def delete_procurement_order(request, order_id):
-    procurement_order = get_object_or_404(models.ProcurementOrder, pk=order_id)
     try:
-        order_number = procurement_order.order_number
-        procurement_order.delete()
+        order_number = part_procurement.delete_procurement_order(order_id)
         messages.success(request, f"Замовлення {order_number} успішно видалено")
-        return procurement_orders(request)
     except ProtectedError:
-        messages.error(request, f"Неможливо видалити замовлення '{order_number}', оскільки воно має позиції.")
-        return procurement_orders(request)
+        messages.error(request, "Неможливо видалити замовлення, оскільки воно має позиції.")
+        return HttpResponse(status=400)
+    except ObjectDoesNotExist:
+        messages.error(request, "Неможливо видалити замовлення, оскільки воно не існує")
+        return HttpResponse(status=400)
+    else:
+        response = HttpResponse()
+        response['HX-Redirect'] = reverse('procurement-orders', kwargs={})
+        return response
 
+@login_required
+@require_http_methods(["GET", 'POST'])
+@permission_required(['service_site.view_procurementorder'], raise_exception=True)
 def order_info(request, pk):
     order = get_object_or_404(models.ProcurementOrder, pk=pk)
     return render(request, 'service_site/part_procurement/_order_info_fields.html', {'order': order})
 
+@login_required
+@require_http_methods(["GET", "POST"])
+@permission_required(['service_site.change_procurementorder'], raise_exception=True)
 def edit_order_info(request, pk):
     order = get_object_or_404(models.ProcurementOrder, pk=pk)
     if request.method == 'POST':
+        # TODO: Refactor this to avoid using model forms
         form = forms.ProcurementOrderInfoForm(request.POST, instance=order)
         if form.is_valid():
             form.save()
@@ -140,136 +169,139 @@ def edit_order_info(request, pk):
         form = forms.ProcurementOrderInfoForm(instance=order)
     return render(request, 'service_site/part_procurement/_edit_order_info_form.html', {'form': form, 'order': order})
 
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_procurementorder', 'service_site.view_procurementunit', 'service_site.view_storageplacement'], raise_exception=True)
 def procurement_order_items(request, order_id):
     order = models.ProcurementOrder.objects.prefetch_related("units", "units__part", "units__part__part_type", "units__part__part_brand").get(pk=order_id)
     return render(request, 'service_site/part_procurement/_order_details.html', {
         'order': order
     })
+    
+class AddOrderUnitView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['service_site.view_procurementunit', 'service_site.add_procurementunit']
+    login_url = '/login/'
 
-def add_order_unit(request, order_id):
-
-    if request.method == "GET":
+    def get(self, request, order_id):
         parts = models.Part.objects.select_related('part_brand').all()
         part_brands = models.PartBrand.objects.all()
         part_types = models.PartType.objects.all()
+
         context = {
-            'parts' : parts,
-            'part_brands' : part_brands,
-            "part_types" : part_types,
-            'order_id' : order_id 
+            'parts': parts,
+            'part_brands': part_brands,
+            'part_types': part_types,
+            'order_id': order_id
         }
         return render(request, 'service_site/part_procurement/_add_order_unit.html', context)
-    elif request.method == 'POST':
-        #TODO: add validation
-        part_id = request.POST.get('part_id', None)
-        quantity = int(request.POST.get('quantity', 1))
-        price_per_unit = float(request.POST.get('price_per_unit', 1))
-        part = get_object_or_404(models.Part, pk=part_id)
-        order = models.ProcurementOrder.objects.get(pk=order_id)
-        order_unit = models.ProcurementUnit.objects.create(
-            procurement_order=order,
-            quantity=quantity,
-            price_per_unit=price_per_unit,
-            part=part
-        )
-        # messages.error(request, "Quantity must be greater than 0.")
+
+    def post(self, request, order_id):
+        try:
+            order_unit = part_procurement.add_order_unit(order_id, 
+                                                         request.POST.get('part_id'), 
+                                                         request.POST.get('quantity'), 
+                                                         request.POST.get('price_per_unit'))
+        except exceptions.InvalidProcurementUnitData as e:
+            messages.error(request, str(e))
+            return HttpResponse(status=400)
+        except  ObjectDoesNotExist as e:
+            messages.error(request, str(e))
+            return HttpResponse(status=400)
+        except (TypeError, ValueError) as e:
+            messages.error(request, str(e))
+            return HttpResponse(status=400)
+
         return render(request, 'service_site/part_procurement/_unit_row_with_placement.html', 
                       {'unit': order_unit, "placed_count": order_unit.get_placed_count})
     
+@login_required
+@require_http_methods(["DELETE"])
+@permission_required(['service_site.delete_procurementunit',
+                      'service_site.view_procurementunit'], raise_exception=True)
 def delete_procurement_unit(request, unit_id):
-    procurement_unit = get_object_or_404(models.ProcurementUnit, pk=unit_id)
+    unit = get_object_or_404(models.ProcurementUnit, pk=unit_id)
+
     try:
-        procurement_unit.delete()
+        part_procurement.delete_procurement_unit(unit)
+    except exceptions.UnitHasPlacementsError as e:
+        messages.error(request, str(e))
+        rendered = render_to_string('service_site/part_procurement/_unit_row.html', {
+            'unit': unit,
+            'placed_count': unit.get_placed_count()
+        }, request=request)
+        return HttpResponse(rendered, status=400)
+    else:
         messages.success(request, f"Одиницю закупівлі успішно видалено")
         return HttpResponse("", status=200)
-    except ProtectedError:
-        placed_count = procurement_unit.get_placed_count()
-        messages.error(request, f"Неможливо видалити, оскільки {placed_count} одиниці вже розміщені.")
-        return render(request, 'service_site/part_procurement/_unit_row.html', {'unit': procurement_unit, "placed_count": placed_count})
 
+@login_required
+@require_http_methods(["POST"])
+@permission_required(['service_site.change_procurementunit',
+                      'service_site.view_procurementunit'], raise_exception=True)
 def edit_unit(request, unit_id):
     unit = get_object_or_404(models.ProcurementUnit, pk=unit_id)
-    price = float(request.POST.get("price", unit.price_per_unit))
-    quantity = int(request.POST.get("quantity", unit.quantity))
-
-    # TODO: validate input
-    if quantity < 1:
-        messages.error(request, "Кількість одиниць має бути вищою за 0")
-    elif quantity < unit.get_placed_count():
-        messages.error(request, f"Вказана кількість одиниць ({quantity}) менша за кількість вже розміщених запчастин ({unit.get_placed_count()})")
+    try:
+        part_procurement.update_procurement_unit(unit, 
+                                                request.POST.get("quantity"),
+                                                request.POST.get("price"))
+    except exceptions.InvalidProcurementUnitData as e:
+        messages.error(request, str(e))
+        status = 400
+    except (ValueError, TypeError):
+        messages.error(request, "Невірні дані для ціни або кількості")
+        status = 400
     else:
-        unit.quantity = quantity
-    
-    if price <= 0:
-        messages.error(request, "Ціна за одиницю має бути вищою за 0")
-    else:
-        unit.price_per_unit = price
+        messages.success(request, "Одиницю успішно оновлено")
+        status = 200
 
-    unit.save()
-    return render(request, 'service_site/part_procurement/_unit_row.html', {'unit': unit, "placed_count": unit.get_placed_count})
+    return render(request, 'service_site/part_procurement/_unit_row.html', {
+        'unit': unit, 
+        "placed_count": unit.get_placed_count
+        }, status=status)
 
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_storageplacement'], raise_exception=True)
 def unit_placements(request, pk):
     unit = get_object_or_404(models.ProcurementUnit.objects.prefetch_related('placements__part_in_station__station'), pk=pk)
     return render(request, 'service_site/part_procurement/_unit_placements.html', {'unit': unit})
 
-def add_placement(request, unit_id):
-    unit = get_object_or_404(models.ProcurementUnit, procurement_unit_id=unit_id)
-    if request.method == "GET":
-        
+class AddPlacementView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['service_site.view_procurementunit', 'service_site.add_storageplacement']
+    login_url = '/login/'
+
+    def get(self, request, unit_id):
+        unit = get_object_or_404(models.ProcurementUnit, procurement_unit_id=unit_id)
         stations = models.Station.objects.all()
         context = {
             'unit': unit,
             'stations': stations
         }
         return render(request, 'service_site/part_procurement/_placement_form.html', context)
-    elif request.method == "POST":
-        station_id = request.POST.get('station_id')
-        quantity = int(request.POST.get('quantity', 0))
 
-        placed_count = unit.get_placed_count()
-        available_quantity = unit.quantity - placed_count
+    def post(self, request, unit_id):
+        unit = get_object_or_404(models.ProcurementUnit, procurement_unit_id=unit_id)
 
-        if quantity <= 0 or quantity > available_quantity:
-            messages.error(request,  f"Кількість для розміщення має бути в діапазоні від 1 до {available_quantity}")
-            unit.refresh_from_db()
-            placed_count = unit.get_placed_count()
+        try:
+            part_procurement.add_part_placement(unit, 
+                                                request.POST.get('station_id'),
+                                                request.POST.get('quantity'))
+        except exceptions.InvalidPlacementError as e:
+            messages.error(request, str(e))
+        except models.Station.DoesNotExist:
+            messages.error(request, "Станцію не знайдено.")
+        except (TypeError, ValueError):
+            messages.error(request, "Некоректна кількість для розміщення або станція.")
+            return HttpResponse(status=400)
+        else:
+            messages.success(request, "Розміщення успішно додано.")
 
-            # Render only this updated row
-            rendered_row = render_to_string("service_site/part_procurement/_unit_row.html", {
-                "unit": unit,
-                "placed_count": placed_count
-            }, request=request)
-
-            return HttpResponse(rendered_row)
-
-        station = get_object_or_404(models.Station, station_id=station_id)
-
-        part_in_station, created = models.PartInStation.objects.get_or_create(
-            station=station,
-            part=unit.part,
-            defaults={'quantity': 0}
-        )
-
-        part_in_station.quantity += quantity
-        part_in_station.save()
-
-        models.StoragePlacement.objects.create(
-            procurement_unit=unit,
-            part_in_station=part_in_station,
-            quantity=quantity,
-            placement_date=datetime.now()
-        )
-
-        # Refresh the unit instance and re-fetch placed_count
         unit.refresh_from_db()
         placed_count = unit.get_placed_count()
-
-        # Render only this updated row
         rendered_row = render_to_string("service_site/part_procurement/_unit_row.html", {
             "unit": unit,
             "placed_count": placed_count
         }, request=request)
-
         return HttpResponse(rendered_row)
     
 @login_required
@@ -301,6 +333,9 @@ def remove_placement(request, placement_id):
     response['HX-Trigger'] = 'placementRemoved'
     return response
 
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.change_procurementunit'], raise_exception=True)
 def update_row(request, unit_id):
     unit = get_object_or_404(models.ProcurementUnit, procurement_unit_id=unit_id)
     unit.refresh_from_db()
@@ -311,6 +346,9 @@ def update_row(request, unit_id):
         "placed_count": placed_count
     })
 
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_procurementorder'], raise_exception=True)
 def update_order_row(request, order_id):
     order = get_object_or_404(models.ProcurementOrder, pk=order_id)
 

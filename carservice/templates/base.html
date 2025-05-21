@@ -35,6 +35,7 @@
     </head>
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-ext="response-targets"
         >
         {% block content %}
         {% endblock %}
