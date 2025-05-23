@@ -16,3 +16,6 @@ class UnitHasPlacementsError(BusinessLogicError):
 
 class InvalidProcurementUnitData(BusinessLogicError):
     pass
+
+class InvalidVisitServiceData(BusinessLogicError):
+    pass

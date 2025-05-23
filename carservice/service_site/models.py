@@ -11,6 +11,7 @@ from django.utils import timezone
 import random
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q, Count, Max
 
 class CustomUser(AbstractUser):
     employee = models.OneToOneField('Employee', null=True, blank=True, on_delete=models.CASCADE, db_column='EmployeeID')
@@ -213,15 +214,23 @@ class PartInStation(models.Model):
     class Meta:
         db_table = 'PartInStation'
         unique_together = ('station', 'part')   
+
+    @classmethod
+    def new(cls, station, part, quantity):
+        return cls.objects.create(station=station,
+                                  part=part,
+                                  quantity=quantity)
     
     def __str__(self):
         return f"{self.part} at {self.station}"
     
     def add_parts(self, qty):
         self.quantity += qty
+        self.save()
 
     def remove_parts(self, qty):
         self.quantity -= qty
+        self.save()
 
 class EmployeePosition(models.Model):
     employee_position_id = models.AutoField(primary_key=True, db_column='EmployeePositionID')
@@ -326,7 +335,6 @@ class Visit(models.Model):
                 break
         return visit_number
         
-
 class VisitService(models.Model):
     visit_service_id = models.AutoField(primary_key=True, db_column='VisitServiceID')
     visit = models.ForeignKey(Visit, on_delete=models.PROTECT, db_column='VisitID', related_name='visit_services')
@@ -335,6 +343,10 @@ class VisitService(models.Model):
     
     class Meta:
         db_table = 'VisitService'
+
+    def set_quantity(self, quantity):
+        self.quantity = quantity
+        self.save()
     
     def __str__(self):
         return f"{self.service} for {self.visit}"
@@ -394,6 +406,18 @@ class Supplier(models.Model):
     
     def __str__(self):
         return self.supplier_name
+    
+    def set_supplier_name(self, name):
+        self.supplier_name = name
+        self.save()
+
+    def set_email(self, email):
+        self.email = email
+        self.save()
+
+    def set_phone_number(self, phone_number):
+        self.phone_number = phone_number
+        self.save()
 
 class ProcurementStatus(models.Model):
     procurement_status_id = models.AutoField(primary_key=True, db_column='ProcurementStatusID')
@@ -428,6 +452,10 @@ class ProcurementOrder(models.Model):
             if not ProcurementOrder.objects.filter(order_number=order_number).exists():
                 break
         return order_number
+    
+    @classmethod
+    def supplier_last_order_date(cls, supplier):
+        return cls.objects.filter(supplier=supplier).aggregate(Max('order_date'))['order_date__max']
 
 class ProcurementUnit(models.Model):
     procurement_unit_id = models.AutoField(primary_key=True, db_column='ProcurementUnitID')
@@ -437,10 +465,29 @@ class ProcurementUnit(models.Model):
     procurement_order = models.ForeignKey(ProcurementOrder, on_delete=models.PROTECT, db_column='ProcurementOrderID', related_name='units')
     
     class Meta:
-        db_table = 'ProcurementUnit'  
+        db_table = 'ProcurementUnit'
+
+    @classmethod
+    def new(cls, part, quantity, price_per_unit, procurement_order):
+        return cls.objects.create(part=part, 
+                                  quantity=quantity, 
+                                  price_per_unit=price_per_unit, 
+                                  procurement_order=procurement_order) 
+
+    @classmethod
+    def items_supplied_by_supplier(cls, supplier): 
+        return cls.objects.filter(procurement_order__supplier=supplier).count()
     
     def __str__(self):
         return f"{self.quantity} of {self.part}"
+    
+    def set_price_per_unit(self, price):
+        self.price_per_unit = price
+        self.save()
+    
+    def set_quantity(self, qty):
+        self.quantity = qty
+        self.save()
     
     def get_total_price(self):
         return self.quantity * self.price_per_unit
@@ -462,6 +509,13 @@ class StoragePlacement(models.Model):
     class Meta:
         db_table = 'StoragePlacement'   
     
+    @classmethod
+    def new(cls, procurement_unit, part_in_station, quantity, placement_date):
+        return cls.objects.create(procurement_unit=procurement_unit,
+                                  part_in_station=part_in_station,
+                                  quantity=quantity,
+                                  placement_date=placement_date)
+
     def __str__(self):
         return f"Placement of {self.quantity} {self.procurement_unit.part}"
 

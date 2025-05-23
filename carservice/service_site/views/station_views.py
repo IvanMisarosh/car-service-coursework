@@ -1,52 +1,20 @@
 from django.views import View
-from django.db.models import Q, Count, Avg
+from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from ..views_utils import render_htmx
 from .. import models
 from .. import forms
+from .. import views_utils 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseBadRequest, HttpResponse
-from crispy_forms.templatetags.crispy_forms_filters import as_crispy_field
-from django.utils import timezone
-from datetime import timedelta
+from django.http import HttpResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
-from django.db.models import ProtectedError, Max
-
-def calculate_station_stats(station):
-    """Helper function to calculate station statistics"""
-    one_month_ago = timezone.now() - timedelta(days=60)
-    
-    # Get unique customers who visited this station in the last month
-    unique_customers = models.Customer.objects.filter(
-        cars__visits__employee__station=station,
-        cars__visits__visit_date__gte=one_month_ago
-    ).distinct().count()
-    
-    # Get total services completed in the last month
-    completed_services = models.ProvidedService.objects.filter(
-        employee__station=station,
-        provided_date__gte=one_month_ago
-    ).count()
-    
-    # Calculate average visit price for this station in the last month
-    avg_visit_price = models.Visit.objects.filter(
-        employee__station=station,
-        visit_date__gte=one_month_ago,
-        price__isnull=False
-    ).aggregate(avg_price=Avg('price'))['avg_price'] or 0
-    
-    # Format the average price to two decimal places
-    avg_visit_price = round(float(avg_visit_price), 2)
-    
-    return {
-        "unique_customers": unique_customers,
-        "completed_services": completed_services,
-        "avg_visit_price": avg_visit_price
-    }
+from django.db.models import ProtectedError
 
 class StationsView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = []
+    permission_required = ['service_site.view_station']
     login_url = '/login/'
     
     def get(self, request, *args, **kwargs):
@@ -69,7 +37,7 @@ class StationsView(LoginRequiredMixin, PermissionRequiredMixin, View):
         # Add statistics to each station before pagination
         stations_with_stats = []
         for station in stations:
-            stats = calculate_station_stats(station)
+            stats = views_utils.calculate_station_stats(station)
             station.unique_customers = stats["unique_customers"]
             station.completed_services = stats["completed_services"]
             station.avg_visit_price = stats["avg_visit_price"]
@@ -83,7 +51,10 @@ class StationsView(LoginRequiredMixin, PermissionRequiredMixin, View):
         }
         
         return render_htmx(request, "service_site/station/stations.html", "service_site/station/_station_list.html", context)
-    
+
+@login_required
+@require_http_methods(["DELETE"])
+@permission_required(['service_site.delete_station'], raise_exception=True) 
 def delete_station(request, station_id):
     station = get_object_or_404(models.Station, pk=station_id)
     try:
@@ -94,7 +65,10 @@ def delete_station(request, station_id):
     except ProtectedError:
         messages.error(request, f"Неможливо видалити станцію '{station.address}', оскільки вона має працівників та\або запчастини на складі склад.")
         return view_station(request, station_id)
-    
+
+@login_required
+@require_http_methods(["GET", "POST"])
+@permission_required(['service_site.add_station'], raise_exception=True) 
 def add_station(request):
     if request.method == "GET":
         context = {
@@ -111,7 +85,10 @@ def add_station(request):
                 "form": form
             }
             return render(request, 'service_site/station/_station_add_form.html', context)
-    
+
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_station'], raise_exception=True) 
 def view_station(request, pk):
     station = get_object_or_404(models.Station, pk=pk)
     
@@ -120,7 +97,7 @@ def view_station(request, pk):
     parts_in_station = models.PartInStation.objects.filter(station=station).select_related('part', 'part__part_brand', 'part__part_type')
     
     active_tab = request.GET.get('tab', 'summary')
-    stats = calculate_station_stats(station)
+    stats = views_utils.calculate_station_stats(station)
     station.unique_customers = stats["unique_customers"]
     station.completed_services = stats["completed_services"]
     station.avg_visit_price = stats["avg_visit_price"]
@@ -134,6 +111,9 @@ def view_station(request, pk):
     }
     return render(request, "service_site/station/_station_card.html", context)
 
+@login_required
+@require_http_methods(["GET", "POST"])
+@permission_required(['service_site.view_station', 'service_site.change_station'], raise_exception=True) 
 def edit_station(request, pk):
     station = get_object_or_404(models.Station, pk=pk)
     if request.method == "POST":
@@ -145,6 +125,9 @@ def edit_station(request, pk):
         form = forms.StationForm(instance=station)
         return render(request, 'service_site/station/_station_form.html', {'form': form, 'station': station})
 
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_station'], raise_exception=True) 
 def station_employees(request, pk):
     station = get_object_or_404(models.Station, pk=pk)
     employees = models.Employee.objects.filter(station=station).select_related('employee_position')
@@ -156,6 +139,9 @@ def station_employees(request, pk):
     }
     return render(request, "service_site/station/_station_employees_tab.html", context)
 
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_station'], raise_exception=True) 
 def station_equipment(request, pk):
     station = get_object_or_404(models.Station, pk=pk)
     parts_in_station = models.PartInStation.objects.filter(station=station).select_related('part', 'part__part_brand', 'part__part_type')
@@ -167,11 +153,14 @@ def station_equipment(request, pk):
     }
     return render(request, "service_site/station/_station_equipment_tab.html", context)
 
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_station'], raise_exception=True) 
 def station_empty(request, pk):
     station = get_object_or_404(models.Station, pk=pk)
     
     # Calculate statistics for the station
-    stats = calculate_station_stats(station)
+    stats = views_utils.calculate_station_stats(station)
     station.unique_customers = stats["unique_customers"]
     station.completed_services = stats["completed_services"]
     station.avg_visit_price = stats["avg_visit_price"]

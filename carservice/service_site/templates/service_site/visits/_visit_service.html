@@ -86,7 +86,7 @@
             </button>
 
             <button class="btn btn-sm btn-outline-primary me-2" @click="editing = false" x-show="editing"
-                hx-post="{% url 'visit-service' v_service.pk %}"
+                hx-post="{% url 'visit-service-edit' v_service.pk %}"
                 hx-target="#visit-services"
                 hx-swap="outerHTML"
                 hx-include="#quantity-input-v_id-{{v_service.pk}}"
@@ -96,7 +96,7 @@
 
             {% csrf_token %}
             <button class="btn btn-sm btn-close btn-danger" 
-                    hx-delete="{% url 'visit-service' v_service.pk %}" 
+                    hx-delete="{% url 'visit-service-delete' v_service.pk %}" 
                     hx-target="#visit-services"
                     hx-swap="outerHTML"
                     hx-confirm="Ви дійсно хочете видалити цю послугу?"

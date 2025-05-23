@@ -5,15 +5,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from ..views_utils import render_htmx
 from .. import models
 from .. import forms
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseBadRequest, HttpResponse
-import json
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
 from crispy_forms.templatetags.crispy_forms_filters import as_crispy_field
 from django.contrib import messages
 from django.db.models import ProtectedError
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required, permission_required
 
 class CarModelsView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = []
+    permission_required = ['service_site.view_carmodel', 'service_site.delete_carmodel']
     login_url = '/login/'
 
     def get(self, request, *args, **kwargs):
@@ -69,7 +70,10 @@ class CarModelsView(LoginRequiredMixin, PermissionRequiredMixin, View):
             messages.error(request, f"Сталася невідома помилка при видаленні моделі.")
         finally:
             return self.get(request)
-    
+
+@login_required
+@require_http_methods(["GET", "POST"])
+@permission_required(['service_site.add_carmodel'], raise_exception=True)  
 def add_car_model(request):
     if request.method == "GET":
         context = {
@@ -85,16 +89,25 @@ def add_car_model(request):
             response['HX-Trigger'] = 'update-model-list'
 
             return response
-    
+
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_carmodel'], raise_exception=True) 
 def check_model_name(request):
     form = forms.CarModelForm(request.GET)
     return HttpResponse(as_crispy_field(form['model_name']))
-    
+
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_carmodel'], raise_exception=True)  
 def view_car_model(request, pk):
     car_model = get_object_or_404(models.CarModel, pk=pk)
     context = {"car_model": car_model}
     return render(request, "service_site/car_model/_car_model_card.html", context)
 
+@login_required
+@require_http_methods(["GET", "POST"])
+@permission_required(['service_site.change_carmodel'], raise_exception=True) 
 def edit_car_model(request, pk):
     car_model = get_object_or_404(models.CarModel, pk=pk)
     if request.method == "POST":

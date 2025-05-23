@@ -2,15 +2,17 @@ from django.core.paginator import Paginator
 from .. import models
 from django.views.generic import View 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from ..filters import VisitFilter
+from ...filters import VisitFilter
 from django.db.models import Q
-from ..views_utils import render_htmx
+from ...views_utils import render_htmx
 from django.contrib import messages
 from django.db.models import ProtectedError
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .. import models, resources, filters
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from datetime import datetime
 
 class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -74,6 +76,8 @@ class Visits(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 
 @login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_visit'], raise_exception=True)
 def export_visits(request):
     """
     Export visit data with customer, car, employee, and station details.

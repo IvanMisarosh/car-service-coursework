@@ -1,23 +1,24 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.core.paginator import Paginator
 from .. import models
-from django.contrib.auth.decorators import login_required, permission_required
 from .. import filters
-from django.db.models import Q
 from ..views_utils import render_htmx
 from .. import resources
+from .. import forms
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Q
 from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from .. import forms
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import View
-from django.template.loader import render_to_string
-import json
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 
 @login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_customer'], raise_exception=True) 
 def export_customers(request):
     """
     Export customer data with their cars to various formats.
@@ -65,6 +66,7 @@ def export_customers(request):
     return response
 
 @login_required
+@require_http_methods(["GET"])
 @permission_required('service_site.view_customer', raise_exception=True)
 def customer_details(request):
     customer_id = request.GET.get("customer_id", None)
@@ -80,6 +82,7 @@ def customer_details(request):
 
 
 @login_required
+@require_http_methods(["GET"])
 @permission_required('service_site.view_customer', raise_exception=True)
 def customer_list(request):
     page_number = request.GET.get("page", 1)
@@ -111,42 +114,8 @@ def customer_list(request):
     return render_htmx(request, "service_site/customers/customers.html", "service_site/customers/_customers_list.html", context)
 
 @login_required
-@permission_required('service_site.view_customer', raise_exception=True)
-def customer_search(request):
-    search = request.GET.get("search", '')
-    search_terms = search.split()
-    search_query = Q()
-
-    for term in search_terms:
-        search_query |= Q(first_name__icontains=term) | \
-                Q(last_name__icontains=term) | \
-                Q(email__icontains=term) | \
-                Q(phone_number__icontains=term)
-
-    customers = models.Customer.objects.prefetch_related('cars').filter(search_query).distinct()
-    return render(request, "service_site/visits/_customer_search_result.html", 
-                  {"customers": customers})
-
-@login_required
-@permission_required('service_site.view_customer', raise_exception=True)
-def select_visit_customer(request):
-    customer_id = request.GET.get("customer_id", None)
-    customer = models.Customer.objects.prefetch_related(
-        'cars__car_model', 'cars__car_model__car_brand', 'cars__car_model__suspension_type', 'cars__car_model__engine_type',
-        'cars__car_model__transmission_type', 'cars__car_model__drive_type', 'cars__car_model__body_type'
-    ).get(pk=customer_id)
-
-    context = {
-        'visit_customer': customer,
-    }
-
-    return render(request, "service_site/visits/_visit_customer_details.html", context)
-
-
-def get_customer_search(request):
-    return render(request, "service_site/visits/_customer_search.html")
-
-
+@require_http_methods(["GET", "POST"])
+@permission_required(['service_site.change_customer'], raise_exception=True) 
 def get_customer_edit_row(request, pk):
     """
     Handle GET request to display the customer edit form
@@ -186,6 +155,9 @@ def get_customer_edit_row(request, pk):
         }
         return render_htmx(request, None, "service_site/customers/_customer_list_row.html", context)
 
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_customer'], raise_exception=True) 
 def get_customer_row(request, pk):
     """
     Return the normal display row for a customer (used for canceling edits)
@@ -202,6 +174,9 @@ def get_customer_row(request, pk):
     }
     return render_htmx(request, None, "service_site/customers/_customer_list_row.html", context)
 
+@login_required
+@require_http_methods(["DELETE"])
+@permission_required(['service_site.delete_customer'], raise_exception=True) 
 def delete_customer(request, customer_id):
     customer = get_object_or_404(models.Customer, pk=customer_id)
     try:
@@ -235,6 +210,9 @@ class CustomerAddView(LoginRequiredMixin, PermissionRequiredMixin, View):
             return render_htmx(request, None, "service_site/customers/_customer_list_row.html", {"customer": customer})
         return render_htmx(request, None, "service_site/customers/_add_customer_form.html", {"form": form})
 
+@login_required
+@require_http_methods(["DELETE"])
+@permission_required(['service_site.delete_car'], raise_exception=True) 
 def delete_car(request, car_id):
     car = get_object_or_404(models.Car, pk=car_id)
     try:
@@ -303,7 +281,10 @@ class CarAddView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "customer": models.Customer.objects.get(pk=customer_id) if customer_id else None
         }
         return render_htmx(request, None, "service_site/customers/_add_car_form.html", context)
-    
+
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_customer'], raise_exception=True) 
 def selected_customer_car_list_row(request, car_id):
     car = get_object_or_404(models.Car.objects.select_related(
         'customer', 'car_model__car_brand', 'car_model__body_type',
@@ -314,6 +295,9 @@ def selected_customer_car_list_row(request, car_id):
     
     return render(request, "service_site/customers/_selected_customer_car_list_row.html", {"car": car})
 
+@login_required
+@require_http_methods(["GET"])
+@permission_required(['service_site.view_customer'], raise_exception=True) 
 def selected_customer_car_list(request, customer_id):
     cars = models.Car.objects.select_related(
         'customer', 'car_model__car_brand', 'car_model__body_type',

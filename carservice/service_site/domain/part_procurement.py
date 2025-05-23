@@ -23,7 +23,7 @@ def add_order_unit(order_id, part_id, quantity, price_per_unit):
     part = models.Part.objects.get(pk=part_id)
     order = models.ProcurementOrder.objects.get(pk=order_id)
 
-    return models.ProcurementUnit.objects.create(
+    return models.ProcurementUnit.new(
         procurement_order=order,
         quantity=quantity,
         price_per_unit=price_per_unit,
@@ -49,9 +49,8 @@ def update_procurement_unit(unit, quantity, price):
     if price <= 0:
         raise exceptions.InvalidProcurementUnitData("Ціна за одиницю має бути вищою за 0")
 
-    unit.quantity = quantity
-    unit.price_per_unit = price
-    unit.save()
+    unit.set_quantity(quantity)
+    unit.set_price_per_unit(price)
 
 def remove_part_placement(placement_id):
     placement = models.StoragePlacement.objects.select_related('part_in_station', 'procurement_unit').prefetch_related(
@@ -87,17 +86,23 @@ def add_part_placement(unit, station_id, quantity):
     station = models.Station.objects.get(station_id=station_id)
 
     with transaction.atomic():
-        part_in_station, _ = models.PartInStation.objects.get_or_create(
-            station=station,
-            part=unit.part,
-            defaults={'quantity': 0}
-        )
-        part_in_station.quantity += quantity
-        part_in_station.save()
+        try:
+            part_in_station = models.PartInStation.objects.get(
+                station=station,
+                part=unit.part,
+            )
+        except models.PartInStation.DoesNotExist:
+            part_in_station = models.PartInStation.new(
+                station=station,
+                part=unit.part,
+                quantity=quantity
+            )
 
-        models.StoragePlacement.objects.create(
+        placement = models.StoragePlacement.new(
             procurement_unit=unit,
             part_in_station=part_in_station,
             quantity=quantity,
             placement_date=datetime.now()
         )
+
+    return placement
